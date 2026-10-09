@@ -41,10 +41,16 @@ function webPlay(id: Sfx, volume: number) {
   void node.play().catch(() => {})
 }
 
+/** Suspended while the mic is recording: playing a sound resets the iOS audio session and cuts dictation. */
+let suspended = false
+export function suspendSounds(v: boolean) {
+  suspended = v
+}
+
 export const sfx = {
   preload,
   play(id: Sfx, volume = 1) {
-    if (!enabled)
+    if (!enabled || suspended)
       return
     if (!native)
       return webPlay(id, volume)

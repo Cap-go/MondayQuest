@@ -2,18 +2,18 @@
 import type { PluginListenerHandle } from '@capacitor/core'
 import type { TrackerProps } from './useDay'
 import { Capacitor } from '@capacitor/core'
+import { toast } from '@capgo/capacitor-pretty-toast'
 import { SpeechRecognition } from '@capgo/capacitor-speech-recognition'
 import { onBeforeUnmount, ref } from 'vue'
 import { useL } from '~/composables/useL'
 import { haptic } from '~/services/haptics'
-import { sfx } from '~/services/sound'
+import { sfx, suspendSounds } from '~/services/sound'
 import { useDay } from './useDay'
 
 const props = defineProps<TrackerProps>()
 const L = useL()
 const { data, done, patch, markDone, unmark } = useDay(props, { items: ['', '', ''] as string[] })
 const listening = ref<number | null>(null)
-let partial: PluginListenerHandle | undefined
 
 function set(i: number, v: string) {
   const items = [...data.value.items]
@@ -31,28 +31,61 @@ function set(i: number, v: string) {
     unmark()
 }
 
+const handles: PluginListenerHandle[] = []
+
 async function dictate(i: number) {
-  if (!Capacitor.isNativePlatform() || !props.editable)
+  if (!props.editable)
     return
+  if (!Capacitor.isNativePlatform()) {
+    toast.info(L('Dictée disponible dans l\'app', 'Dictation works in the app'))
+    return
+  }
   if (listening.value != null)
     return stopDictation()
-  const perm = await SpeechRecognition.requestPermissions().catch(() => null)
-  if (perm?.speechRecognition !== 'granted')
+  const { available } = await SpeechRecognition.available().catch(() => ({ available: false }))
+  if (!available) {
+    toast.error(L('Dictée indisponible sur cet appareil', 'Dictation is not available on this device'))
     return
+  }
+  const perm = await SpeechRecognition.requestPermissions().catch(() => null)
+  if (perm?.speechRecognition !== 'granted') {
+    toast.error(L('Autorisez le micro et la dictée dans Réglages > Monday Quest', 'Allow Microphone and Speech Recognition in Settings > Monday Quest'))
+    return
+  }
   listening.value = i
   haptic.press()
-  partial = await SpeechRecognition.addListener('partialResults', (e) => {
-    const t = e.accumulatedText ?? e.matches?.[0]
+  suspendSounds(true)
+  const base = data.value.items[i] ? `${data.value.items[i]} ` : ''
+  handles.push(await SpeechRecognition.addListener('partialResults', (e) => {
+    const t = e.accumulatedText ?? e.accumulated ?? e.matches?.[0]
     if (t)
-      set(i, t)
-  })
-  await SpeechRecognition.start({ language: L.tag(), partialResults: true, addPunctuation: true, popup: false, maxResults: 1 }).catch(stopDictation)
+      set(i, base + t)
+  }))
+  handles.push(await SpeechRecognition.addListener('listeningState', (e) => {
+    if (e.state === 'stopped' && listening.value === i)
+      void stopDictation()
+  }))
+  handles.push(await SpeechRecognition.addListener('error', (e) => {
+    toast.error(L('Dictée interrompue', 'Dictation stopped'), { message: e.message })
+    void stopDictation()
+  }))
+  try {
+    const res = await SpeechRecognition.start({ language: L.tag(), partialResults: true, addPunctuation: true, popup: false, maxResults: 1 })
+    const final = res?.matches?.[0]
+    if (final)
+      set(i, base + final)
+  }
+  catch (e) {
+    toast.error(L('Impossible de lancer la dictée', 'Could not start dictation'), { message: String((e as Error)?.message ?? e) })
+    await stopDictation()
+  }
 }
 
 async function stopDictation() {
   listening.value = null
+  suspendSounds(false)
   await SpeechRecognition.stop().catch(() => {})
-  await partial?.remove()
+  await Promise.all(handles.splice(0).map(h => h.remove()))
 }
 
 onBeforeUnmount(() => {
