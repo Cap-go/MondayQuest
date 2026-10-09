@@ -25,6 +25,8 @@ if [ -d ios/App ]; then
   plist_set "$INFO" CapgoWidgetKitAppGroup string group.ee.forgr.mondayquest.widgetkit
   plist_set "$INFO" UIRequiresFullScreen bool true
   plist_set "$INFO" ITSAppUsesNonExemptEncryption bool false
+  # Paper-and-ink design only: keep native chrome (tab bar, sheets) light in dark mode too.
+  plist_set "$INFO" UIUserInterfaceStyle string Light
   "$PB" -c "Delete :UIRequiredDeviceCapabilities" "$INFO" >/dev/null 2>&1 || true
   "$PB" -c "Add :UIRequiredDeviceCapabilities array" "$INFO"
   "$PB" -c "Add :UIRequiredDeviceCapabilities:0 string arm64" "$INFO"
@@ -53,6 +55,8 @@ if [ -d ios/App ]; then
 fi
 
 if [ -d android/app ]; then
+  # Paper-and-ink design only: no DayNight theme so native chrome stays light.
+  sed -i '' 's/Theme.AppCompat.DayNight.NoActionBar/Theme.AppCompat.Light.NoActionBar/' android/app/src/main/res/values/styles.xml
   # Health Connect (capacitor-health) requires API 26+
   sed -i '' 's/minSdkVersion = 2[0-5]/minSdkVersion = 26/' android/variables.gradle
   MANIFEST=android/app/src/main/AndroidManifest.xml

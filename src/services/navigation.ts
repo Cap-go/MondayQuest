@@ -78,5 +78,7 @@ export async function renderTabbar(hidden = false, animated = false) {
       selectedIcon: { svg: TAB_ICONS[id].svg, template: true, ios: { sfSymbol: TAB_ICONS[id].sfOn } },
     })),
     colors: { tint: '#141414', inactiveTint: '#8c8a85', background: '#f6f4ef' },
+    // iOS 26 Liquid Glass otherwise re-tints the selected item and it can vanish on the glass.
+    experimentalBakedTintColors: true,
   }).catch(() => {})
 }
