@@ -272,3 +272,15 @@ cap-sheet-handle:focus-visible {
     transition-duration: 1ms !important;
   }
 }
+
+/* The camera preview renders behind the WebView: everything but the camera overlay must go. */
+html.camera-on,
+html.camera-on body {
+  background: transparent !important;
+}
+
+/* opacity, not visibility: page transitions set visibility: visible on their pages. */
+html.camera-on body > :not(.cam-ui) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

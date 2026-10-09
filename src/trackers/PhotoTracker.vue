@@ -120,7 +120,7 @@ onBeforeUnmount(() => {
           {{ L('Demandez à quelqu\'un de vous photographier', 'Ask someone to take your picture') }}
         </p>
         <div class="cam-bar">
-          <button class="t-label text-paper" @click="close">
+          <button class="t-label cam-cancel" @click="close">
             {{ L('Annuler', 'Cancel') }}
           </button>
           <button class="shutter" aria-label="shutter" @click="shoot" />
@@ -176,18 +176,6 @@ onBeforeUnmount(() => {
 </style>
 
 <style>
-html.camera-on,
-html.camera-on body,
-html.camera-on #app,
-html.camera-on .app-root,
-html.camera-on cap-page {
-  background: transparent !important;
-}
-
-html.camera-on .app-root {
-  visibility: hidden;
-}
-
 .cam-ui {
   position: fixed;
   inset: 0;
@@ -208,6 +196,12 @@ html.camera-on .app-root {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.cam-cancel {
+  width: 56px;
+  color: #fff;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.6);
 }
 
 .shutter {
