@@ -72,7 +72,7 @@ function open(id: string) {
         {{ $t('journal.stats') }}
       </p>
       <div class="grid grid-cols-10 gap-1.5">
-        <button v-for="c in CHALLENGES" :key="c.id" class="cell" :class="{ on: quest.completedIds.has(c.id), live: quest.runFor(c.id) }" :aria-label="c.text[quest.locale].title" @click="open(c.id)">
+        <button v-for="c in CHALLENGES" :key="c.id" class="cell" :class="{ on: quest.completedIds.has(c.id), joker: quest.skippedIds.has(c.id), live: quest.runFor(c.id) }" :aria-label="c.text[quest.locale].title" @click="open(c.id)">
           <span class="t-label text-[0.55rem]">{{ c.n }}</span>
         </button>
       </div>
@@ -135,6 +135,10 @@ function open(id: string) {
 .cell.on {
   background: var(--color-ink);
   color: var(--color-paper);
+}
+
+.cell.joker {
+  background: repeating-linear-gradient(45deg, var(--color-ink) 0 2px, transparent 2px 6px);
 }
 
 .cell.live {

@@ -71,7 +71,8 @@ function stampDone() {
 }
 
 function onCelebrated() {
-  quest.complete(props.run)
+  if (quest.complete(props.run))
+    toast.success(L('Joker gagné !', 'Joker earned!'), { message: L('Refaire un challenge rapporte un joker pour en passer un autre.', 'Doing a challenge again earns a joker to skip another one.') })
 }
 
 function dayLabel(i: number) {

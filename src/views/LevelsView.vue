@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Challenge } from '~/data/challenges'
 import { setDirection } from '@capgo/capacitor-transitions/vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import JokerSheet from '~/components/JokerSheet.vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import { useL } from '~/composables/useL'
@@ -13,6 +14,7 @@ import { useQuest } from '~/stores/quest'
 const quest = useQuest()
 const router = useRouter()
 const L = useL()
+const jokerSheet = ref<InstanceType<typeof JokerSheet> | null>(null)
 
 const levels = computed(() => LEVELS.map(l => ({ ...l, items: challengesOfLevel(l.n), done: quest.levelDone(l.n) })))
 
@@ -27,6 +29,8 @@ function state(c: Challenge) {
     return 'done'
   if (quest.runFor(c.id))
     return 'live'
+  if (quest.skippedIds.has(c.id))
+    return 'joker'
   if (quest.isLocked(c))
     return 'locked'
   return 'todo'
@@ -44,6 +48,10 @@ function newCustom() {
     <h1 class="t-display text-[2.6rem]">
       {{ $t('tabs.levels') }}
     </h1>
+    <button class="joker-chip mt-3" @click="jokerSheet?.present()">
+      <QuestIcon name="joker" :size="18" :stroke="3" /> {{ quest.jokerBalance }} joker{{ quest.jokerBalance === 1 ? '' : 's' }}
+    </button>
+    <JokerSheet ref="jokerSheet" />
     <p class="t-body text-graphite mt-1">
       {{ L('52 challenges, un par semaine pendant un an. Terminez un niveau pour débloquer le suivant.', '52 challenges, one a week for a year. Finish a level to unlock the next.') }}
     </p>
@@ -75,7 +83,8 @@ function newCustom() {
               {{ c.text[quest.locale].short }}
             </p>
           </div>
-          <QuestIcon v-if="state(c) === 'locked'" name="lock" :size="22" :stroke="3" class="shrink-0 text-pencil mr-1" />
+          <QuestIcon v-if="state(c) === 'joker'" name="joker" :size="26" :stroke="3" class="shrink-0 mr-0.5" />
+          <QuestIcon v-else-if="state(c) === 'locked'" name="lock" :size="22" :stroke="3" class="shrink-0 text-pencil mr-1" />
           <span v-else class="box" :class="state(c)">
             <svg v-if="state(c) === 'done'" viewBox="0 0 100 100" class="overflow-visible"><path d="M20 50 C27 55 33 63 40 77 C53 52 72 25 104 2" fill="none" stroke="var(--color-ink)" stroke-width="11" stroke-linecap="round" /></svg>
             <span v-else-if="state(c) === 'live'" class="live-dot" />
@@ -114,6 +123,18 @@ function newCustom() {
 </template>
 
 <style scoped>
+.joker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 2px solid var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
 .level-locked {
   background: transparent;
   box-shadow: inset 0 0 0 2px var(--color-rule);

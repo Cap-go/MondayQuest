@@ -67,7 +67,7 @@ export type TrackerKind
 export type IconName
   = | 'foot' | 'sunrise' | 'apple' | 'pill' | 'broom' | 'cutlery' | 'dot' | 'nodes' | 'stretch' | 'minus'
     | 'stones' | 'shower' | 'ok' | 'frame' | 'heart' | 'drop' | 'book' | 'pencil' | 'plane' | 'band'
-    | 'stairs' | 'arms' | 'bubble' | 'cube' | 'compass' | 'moon' | 'lines' | 'flame' | 'envelope' | 'clock' | 'star' | 'lock'
+    | 'stairs' | 'arms' | 'bubble' | 'cube' | 'compass' | 'moon' | 'lines' | 'flame' | 'envelope' | 'clock' | 'star' | 'lock' | 'joker'
     | 'plank' | 'phone' | 'pot' | 'cards' | 'chair' | 'box' | 'coin' | 'dial' | 'seed' | 'leaf' | 'calendar' | 'nosign' | 'note' | 'wave' | 'bed' | 'still' | 'ribbon' | 'balls' | 'sunset' | 'tomato' | 'loop' | 'share'
 
 export interface ChallengeText {

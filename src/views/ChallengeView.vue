@@ -2,6 +2,7 @@
 import { setDirection } from '@capgo/capacitor-transitions/vue'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import JokerSheet from '~/components/JokerSheet.vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import TrackerShell from '~/components/TrackerShell.vue'
@@ -31,6 +32,8 @@ const pager = ref<HTMLElement | null>(null)
 const page = ref(route.params.page === 'track' ? 1 : 0)
 const scrollP = ref(page.value)
 const sheet = ref<any>(null)
+const jokerSheet = ref<InstanceType<typeof JokerSheet> | null>(null)
+const skipped = computed(() => quest.skippedIds.has(id.value))
 
 onMounted(async () => {
   await nextTick()
@@ -156,6 +159,12 @@ function capitalize(s: string) {
               <p v-if="completed" class="t-label text-center mt-3">
                 ✓ {{ $t('detail.completedOn', { date: formatDate(new Date(completed).toISOString().slice(0, 10), L.tag(), { day: 'numeric', month: 'long' }) }) }}
               </p>
+              <p v-if="skipped && !run && !completed" class="t-label text-center mt-3 flex items-center justify-center gap-1">
+                <QuestIcon name="joker" :size="16" :stroke="3" /> {{ L('Passé avec un joker', 'Skipped with a joker') }}
+              </p>
+              <button v-else-if="!run && !completed && !locked && c.source !== 'custom'" class="t-label text-graphite underline w-full text-center mt-4" @click="jokerSheet?.present()">
+                {{ L('Pas pour moi : utiliser un joker', 'Not for me: use a joker') }} ({{ quest.jokerBalance }})
+              </button>
               <p v-if="locked" class="t-body text-xs text-pencil text-center mt-3">
                 {{ $t('detail.locked') }}
               </p>
@@ -190,6 +199,8 @@ function capitalize(s: string) {
           </div>
         </section>
       </div>
+
+      <JokerSheet ref="jokerSheet" :challenge="c" @used="back" />
 
       <!-- start sheet (@capgo/capacitor-sheets) -->
       <cap-sheet ref="sheet" detents="26em" content-placement="bottom" swipe-dismissal="true">

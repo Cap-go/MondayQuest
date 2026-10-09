@@ -30,11 +30,24 @@ export interface Settings {
   unlockAll: boolean
 }
 
+export interface Jokers {
+  /** +1 each: shared the app with a friend (capped), finished a challenge for the second time. */
+  earned: { kind: 'share' | 'repeat', at: number, ref?: string }[]
+  /** A joker clears a challenge you don't want to do: it counts for unlocking the next level. */
+  used: { challengeId: string, at: number }[]
+}
+
+/** Every notebook starts with two jokers. */
+export const STARTING_JOKERS = 2
+/** Sharing can't be farmed: at most this many jokers come from shares. */
+export const MAX_SHARE_JOKERS = 3
+
 interface Persisted {
   version: 1
   runs: Run[]
   custom: Challenge[]
   settings: Settings
+  jokers?: Jokers
 }
 
 const KEY = 'mq.state.v1'
@@ -77,6 +90,13 @@ export const useQuest = defineStore('quest', () => {
 
   const completedIds = computed(() => new Set(runs.value.filter(r => r.completedAt).map(r => r.challengeId)))
 
+  const jokers = ref<Jokers>({ earned: [], used: [] })
+  const jokerBalance = computed(() => STARTING_JOKERS + jokers.value.earned.length - jokers.value.used.length)
+  const skippedIds = computed(() => new Set(jokers.value.used.map(u => u.challengeId)))
+  const shareJokersLeft = computed(() => MAX_SHARE_JOKERS - jokers.value.earned.filter(e => e.kind === 'share').length)
+  /** Done or skipped with a joker: what level unlocking looks at. */
+  const clearedIds = computed(() => new Set([...completedIds.value, ...skippedIds.value]))
+
   const currentStreak = computed(() => streak(runs.value, today.value))
 
   const totalChecks = computed(() => runs.value.reduce((n, r) => n + r.days.filter(d => d.done).length, 0))
@@ -85,7 +105,7 @@ export const useQuest = defineStore('quest', () => {
   const currentLevel = computed(() => {
     for (const l of LEVELS) {
       const ids = CHALLENGES.filter(c => c.level === l.n).map(c => c.id)
-      if (ids.some(id => !completedIds.value.has(id)))
+      if (ids.some(id => !clearedIds.value.has(id)))
         return l.n
     }
     return LEVELS.length
@@ -93,7 +113,7 @@ export const useQuest = defineStore('quest', () => {
 
   /** Book rule: a level opens once the previous one is finished. Future challenges stay readable. */
   function isLocked(c: Challenge): boolean {
-    return !settings.value.unlockAll && c.level <= LEVELS.length && c.level > currentLevel.value && !completedIds.value.has(c.id) && !runFor(c.id)
+    return !settings.value.unlockAll && c.level <= LEVELS.length && c.level > currentLevel.value && !clearedIds.value.has(c.id) && !runFor(c.id)
   }
 
   function challenge(id: string): Challenge | undefined {
@@ -109,7 +129,7 @@ export const useQuest = defineStore('quest', () => {
   }
 
   function levelDone(level: number): number {
-    return CHALLENGES.filter(c => c.level === level && completedIds.value.has(c.id)).length
+    return CHALLENGES.filter(c => c.level === level && clearedIds.value.has(c.id)).length
   }
 
   function start(challengeId: string, startDate: ISODate): Run {
@@ -140,8 +160,33 @@ export const useQuest = defineStore('quest', () => {
   }
 
   function complete(run: Run) {
-    if (allChecked(run))
-      replace(completeRun(run))
+    if (!allChecked(run))
+      return
+    // Doing a challenge again earns a joker to skip one you don't like.
+    const repeat = completedIds.value.has(run.challengeId) && !jokers.value.earned.some(e => e.ref === run.id)
+    replace(completeRun(run))
+    if (repeat)
+      jokers.value.earned.push({ kind: 'repeat', at: Date.now(), ref: run.id })
+    return repeat
+  }
+
+  function canUseJoker(c: Challenge): boolean {
+    return c.source !== 'custom' && jokerBalance.value > 0 && !clearedIds.value.has(c.id) && !runFor(c.id) && !isLocked(c)
+  }
+
+  function useJoker(c: Challenge): boolean {
+    if (!canUseJoker(c))
+      return false
+    jokers.value.used.push({ challengeId: c.id, at: Date.now() })
+    return true
+  }
+
+  /** Returns false once the share cap is reached. */
+  function earnShareJoker(): boolean {
+    if (shareJokersLeft.value <= 0)
+      return false
+    jokers.value.earned.push({ kind: 'share', at: Date.now() })
+    return true
   }
 
   function abandon(run: Run) {
@@ -163,6 +208,7 @@ export const useQuest = defineStore('quest', () => {
   function resetAll() {
     runs.value = []
     custom.value = []
+    jokers.value = { earned: [], used: [] }
     settings.value = { ...DEFAULT_SETTINGS, onboarded: true }
   }
 
@@ -172,17 +218,18 @@ export const useQuest = defineStore('quest', () => {
     // Custom challenges used to sit on level 7, which is now a real level.
     custom.value = data.custom.map(c => ({ ...c, level: CUSTOM_LEVEL }))
     settings.value = { ...DEFAULT_SETTINGS, ...data.settings }
+    jokers.value = { earned: [], used: [], ...data.jokers }
     ready.value = true
     setInterval(tick, 60_000)
   }
 
   let saveTimer: ReturnType<typeof setTimeout> | undefined
-  watch([runs, custom, settings], () => {
+  watch([runs, custom, settings, jokers], () => {
     if (!ready.value)
       return
     clearTimeout(saveTimer)
     saveTimer = setTimeout(() => {
-      void saveJSON(KEY, { version: 1, runs: runs.value, custom: custom.value, settings: settings.value } satisfies Persisted)
+      void saveJSON(KEY, { version: 1, runs: runs.value, custom: custom.value, settings: settings.value, jokers: jokers.value } satisfies Persisted)
     }, 250)
   }, { deep: true })
 
@@ -201,6 +248,14 @@ export const useQuest = defineStore('quest', () => {
     liveRuns,
     activeRuns,
     completedIds,
+    clearedIds,
+    skippedIds,
+    jokers,
+    jokerBalance,
+    shareJokersLeft,
+    canUseJoker,
+    useJoker,
+    earnShareJoker,
     currentStreak,
     totalChecks,
     currentLevel,

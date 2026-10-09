@@ -26,7 +26,7 @@ const cards = computed(() => quest.liveRuns
   .map(run => ({ run, c: quest.challenge(run.challengeId)!, status: runStatus(run, quest.today), idx: quest.todayIndex(run) }))
   .filter(x => x.c))
 
-const next = computed<Challenge | undefined>(() => CHALLENGES.find(c => !quest.completedIds.has(c.id) && !quest.runFor(c.id)))
+const next = computed<Challenge | undefined>(() => CHALLENGES.find(c => !quest.clearedIds.has(c.id) && !quest.runFor(c.id)))
 
 function open(c: Challenge, page: 'read' | 'track' = 'track') {
   haptic.tap()
