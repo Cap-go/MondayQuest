@@ -1,9 +1,9 @@
 {
   "name": "monday-quest",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
-  "description": "Monday Quest — 30 weekly challenges to become a more resilient version of yourself.",
+  "description": "Monday Quest \u2014 30 weekly challenges to become a more resilient version of yourself.",
   "author": "Martin Donadieu <martin@capgo.app>",
   "license": "UNLICENSED",
   "scripts": {
@@ -19,7 +19,8 @@
     "ios": "bun run cap:sync && cap open ios",
     "android": "bun run cap:sync && cap open android",
     "native:setup": "bash scripts/native-setup.sh",
-    "assets": "bunx @capacitor/assets generate --iconBackgroundColor '#141414' --splashBackgroundColor '#f6f4ef'"
+    "assets": "bunx @capacitor/assets generate --iconBackgroundColor '#141414' --splashBackgroundColor '#f6f4ef'",
+    "ota": "bun run build && bunx @capgo/cli@latest bundle upload ee.forgr.mondayquest --path dist --channel production --delta --ignore-metadata-check --version-exists-ok"
   },
   "dependencies": {
     "@capacitor/android": "^8",

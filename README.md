@@ -65,6 +65,8 @@ After `cap add` (or when changing permissions), run `bun run native:setup`. It a
 
 1. Lint, test, build.
 2. `capgo bundle releaseType` decides: JS-only change → **live update** (`bundle upload --delta` to the channel); native change → **Capgo Cloud Build** for iOS and Android.
+
+Live updates are **delta only**: the `production` channel serves delta packages (`channel set --update-package delta`), so phones download just the files that changed. Manual release: `bun run ota` (bumps nothing: set `version` in `package.json` first).
 3. Run it manually from the Actions tab to force OTA or native, choose the platform, channel and build mode.
 
 One-time setup:
