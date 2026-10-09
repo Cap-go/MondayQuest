@@ -710,21 +710,21 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'Le nez au sol',
-        short: 'Faites cinquante pompes chaque jour pendant une semaine.',
+        short: 'Des pompes chaque jour : 10 le lundi, 5 de plus chaque jour, 40 le dimanche.',
         body: [
           'Les pompes sollicitent les pectoraux, les épaules, les bras et la sangle abdominale. Un seul exercice, aucun matériel, des résultats visibles en quelques jours.',
           'Posez votre téléphone au sol, sous votre visage : touchez l\'écran du bout du nez à chaque descente pour compter.',
         ],
-        tip: 'Pas besoin de tout faire d\'un coup : cinq séries de dix tout au long de la journée comptent aussi.',
+        tip: 'Pas besoin de tout faire d\'un coup : des petites séries tout au long de la journée comptent aussi. Genoux au sol si besoin, ce sont toujours des pompes.',
       },
       en: {
         title: 'Nose to the floor',
-        short: 'Do fifty push-ups every day for a week.',
+        short: 'Push-ups every day: 10 on Monday, 5 more each day, 40 by Sunday.',
         body: [
           'Push-ups work your chest, shoulders, arms and core. One exercise, no equipment, visible results within days.',
           'Put your phone on the floor under your face: tap the screen with your nose on every rep to count.',
         ],
-        tip: 'No need to do them all at once: five sets of ten across the day count too.',
+        tip: 'No need to do them all at once: small sets across the day count too. Knees on the floor if needed, they are still push-ups.',
       },
     },
   },

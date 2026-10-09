@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TrackerProps } from './useDay'
 import { KeepAwake } from '@capgo/capacitor-keep-awake'
-import { onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { useL } from '~/composables/useL'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
@@ -10,7 +10,8 @@ import { useDay } from './useDay'
 const props = defineProps<TrackerProps>()
 const L = useL()
 const { data, done, patch, markDone } = useDay(props, { count: 0 })
-const GOAL = 50
+// Progressive week: 10, 15, 20 … 40 push-ups.
+const GOAL = computed(() => 10 + props.idx * 5)
 const floor = ref(false)
 const pulse = ref(0)
 let lastTap = 0
@@ -43,7 +44,7 @@ function rep() {
     haptic.thud()
     sfx.play('tick')
   }
-  if (count >= GOAL && !done.value) {
+  if (count >= GOAL.value && !done.value) {
     markDone({ count })
     setTimeout(exitFloor, 1200)
   }
@@ -61,7 +62,7 @@ onBeforeUnmount(() => void KeepAwake.allowSleep().catch(() => {}))
       <span v-for="i in GOAL" :key="i" class="aspect-square border border-ink" :class="i <= data.count ? 'bg-ink' : ''" />
     </div>
     <button class="btn btn-ink w-full mt-5" :disabled="!editable || done" @click="enterFloor">
-      {{ done ? L('50 pompes ✓', '50 push-ups ✓') : L('Poser le téléphone au sol', 'Put the phone on the floor') }}
+      {{ done ? L(`${GOAL} pompes ✓`, `${GOAL} push-ups ✓`) : L('Poser le téléphone au sol', 'Put the phone on the floor') }}
     </button>
     <p class="t-body text-xs text-pencil mt-3">
       {{ L('Touchez l\'écran avec le nez à chaque descente.', 'Touch the screen with your nose on every rep.') }}
