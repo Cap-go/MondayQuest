@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { TrackerProps } from './useDay'
+import { toast } from '@capgo/capacitor-pretty-toast'
 import { computed, onBeforeUnmount, ref } from 'vue'
 import { useL } from '~/composables/useL'
+import { cancelHourlyAlarms, scheduleHourlyAlarms } from '~/services/alarm'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 import { useDay } from './useDay'
@@ -9,7 +11,7 @@ import { useDay } from './useDay'
 // One cell per working hour: get up, tap the hour, the little figure stands with you.
 const props = defineProps<TrackerProps>()
 const L = useL()
-const { data, done, patch, markDone } = useDay(props, { hours: [] as number[] })
+const { data, done, patch, markDone } = useDay(props, { hours: [] as number[], alarms: [] as string[], alarmKind: 'none' as 'alarm' | 'notification' | 'none' })
 const HOURS = Array.from({ length: 10 }, (_, i) => 9 + i)
 const GOAL = 8
 
@@ -25,6 +27,35 @@ const count = computed(() => data.value.hours.length)
 const has = (h: number) => data.value.hours.includes(h)
 // Today: only the current or past hours can be ticked. Past days: free.
 const open = (h: number) => props.editable && (!props.isToday || h <= nowHour.value)
+
+const ringing = computed(() => data.value.alarms.length > 0)
+const busy = ref(false)
+
+/** Real alarms at the top of every remaining work hour, so you don't have to remember. */
+async function ringHourly() {
+  if (busy.value || !props.isToday || !props.editable)
+    return
+  busy.value = true
+  haptic.press()
+  const upcoming = HOURS.filter(h => h > nowHour.value)
+  const res = await scheduleHourlyAlarms(upcoming, L('Debout ! 2 minutes', 'Stand up! 2 minutes'), L('Levez-vous, marchez 2 minutes, puis cochez l\'heure.', 'Get up, move for 2 minutes, then tick the hour.'))
+  busy.value = false
+  if (res.kind === 'none') {
+    toast.info(L('Plus d\'heure à sonner aujourd\'hui', 'No hours left to ring today'))
+    return
+  }
+  patch({ alarms: res.ids, alarmKind: res.kind })
+  sfx.play('chime')
+  haptic.success()
+  toast.success(res.kind === 'alarm' ? L(`${res.ids.length} réveils programmés`, `${res.ids.length} alarms set`) : L(`${res.ids.length} rappels programmés`, `${res.ids.length} reminders set`), { message: `${upcoming[0]}h → 18h` })
+}
+
+async function stopRinging() {
+  haptic.tap()
+  await cancelHourlyAlarms(data.value.alarms, data.value.alarmKind)
+  patch({ alarms: [], alarmKind: 'none' })
+  toast.info(L('Réveils retirés', 'Alarms removed'))
+}
 
 function tap(h: number) {
   if (!open(h))
@@ -84,8 +115,16 @@ function tap(h: number) {
         <svg v-if="has(h)" viewBox="0 0 24 24" class="tick"><path d="M4 13 l5 5 L20 6" fill="none" stroke="currentColor" stroke-width="3" /></svg>
       </button>
     </div>
+    <template v-if="isToday && editable && !done">
+      <button v-if="!ringing" class="btn btn-ink w-full mt-4" :disabled="busy || nowHour >= 18" @click="ringHourly">
+        {{ L('Sonner chaque heure', 'Ring me every hour') }}
+      </button>
+      <button v-else class="btn w-full mt-4" @click="stopRinging">
+        {{ data.alarmKind === 'alarm' ? L(`${data.alarms.length} réveils · les retirer`, `${data.alarms.length} alarms set · remove`) : L(`${data.alarms.length} rappels · les retirer`, `${data.alarms.length} reminders set · remove`) }}
+      </button>
+    </template>
     <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('2 minutes debout, puis touchez l\'heure.', '2 minutes on your feet, then tap the hour.') }}
+      {{ L('Une alarme à chaque heure pile jusqu\'à 18h. 2 minutes debout, puis touchez l\'heure.', 'An alarm at the top of every hour until 6 p.m. 2 minutes on your feet, then tap the hour.') }}
     </p>
   </div>
 </template>
