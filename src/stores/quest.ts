@@ -25,7 +25,6 @@ export interface Settings {
   wakeAuto: boolean
   hardcore: boolean
   onboarded: boolean
-  privacy: boolean
   /** Debug menu unlocked (TestFlight, or 7 taps on the version box). */
   debug: boolean
   /** Debug: every level open. */
@@ -64,7 +63,6 @@ export const DEFAULT_SETTINGS: Settings = {
   wakeAuto: true,
   hardcore: false,
   onboarded: false,
-  privacy: false,
   debug: false,
   unlockAll: false,
 }

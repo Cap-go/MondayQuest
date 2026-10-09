@@ -183,7 +183,6 @@ function custom() {
       <ToggleRow v-model="quest.settings.sound" :label="$t('settings.sound')" />
       <ToggleRow v-model="quest.settings.haptics" :label="$t('settings.haptics')" />
       <ToggleRow v-model="quest.settings.hardcore" :label="$t('settings.hardcore')" :hint="$t('settings.hardcoreHint')" />
-      <ToggleRow v-model="quest.settings.privacy" :label="$t('settings.privacy')" :hint="L('Floute l\'app dans le sélecteur et bloque les captures (Android).', 'Blurs the app switcher preview and blocks screenshots (Android).')" />
     </section>
 
     <section class="mt-8">

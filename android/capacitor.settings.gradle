@@ -86,9 +86,6 @@ project(':capgo-capacitor-photo-library').projectDir = new File('../node_modules
 include ':capgo-capacitor-pretty-toast'
 project(':capgo-capacitor-pretty-toast').projectDir = new File('../node_modules/@capgo/capacitor-pretty-toast/android')
 
-include ':capgo-capacitor-privacy-screen'
-project(':capgo-capacitor-privacy-screen').projectDir = new File('../node_modules/@capgo/capacitor-privacy-screen/android')
-
 include ':capgo-capacitor-rich-notifications'
 project(':capgo-capacitor-rich-notifications').projectDir = new File('../node_modules/@capgo/capacitor-rich-notifications/android')
 

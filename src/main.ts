@@ -4,7 +4,6 @@ import { Keyboard, KeyboardResize } from '@capacitor/keyboard'
 import { SplashScreen } from '@capacitor/splash-screen'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { NavigationBar } from '@capgo/capacitor-navigation-bar'
-import { PrivacyScreen } from '@capgo/capacitor-privacy-screen'
 import { initTransitions, setDirection } from '@capgo/capacitor-transitions/vue'
 import { createPinia } from 'pinia'
 import { createApp, watch } from 'vue'
@@ -56,8 +55,6 @@ async function boot() {
     void StatusBar.setStyle({ style: Style.Light }).catch(() => {})
     void NavigationBar.setNavigationBarColor({ color: '#f6f4ef', darkButtons: true }).catch(() => {})
     void Keyboard.setResizeMode({ mode: KeyboardResize.Body }).catch(() => {})
-    if (quest.settings.privacy)
-      void PrivacyScreen.enable({ ios: { blurEffect: 'light' }, android: { privacyModeOnActivityHidden: 'splash' } }).catch(() => {})
   }
 
   await router.isReady()
@@ -119,13 +116,6 @@ async function boot() {
   watch(() => quest.locale, (l) => {
     i18n.global.locale.value = l
     void renderTabbar(!!router.currentRoute.value.meta.hideTabs)
-  })
-  watch(() => quest.settings.privacy, (on) => {
-    if (!native)
-      return
-    void (on
-      ? PrivacyScreen.enable({ ios: { blurEffect: 'light' }, android: { privacyModeOnActivityHidden: 'splash' } })
-      : PrivacyScreen.disable()).catch(() => {})
   })
 }
 

@@ -37,7 +37,6 @@ dependencies {
     implementation project(':capgo-capacitor-pedometer')
     implementation project(':capgo-capacitor-photo-library')
     implementation project(':capgo-capacitor-pretty-toast')
-    implementation project(':capgo-capacitor-privacy-screen')
     implementation project(':capgo-capacitor-rich-notifications')
     implementation project(':capgo-capacitor-shake')
     implementation project(':capgo-capacitor-speech-recognition')
