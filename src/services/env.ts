@@ -16,8 +16,13 @@ export async function detectBuildEnv() {
     buildEnv.value = 'android'
     return
   }
+  // Older binaries without the plugin: stay "store" so the menu never leaks; 7 taps still unlock it.
   const res = await NativePurchases.getAppTransaction().catch(() => null)
-  const env = res?.appTransaction.environment
+  if (!res) {
+    buildEnv.value = 'store'
+    return
+  }
+  const env = res.appTransaction.environment
   buildEnv.value = env === 'Production' ? 'store' : env === 'Xcode' ? 'dev' : 'testflight'
   isTestBuild.value = buildEnv.value !== 'store'
 }
