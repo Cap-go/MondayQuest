@@ -4,6 +4,7 @@ import { toast } from '@capgo/capacitor-pretty-toast'
 import { setDirection } from '@capgo/capacitor-transitions/vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import BackButton from '~/components/BackButton.vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import { useL } from '~/composables/useL'
@@ -34,18 +35,11 @@ function create() {
   setDirection('forward')
   void router.replace(`/challenge/${c.id}/read`)
 }
-
-function back() {
-  setDirection('back')
-  router.back()
-}
 </script>
 
 <template>
   <QuestPage>
-    <button class="t-label mb-4" @click="back">
-      ← {{ $t('common.back') }}
-    </button>
+    <BackButton fallback="/levels" class="mb-4" />
     <div class="frame">
       <div class="frame-inner p-5">
         <div class="flex justify-center">

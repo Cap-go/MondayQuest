@@ -5,6 +5,7 @@ import { RichNotifications } from '@capgo/capacitor-rich-notifications'
 import { setDirection } from '@capgo/capacitor-transitions/vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import BackButton from '~/components/BackButton.vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import ToggleRow from '~/components/ToggleRow.vue'
@@ -106,9 +107,7 @@ function hideDebug() {
 <template>
   <QuestPage>
     <div class="flex items-center gap-3">
-      <button class="icon-btn" aria-label="Back" @click="setDirection('back'); router.back()">
-        ‹
-      </button>
+      <BackButton fallback="/settings" />
       <h1 class="t-display text-[2.2rem]">
         Debug
       </h1>
@@ -209,13 +208,5 @@ function hideDebug() {
 .chip.on {
   background: var(--color-ink);
   color: var(--color-paper);
-}
-
-.icon-btn {
-  width: 40px;
-  height: 40px;
-  border: 2.5px solid var(--color-ink);
-  font-size: 1.4rem;
-  line-height: 1;
 }
 </style>
