@@ -48,7 +48,8 @@ async function openCamera() {
     return
   document.documentElement.classList.add('camera-on')
   camera.value = true
-  await CameraPreview.start({ position: 'rear', toBack: true, disableAudio: true, aspectMode: 'cover', includeSafeAreaInsets: true }).catch(close)
+  // Full-screen preview: the default 4:3 frame leaves the native background showing below it.
+  await CameraPreview.start({ position: 'rear', toBack: true, disableAudio: true, aspectRatio: 'fill', aspectMode: 'cover', includeSafeAreaInsets: false }).catch(close)
 }
 
 async function shoot() {
@@ -179,6 +180,9 @@ onBeforeUnmount(() => {
 .cam-ui {
   position: fixed;
   inset: 0;
+  background:
+    linear-gradient(to bottom, rgb(0 0 0 / 0.45), transparent 18%),
+    linear-gradient(to top, rgb(0 0 0 / 0.55), transparent 26%);
   z-index: 300;
   display: flex;
   flex-direction: column;
