@@ -58,7 +58,7 @@ export const TRACKERS: Record<TrackerKind, { component: Component, summary?: Sum
   dance: { component: lazy(() => import('./DanceTracker.vue')) },
   bed: { component: lazy(() => import('./BedTracker.vue')) },
   still: { component: lazy(() => import('./StillTracker.vue')) },
-  compliment: { component: lazy(() => import('./ComplimentTracker.vue')) },
+  compliment: { component: lazy(() => import('./ComplimentTracker.vue')), summary: d => d.data.to ? `${d.data.to}: ${d.data.did ?? d.data.words ?? ''}` : '' },
   juggle: { component: lazy(() => import('./JuggleTracker.vue')) },
   sunset: { component: lazy(() => import('./SunsetTracker.vue')) },
   focus: { component: lazy(() => import('./FocusTracker.vue')) },

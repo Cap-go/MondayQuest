@@ -37,22 +37,22 @@ export const LEVEL_10: Def[] = [
     category: 'growth',
     text: {
       fr: {
-        title: 'Lancer des fleurs',
-        short: 'Faites un compliment sincère à quelqu\'un chaque jour pendant une semaine.',
+        title: 'Le vrai compliment',
+        short: 'Chaque jour, un compliment argumenté d\'au moins 30 secondes (5 de plus chaque jour) : un geste précis, ce qu\'il dit de la personne, ce qu\'il a changé pour vous.',
         body: [
-          'Nous pensons souvent du bien des autres sans jamais le leur dire. Un compliment sincère coûte trois secondes et peut illuminer une journée entière.',
-          'Chercher chaque jour quelque chose à admirer change aussi votre regard : vous remarquez davantage le beau, le bien fait, le courageux autour de vous.',
+          'Nous pensons souvent du bien des autres sans jamais le leur dire. Et quand on le dit, on bâcle : « t\'es top », « tu es belle ». Ça glisse. Un compliment qui marque prend du temps : il nomme un geste précis, la qualité qu\'il révèle, et ce qu\'il a changé pour vous.',
+          'Demandez d\'abord son attention (« Je peux te dire un truc ? »), regardez la personne et prenez au moins 30 secondes. Chercher chaque jour quelque chose de vrai à dire change aussi votre regard sur les autres.',
         ],
-        tip: 'Soyez précis : « ta présentation était claire » vaut mieux que « t\'es super ». Complimentez un geste ou un choix plutôt qu\'un physique.',
+        tip: 'Préparez vos trois points avant. Complimentez un geste ou un choix plutôt qu\'un physique. Et ne demandez rien en retour : laissez le compliment atterrir.',
       },
       en: {
-        title: 'Bouquets',
-        short: 'Give someone one sincere compliment every day for a week.',
+        title: 'The real compliment',
+        short: 'Every day, a reasoned compliment of at least 30 seconds (5 more each day): a precise thing they did, what it says about them, what it changed for you.',
         body: [
-          'We often think well of people without ever telling them. A sincere compliment takes three seconds and can light up a whole day.',
-          'Looking for something to admire every day also changes how you see: you start noticing what is beautiful, well made or brave around you.',
+          'We often think well of people without ever telling them. And when we do, we rush it: "you\'re great", "you look nice". It slides off. A compliment that lands takes time: it names a precise thing they did, the quality it reveals, and what it changed for you.',
+          'Ask for their attention first ("Can I tell you something?"), look at them and take at least 30 seconds. Looking for something true to say every day also changes how you see people.',
         ],
-        tip: 'Be specific: "your presentation was crystal clear" beats "you\'re great". Praise an action or a choice rather than looks.',
+        tip: 'Prepare your three points first. Praise an action or a choice rather than looks. And ask for nothing back: let the compliment land.',
       },
     },
   },
