@@ -20,7 +20,7 @@ const INLINE_TEXT: Partial<Record<TrackerKind, string>> = {
 }
 
 /** Trackers that fit an evening reminder instead of a morning one. */
-const EVENING: TrackerKind[] = ['gratitude', 'curfew', 'complain', 'sober', 'sugar', 'hold', 'yes', 'fast', 'nospend', 'detox', 'kindness', 'compliment', 'sunset', 'memory', 'review']
+const EVENING: TrackerKind[] = ['gratitude', 'curfew', 'complain', 'sober', 'sugar', 'hold', 'yes', 'fast', 'nospend', 'detox', 'kindness', 'compliment', 'sunset', 'memory', 'review', 'forgive']
 
 function t(key: string, params?: Record<string, unknown>) {
   return i18n.global.t(key, params ?? {})

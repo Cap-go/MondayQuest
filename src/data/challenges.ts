@@ -54,10 +54,10 @@ export type TrackerKind
     | 'detox'
     | 'practice'
     | 'dance'
-    | 'bed'
+    | 'forgive'
     | 'still'
     | 'compliment'
-    | 'juggle'
+    | 'listen'
     | 'sunset'
     | 'focus'
     | 'review'
@@ -67,7 +67,7 @@ export type TrackerKind
 export type IconName
   = | 'foot' | 'sunrise' | 'apple' | 'pill' | 'broom' | 'cutlery' | 'dot' | 'nodes' | 'stretch' | 'minus'
     | 'stones' | 'shower' | 'ok' | 'frame' | 'heart' | 'drop' | 'book' | 'pencil' | 'plane' | 'band'
-    | 'stairs' | 'arms' | 'bubble' | 'cube' | 'compass' | 'moon' | 'lines' | 'flame' | 'envelope' | 'clock' | 'star' | 'lock' | 'joker'
+    | 'stairs' | 'arms' | 'bubble' | 'cube' | 'compass' | 'moon' | 'lines' | 'flame' | 'envelope' | 'clock' | 'star' | 'lock' | 'joker' | 'ear' | 'feather'
     | 'plank' | 'phone' | 'pot' | 'cards' | 'chair' | 'box' | 'coin' | 'dial' | 'seed' | 'leaf' | 'calendar' | 'nosign' | 'note' | 'wave' | 'bed' | 'still' | 'ribbon' | 'balls' | 'sunset' | 'tomato' | 'loop' | 'share'
 
 export interface ChallengeText {
