@@ -18,19 +18,17 @@ import { buildEnv, isTestBuild } from '~/services/env'
 import { haptic } from '~/services/haptics'
 import { notificationsAllowed, requestNotifications, rescheduleAll } from '~/services/notifications'
 import { locate, wakeHM } from '~/services/sun'
-import { bundleVersion, currentChannel, nativeVersion } from '~/services/updater'
+import { bundleVersion, nativeVersion } from '~/services/updater'
 import { useQuest } from '~/stores/quest'
 
 const quest = useQuest()
 const router = useRouter()
 const L = useL()
 const notif = ref(false)
-const channel = ref<string>()
 const native = Capacitor.isNativePlatform()
 
 onMounted(async () => {
   notif.value = await notificationsAllowed()
-  channel.value = await currentChannel()
 })
 
 async function enableNotif() {
@@ -214,32 +212,9 @@ function custom() {
         <span class="t-body flex-1 text-left">{{ l.label() }}</span>
         <span class="t-body text-sm text-pencil">{{ l.hint }}</span><span class="ml-2">↗</span>
       </button>
-      <div class="version mt-4" @click="versionTap">
-        <div>
-          <p class="t-label text-[0.6rem] text-pencil">
-            App
-          </p>
-          <p class="t-display tabular-nums">
-            {{ nativeVersion || 'web' }}
-          </p>
-        </div>
-        <div>
-          <p class="t-label text-[0.6rem] text-pencil">
-            Bundle
-          </p>
-          <p class="t-display tabular-nums">
-            {{ bundleVersion }}
-          </p>
-        </div>
-        <div>
-          <p class="t-label text-[0.6rem] text-pencil">
-            {{ L('Canal', 'Channel') }}
-          </p>
-          <p class="t-display text-sm normal-case truncate">
-            {{ channel || '—' }}
-          </p>
-        </div>
-      </div>
+      <p class="version-line t-label" @click="versionTap">
+        {{ L('Version', 'Version') }} {{ nativeVersion || 'web' }}{{ bundleVersion && bundleVersion !== 'builtin' ? ` · ${bundleVersion}` : '' }}
+      </p>
     </section>
 
     <section v-if="isTestBuild || quest.settings.debug" class="mt-8">
@@ -269,20 +244,12 @@ function custom() {
 </template>
 
 <style scoped>
-.version {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border: 2.5px solid var(--color-ink);
-}
-
-.version > div {
-  padding: 10px 12px;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.version > div + div {
-  border-left: 2.5px solid var(--color-ink);
+.version-line {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 0.62rem;
+  color: var(--color-pencil);
+  user-select: none;
 }
 
 .seg {

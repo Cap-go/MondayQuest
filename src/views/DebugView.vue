@@ -3,7 +3,7 @@ import type { Challenge } from '~/data/challenges'
 import { toast } from '@capgo/capacitor-pretty-toast'
 import { RichNotifications } from '@capgo/capacitor-rich-notifications'
 import { setDirection } from '@capgo/capacitor-transitions/vue'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BackButton from '~/components/BackButton.vue'
 import QuestIcon from '~/components/QuestIcon.vue'
@@ -16,7 +16,7 @@ import { setSystemAlarm } from '~/services/alarm'
 import { buildEnv } from '~/services/env'
 import { haptic } from '~/services/haptics'
 import { rescheduleAll } from '~/services/notifications'
-import { bundleVersion, nativeVersion } from '~/services/updater'
+import { bundleVersion, currentChannel, nativeVersion } from '~/services/updater'
 import { startSessionActivity, syncTodayWidget } from '~/services/widgets'
 import { useQuest } from '~/stores/quest'
 
@@ -25,6 +25,10 @@ const quest = useQuest()
 const router = useRouter()
 const L = useL()
 const filter = ref(0)
+const channel = ref<string>()
+onMounted(async () => {
+  channel.value = await currentChannel()
+})
 const groups = computed(() => LEVELS
   .filter(l => !filter.value || l.n === filter.value)
   .map(l => ({ level: l, items: CHALLENGES.filter(c => c.level === l.n) })))
@@ -117,7 +121,7 @@ function hideDebug() {
       </h1>
     </div>
     <p class="t-label text-pencil mt-1">
-      {{ buildEnv }} · app {{ nativeVersion || 'web' }} · bundle {{ bundleVersion }}
+      {{ buildEnv }} · app {{ nativeVersion || 'web' }} · bundle {{ bundleVersion }} · {{ channel || 'no channel' }}
     </p>
 
     <h2 class="group-head mt-6">
