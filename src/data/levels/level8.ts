@@ -11,19 +11,19 @@ export const LEVEL_8: Def[] = [
     text: {
       fr: {
         title: 'Le grand vide',
-        short: 'Débarrassez-vous d\'objets chaque jour : 5 le premier jour, 2 de plus chaque jour, 17 le septième.',
+        short: 'Débarrassez-vous d\'objets chaque jour : 1 le premier jour, 1 de plus chaque jour, 7 le septième.',
         body: [
           'Nous possédons des milliers d\'objets, et la plupart dorment dans des placards. Chaque chose en trop demande de la place, du rangement et un peu de votre attention.',
-          'Donner, vendre ou recycler 77 objets en une semaine allège votre intérieur et votre tête. Vous découvrirez vite ce qui compte vraiment pour vous.',
+          'Donner, vendre ou recycler 28 objets en une semaine allège votre intérieur et votre tête. Vous découvrirez vite ce qui compte vraiment pour vous.',
         ],
         tip: 'Commencez par les tiroirs et la salle de bain : câbles morts, échantillons, stylos vides. Prévoyez trois sacs : donner, vendre, recycler.',
       },
       en: {
         title: 'Clean slate',
-        short: 'Get rid of things every day: 5 on day one, 2 more each day, 17 by day seven.',
+        short: 'Get rid of things every day: 1 on day one, 1 more each day, 7 by day seven.',
         body: [
           'We own thousands of things and most of them sleep in cupboards. Every extra object takes space, tidying time and a little piece of your attention.',
-          'Giving, selling or recycling 77 things in a week lightens your home and your head. You will quickly see what really matters to you.',
+          'Giving, selling or recycling 28 things in a week lightens your home and your head. You will quickly see what really matters to you.',
         ],
         tip: 'Start with drawers and the bathroom: dead cables, samples, empty pens. Keep three bags ready: give, sell, recycle.',
       },

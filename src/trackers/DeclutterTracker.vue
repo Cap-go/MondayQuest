@@ -11,7 +11,8 @@ type Pile = 'give' | 'sell' | 'recycle'
 const props = defineProps<TrackerProps>()
 const L = useL()
 // 5 things on day one, 2 more every day, 17 on day seven.
-const GOAL = 5 + props.idx * 2
+// Gentle ramp: 1 thing on day one, one more each day, 7 on day seven.
+const GOAL = 1 + props.idx
 const { data, done, patch, markDone, unmark } = useDay(props, { items: [] as Pile[] })
 
 const pile = ref<Pile>('give')
@@ -109,13 +110,13 @@ function up(e: PointerEvent) {
       {{ count }}<span class="text-pencil">/{{ GOAL }}</span>
     </p>
     <p class="t-label text-graphite">
-      {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ L('objets', 'things') }}
+      {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ GOAL > 1 ? L('objets', 'things') : L('objet', 'thing') }}
     </p>
     <div class="flex gap-4 mt-2">
       <span v-for="t in tally" :key="t.id" class="t-label text-graphite">{{ t.label }} {{ t.n }}</span>
     </div>
     <p v-if="done" class="t-body text-sm text-graphite mt-3">
-      {{ L(`Carton fermé. ${GOAL} de moins.`, `Box closed. ${GOAL} things lighter.`) }}
+      {{ L(`Carton fermé. ${GOAL} de moins.`, `Box closed. ${GOAL} ${GOAL > 1 ? 'things' : 'thing'} lighter.`) }}
     </p>
     <p v-else-if="editable" class="t-body text-xs text-pencil mt-3 text-center">
       {{ L('Glissez vers le haut ou touchez le carton pour y jeter un objet.', 'Swipe up or tap the box to throw a thing in.') }}
