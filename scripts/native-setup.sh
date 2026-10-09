@@ -74,7 +74,6 @@ perms = [
   'android.permission.VIBRATE',
   'android.permission.WAKE_LOCK',
   'android.permission.HIGH_SAMPLING_RATE_SENSORS',
-  'android.permission.health.READ_STEPS',
   'android.permission.health.WRITE_MINDFULNESS',
 ]
 for perm in perms:
@@ -92,6 +91,26 @@ if 'android:scheme="mondayquest"' not in s:
     s = s.replace('        </activity>', deeplink + '        </activity>', 1)
 if 'android:screenOrientation' not in s:
     s = s.replace('android:name=".MainActivity"', 'android:name=".MainActivity"\n            android:screenOrientation="portrait"', 1)
+# Plugins declare far more than we use; Play then demands a justification for each.
+# Keep Health Connect WRITE_MINDFULNESS only; photos use the system picker (no media permission).
+removed = [f'android.permission.health.{k}' for k in (
+  'READ_ACTIVE_CALORIES_BURNED READ_BASAL_BODY_TEMPERATURE READ_BASAL_METABOLIC_RATE READ_BLOOD_GLUCOSE READ_BLOOD_PRESSURE '
+  'READ_BODY_FAT READ_BODY_TEMPERATURE READ_DISTANCE READ_EXERCISE READ_FLOORS_CLIMBED READ_HEART_RATE READ_HEART_RATE_VARIABILITY '
+  'READ_HEIGHT READ_HYDRATION READ_MINDFULNESS READ_NUTRITION READ_OXYGEN_SATURATION READ_RESPIRATORY_RATE READ_RESTING_HEART_RATE '
+  'READ_SLEEP READ_STEPS READ_TOTAL_CALORIES_BURNED READ_VO2_MAX READ_WEIGHT WRITE_ACTIVE_CALORIES_BURNED WRITE_BASAL_BODY_TEMPERATURE '
+  'WRITE_BASAL_METABOLIC_RATE WRITE_BLOOD_GLUCOSE WRITE_BLOOD_PRESSURE WRITE_BODY_FAT WRITE_BODY_TEMPERATURE WRITE_DISTANCE '
+  'WRITE_FLOORS_CLIMBED WRITE_HEART_RATE WRITE_HEART_RATE_VARIABILITY WRITE_HEIGHT WRITE_HYDRATION WRITE_NUTRITION '
+  'WRITE_OXYGEN_SATURATION WRITE_RESPIRATORY_RATE WRITE_RESTING_HEART_RATE WRITE_SLEEP WRITE_STEPS WRITE_TOTAL_CALORIES_BURNED '
+  'WRITE_VO2_MAX WRITE_WEIGHT READ_HEALTH_DATA_IN_BACKGROUND READ_HEALTH_DATA_HISTORY').split()] + [
+  'android.permission.READ_MEDIA_IMAGES', 'android.permission.READ_MEDIA_VIDEO', 'android.permission.READ_MEDIA_VISUAL_USER_SELECTED',
+  'android.permission.READ_EXTERNAL_STORAGE', 'com.android.vending.BILLING', 'android.permission.health.READ_STEPS']
+s = s.replace('    <uses-permission android:name="android.permission.health.READ_STEPS" />\n', '')
+if 'xmlns:tools=' not in s:
+    s = s.replace('<manifest xmlns:android="http://schemas.android.com/apk/res/android"', '<manifest xmlns:android="http://schemas.android.com/apk/res/android"\n    xmlns:tools="http://schemas.android.com/tools"', 1)
+for perm in removed:
+    tag = f'<uses-permission android:name="{perm}" tools:node="remove" />'
+    if tag not in s:
+        s = s.replace('</manifest>', f'    {tag}\n</manifest>')
 open(p, 'w').write(s)
 PY
   echo "✓ Android configured"
