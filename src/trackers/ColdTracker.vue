@@ -2,128 +2,240 @@
 import type { PluginListenerHandle } from '@capacitor/core'
 import type { TrackerProps } from './useDay'
 import { KeepAwake } from '@capgo/capacitor-keep-awake'
+import { SpeechSynthesis } from '@capgo/capacitor-speech-synthesis'
 import { VolumeButtons } from '@capgo/capacitor-volume-buttons'
 import { computed, onBeforeUnmount, ref } from 'vue'
 import { useL } from '~/composables/useL'
-import { formatClock } from '~/lib/date'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 import { useDay } from './useDay'
 
+// Hands-free: one tap before stepping in, then voice + loud cues guide the
+// warm phase, the switch to cold, and the end. Nothing to touch with wet hands.
 const props = defineProps<TrackerProps>()
 const L = useL()
 const { data, done, patch, markDone } = useDay(props, { best: 0, tries: 0 })
-const MIN = 30_000
 
-const startedAt = ref<number | null>(null)
-const now = ref(Date.now())
-let raf = 0
-let lastShiver = 0
+const WARM = 30
+/** Progressive cold: 20 s on day 1, +10 s a day, 80 s on day 7. */
+const COLD = computed(() => 20 + props.idx * 10)
+
+type Phase = 'idle' | 'warm' | 'cold' | 'end'
+const phase = ref<Phase>('idle')
+const left = ref(0)
+let timer: ReturnType<typeof setInterval> | undefined
 let vol: PluginListenerHandle | undefined
+let coldStart = 0
 
-const elapsed = computed(() => (startedAt.value ? now.value - startedAt.value : 0))
-const frost = computed(() => Math.min(1, elapsed.value / 90_000))
-const crystals = Array.from({ length: 18 }, () => ({ x: Math.random() * 100, y: Math.random() * 100, s: 10 + Math.random() * 26, r: Math.random() * 60, t: Math.random() }))
-
-function loop() {
-  now.value = Date.now()
-  if (now.value - lastShiver > 10_000) {
-    lastShiver = now.value
-    haptic.shiver()
-    sfx.play('freeze', 0.5)
-  }
-  raf = requestAnimationFrame(loop)
+function say(text: string) {
+  void SpeechSynthesis.speak({ text, language: L.tag(), rate: 1, volume: 1, queueStrategy: 'Flush' }).catch(() => {})
 }
 
-async function go() {
-  if (!props.editable)
+const fmt = (s: number) => (s >= 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : `${s}`)
+
+async function begin() {
+  if (!props.editable || phase.value !== 'idle')
     return
-  startedAt.value = Date.now()
-  lastShiver = Date.now()
-  sfx.play('freeze')
-  haptic.shiver(10)
-  loop()
+  phase.value = 'warm'
+  left.value = WARM
+  sfx.play('chime')
+  haptic.press()
+  say(L(`Eau chaude. Trente secondes, puis ${COLD.value} secondes de froid.`, `Warm water. Thirty seconds, then ${COLD.value} seconds of cold.`))
   await KeepAwake.keepAwake().catch(() => {})
-  // wet hands: any volume button stops the stopwatch
-  vol = await VolumeButtons.addListener('volumeButtonPressed', () => stop())
+  vol = await VolumeButtons.addListener('volumeButtonPressed', () => stop()).catch(() => undefined)
+  timer = setInterval(tick, 1000)
 }
 
-function stop() {
-  if (!startedAt.value)
+function tick() {
+  left.value--
+  if (phase.value === 'warm') {
+    if (left.value === 10) {
+      say(L('Froid dans dix secondes', 'Cold in ten seconds'))
+    }
+    else if (left.value <= 3 && left.value > 0) {
+      say(String(left.value))
+      sfx.play('tick')
+      haptic.tap()
+    }
+    else if (left.value <= 0) {
+      toCold()
+    }
     return
-  cancelAnimationFrame(raf)
-  const d = Date.now() - startedAt.value
-  startedAt.value = null
-  void vol?.remove()
-  void KeepAwake.allowSleep().catch(() => {})
-  const best = Math.max(data.value.best ?? 0, d)
-  patch({ best, tries: (data.value.tries ?? 0) + 1 })
-  if (d >= MIN)
-    markDone({ best })
-  else
-    haptic.warning()
+  }
+  if (phase.value === 'cold') {
+    if (left.value > 5 && left.value % 10 === 0) {
+      say(L(`${left.value} secondes`, `${left.value} seconds`))
+      haptic.shiver(4)
+    }
+    else if (left.value <= 5 && left.value > 0) {
+      say(String(left.value))
+      sfx.play('tick')
+      haptic.press()
+    }
+    else if (left.value <= 0) {
+      finish()
+    }
+  }
 }
 
-onBeforeUnmount(() => {
-  cancelAnimationFrame(raf)
+function toCold() {
+  phase.value = 'cold'
+  left.value = COLD.value
+  coldStart = Date.now()
+  sfx.play('wake')
+  sfx.play('freeze')
+  haptic.shiver(12)
+  say(L(`Froid ! Tenez ${COLD.value} secondes.`, `Cold! Hold ${COLD.value} seconds.`))
+}
+
+function finish() {
+  clear()
+  phase.value = 'end'
+  const held = COLD.value
+  sfx.play('done')
+  haptic.success()
+  say(L('Terminé. Bravo, agent secret.', 'Done. Well done, double-oh-seven.'))
+  markDone({ best: Math.max(data.value.best ?? 0, held * 1000), tries: (data.value.tries ?? 0) + 1 })
+  setTimeout(() => {
+    if (phase.value === 'end')
+      phase.value = 'idle'
+  }, 3500)
+}
+
+/** Stopped early: keep the cold seconds held as today's best. */
+function stop() {
+  if (phase.value === 'idle' || phase.value === 'end')
+    return
+  const held = phase.value === 'cold' ? Math.floor((Date.now() - coldStart) / 1000) : 0
+  clear()
+  phase.value = 'idle'
+  haptic.warning()
+  sfx.play('erase')
+  patch({ best: Math.max(data.value.best ?? 0, held * 1000), tries: (data.value.tries ?? 0) + 1 })
+}
+
+function clear() {
+  clearInterval(timer)
   void vol?.remove()
+  vol = undefined
   void KeepAwake.allowSleep().catch(() => {})
-})
+}
+
+onBeforeUnmount(clear)
+
+const total = computed(() => (phase.value === 'warm' ? WARM : COLD.value))
+const progress = computed(() => (phase.value === 'warm' || phase.value === 'cold' ? 1 - left.value / total.value : 0))
+const C = 2 * Math.PI * 120
+const bestCold = computed(() => Math.floor((data.value.best ?? 0) / 1000))
 </script>
 
 <template>
-  <div class="cold" :style="{ '--f': frost }">
-    <div class="frost">
-      <svg v-for="(c, i) in crystals" :key="i" class="crystal" :style="{ left: `${c.x}%`, top: `${c.y}%`, width: `${c.s}px`, opacity: frost > c.t ? 0.75 : 0, rotate: `${c.r}deg` }" viewBox="0 0 20 20">
-        <path d="M10 0v20M0 10h20M3 3l14 14M17 3L3 17M10 3l-2-2M10 3l2-2M10 17l-2 2M10 17l2 2" stroke="var(--color-ink)" stroke-width="1" fill="none" />
-      </svg>
-    </div>
-    <div class="relative text-center py-4">
-      <p class="t-label text-graphite">
-        {{ startedAt ? L('Tenez bon', 'Hold on') : L('Eau glacée', 'Ice-cold water') }}
-      </p>
-      <p class="t-display text-6xl tabular-nums my-2" :class="{ shiver: startedAt }">
-        {{ formatClock(elapsed) }}
-      </p>
-      <div class="h-1.5 bg-rule mx-8 relative">
-        <div class="h-full bg-ink" :style="{ width: `${Math.min(100, elapsed / MIN * 100)}%` }" />
-        <span class="absolute -top-5 right-0 t-label text-[0.6rem]">30 s</span>
+  <div class="text-center py-2">
+    <p class="t-label text-graphite">
+      {{ L('Aujourd\'hui', 'Today') }} · 30 s {{ L('chaud', 'warm') }} → {{ COLD }} s {{ L('froid', 'cold') }}
+    </p>
+    <svg viewBox="0 0 200 110" class="w-full max-w-60 mx-auto mt-2">
+      <path d="M60 10h40a8 8 0 0 1 8 8v8" fill="none" stroke="var(--color-ink)" stroke-width="3" />
+      <path d="M86 26h44a6 6 0 0 1 0 12H86a6 6 0 0 1 0-12z" fill="var(--color-paper)" stroke="var(--color-ink)" stroke-width="3" />
+      <g stroke="var(--color-ink)" stroke-width="2.4" stroke-linecap="round" :class="{ drops: done }">
+        <path v-for="x in [92, 102, 112, 122]" :key="x" :d="`M${x} 46v10M${x - 4} 64v10M${x + 3} 82v10`" />
+      </g>
+      <path d="M40 104h120" stroke="var(--color-rule)" stroke-width="2" />
+    </svg>
+    <button class="btn btn-ink mt-4 w-60" :disabled="!editable" @click="begin">
+      {{ done ? L('Encore une', 'Once more') : L('J\'entre sous la douche', 'I\'m stepping in') }}
+    </button>
+    <p class="t-body text-xs text-pencil mt-3 px-4">
+      {{ L('Posez le téléphone près de la douche, son fort. La voix vous dit quand passer au froid et quand c\'est fini. Bouton de volume pour arrêter.', 'Leave the phone near the shower, volume up. A voice tells you when to switch to cold and when you are done. Any volume button stops it.') }}
+    </p>
+    <p v-if="bestCold" class="t-label mt-3">
+      {{ L('Froid tenu', 'Cold held') }} : {{ bestCold }} s {{ done ? '✓' : '' }}
+    </p>
+
+    <Teleport to="body">
+      <div v-if="phase !== 'idle'" class="shower" :class="phase" @pointerdown="stop">
+        <p class="t-label label">
+          {{ phase === 'warm' ? L('Eau chaude', 'Warm water') : phase === 'cold' ? L('Eau froide !', 'Cold water!') : L('Terminé', 'Done') }}
+        </p>
+        <div class="dial">
+          <svg viewBox="0 0 260 260">
+            <circle cx="130" cy="130" r="120" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="10" />
+            <circle
+              cx="130" cy="130" r="120" fill="none" stroke="currentColor" stroke-width="10"
+              :stroke-dasharray="C" :stroke-dashoffset="C * (1 - progress)" transform="rotate(-90 130 130)"
+            />
+          </svg>
+          <p class="t-display tabular-nums num" :class="{ shiver: phase === 'cold' }">
+            {{ phase === 'end' ? '✓' : fmt(Math.max(0, left)) }}
+          </p>
+        </div>
+        <p class="t-label hint">
+          {{ phase === 'end' ? L('Bravo, agent secret', 'Well done, 007') : L('Touchez ou bouton volume pour arrêter', 'Tap or volume button to stop') }}
+        </p>
       </div>
-      <button v-if="!startedAt" class="btn btn-ink mt-6 w-52" :disabled="!editable" @click="go">
-        {{ L('L\'eau devient froide', 'Turn it cold') }}
-      </button>
-      <button v-else class="btn btn-ink mt-6 w-52" @click="stop">
-        {{ L('Je sors', 'I\'m out') }}
-      </button>
-      <p class="t-body text-xs text-pencil mt-3">
-        {{ L('Mains mouillées ? Appuyez sur un bouton de volume pour arrêter.', 'Wet hands? Press a volume button to stop.') }}
-      </p>
-      <p v-if="data.best" class="t-label mt-3">
-        {{ L('Record du jour', 'Today\'s best') }} : {{ formatClock(data.best) }} {{ done ? '✓' : '' }}
-      </p>
-    </div>
+    </Teleport>
   </div>
 </template>
 
 <style scoped>
-.cold {
-  position: relative;
-  margin: -8px;
-  padding: 8px;
-  background: color-mix(in oklab, var(--color-ice) calc(var(--f) * 100%), transparent);
-  transition: background 1s;
-}
-
-.frost {
-  position: absolute;
+.shower {
+  position: fixed;
   inset: 0;
-  overflow: hidden;
-  pointer-events: none;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  touch-action: none;
+  transition: background 600ms, color 600ms;
 }
 
-.crystal {
+.shower.warm {
+  background: var(--color-sun);
+  color: var(--color-ink);
+}
+
+.shower.cold {
+  background: var(--color-ice);
+  color: var(--color-ink);
+}
+
+.shower.end {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.label {
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+}
+
+.dial {
+  position: relative;
+  width: min(78vw, 360px);
+  display: grid;
+  place-items: center;
+}
+
+.dial svg {
+  width: 100%;
+}
+
+.dial circle {
+  transition: stroke-dashoffset 1s linear;
+}
+
+.num {
   position: absolute;
-  transition: opacity 1.5s;
+  font-size: min(26vw, 120px);
+  line-height: 1;
+}
+
+.hint {
+  position: absolute;
+  bottom: calc(var(--safe-bottom) + 40px);
+  opacity: 0.7;
 }
 
 .shiver {
@@ -132,10 +244,21 @@ onBeforeUnmount(() => {
 
 @keyframes shiver {
   25% {
-    transform: translateX(-1.5px);
+    transform: translateX(-2px);
   }
   75% {
-    transform: translateX(1.5px);
+    transform: translateX(2px);
+  }
+}
+
+.drops {
+  animation: fall 1.2s linear infinite;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(6px);
+    opacity: 0.6;
   }
 }
 </style>

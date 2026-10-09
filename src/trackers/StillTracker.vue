@@ -11,15 +11,17 @@ import { useSession } from './useSession'
 
 const props = defineProps<TrackerProps>()
 const L = useL()
-const GOAL = 10 * 60_000
+// 5 minutes on day one, one more every day, 11 on day seven.
+const MIN = 5 + props.idx
+const GOAL = MIN * 60_000
 
 const s = useSession(props, {
   targetMs: GOAL,
   keepAwake: true,
   title: () => L('CALME PLAT', 'DEAD CALM'),
-  subtitle: () => L('Ne rien faire · 10 min', 'Do nothing · 10 min'),
+  subtitle: () => L(`Ne rien faire · ${MIN} min`, `Do nothing · ${MIN} min`),
   short: '~',
-  doneBody: () => L('10 minutes de rien. Bien joué.', '10 minutes of nothing. Well done.'),
+  doneBody: () => L(`${MIN} minutes de rien. Bien joué.`, `${MIN} minutes of nothing. Well done.`),
   onComplete: () => {
     disarm()
     haptic.success()
@@ -138,6 +140,9 @@ const hint = computed(() => {
     <p class="t-display text-4xl tabular-nums mt-2">
       {{ formatClock(Math.max(0, GOAL - elapsed)) }}
     </p>
+    <p class="t-label text-pencil">
+      {{ L('Aujourd\'hui', 'Today') }} · {{ MIN }} min
+    </p>
     <p class="t-label text-graphite mt-1">
       {{ hint }}
     </p>
@@ -148,7 +153,7 @@ const hint = computed(() => {
       {{ armed ? L('Arrêter', 'Stop') : elapsed ? L('Reprendre', 'Resume') : L('Ne rien faire', 'Do nothing') }}
     </button>
     <p class="t-body text-xs text-pencil mt-3 text-center px-4">
-      {{ done ? L('Dix minutes sans rien faire, case cochée.', 'Ten minutes of nothing, box ticked.') : L('Le chrono ne tourne que si le téléphone reste immobile, face contre table.', 'The clock only runs while the phone lies still, face down.') }}
+      {{ done ? L(`${MIN} minutes sans rien faire, case cochée.`, `${MIN} minutes of nothing, box ticked.`) : L('Le chrono ne tourne que si le téléphone reste immobile, face contre table.', 'The clock only runs while the phone lies still, face down.') }}
     </p>
   </div>
 </template>

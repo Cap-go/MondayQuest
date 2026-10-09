@@ -11,19 +11,19 @@ export const LEVEL_10: Def[] = [
     text: {
       fr: {
         title: 'Calme plat',
-        short: 'Ne faites absolument rien pendant 10 minutes chaque jour pendant une semaine.',
+        short: 'Ne faites absolument rien chaque jour : 5 minutes le premier jour, une de plus chaque jour, 11 le septième.',
         body: [
           'Pas de méditation, pas de musique, pas de podcast. Rien. Nous ne savons plus nous ennuyer : chaque seconde vide est aussitôt remplie par un écran.',
-          'Pourtant, c\'est quand l\'esprit vagabonde qu\'il range, relie et invente. Dix minutes de vide par jour, c\'est un luxe gratuit et une petite victoire sur l\'agitation.',
+          'Pourtant, c\'est quand l\'esprit vagabonde qu\'il range, relie et invente. Quelques minutes de vide par jour, c\'est un luxe gratuit et une petite victoire sur l\'agitation.',
         ],
         tip: 'Posez le téléphone face contre la table, asseyez-vous près d\'une fenêtre et laissez venir. Si vous bougez, on recommence !',
       },
       en: {
         title: 'Dead calm',
-        short: 'Do absolutely nothing for 10 minutes every day for a week.',
+        short: 'Do absolutely nothing every day: 5 minutes on day one, one more each day, 11 by day seven.',
         body: [
           'No meditation, no music, no podcast. Nothing. We have forgotten how to be bored: every empty second gets filled by a screen.',
-          'Yet a wandering mind is a mind that tidies up, connects and invents. Ten empty minutes a day is a free luxury and a small win over the noise.',
+          'Yet a wandering mind is a mind that tidies up, connects and invents. A few empty minutes a day is a free luxury and a small win over the noise.',
         ],
         tip: 'Put the phone face down on the table, sit by a window and let things come. Move, and you start over!',
       },
@@ -65,7 +65,7 @@ export const LEVEL_10: Def[] = [
     text: {
       fr: {
         title: 'Le jongleur',
-        short: 'Apprenez à jongler à trois balles : 10 minutes d\'entraînement chaque jour pendant une semaine.',
+        short: 'Apprenez à jongler à trois balles : 5 minutes d\'entraînement le premier jour, jusqu\'à 15 le septième.',
         body: [
           'Jongler, c\'est apprendre à rater. Les balles tombent, encore et encore, jusqu\'au jour où elles ne tombent plus. Une leçon de patience en miniature.',
           'C\'est aussi un excellent exercice pour le cerveau : la coordination œil-main et la concentration progressent vite, et vous gagnez un petit talent pour la vie.',
@@ -74,7 +74,7 @@ export const LEVEL_10: Def[] = [
       },
       en: {
         title: 'The juggler',
-        short: 'Learn to juggle three balls: 10 minutes of practice every day for a week.',
+        short: 'Learn to juggle three balls: 5 minutes of practice on day one, building up to 15 by day seven.',
         body: [
           'Juggling is learning to fail. The balls drop, again and again, until one day they don\'t. A pocket-sized lesson in patience.',
           'It is also a great brain workout: hand-eye coordination and focus improve fast, and you pick up a small talent for life.',

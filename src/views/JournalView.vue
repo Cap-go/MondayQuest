@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { toast } from '@capgo/capacitor-pretty-toast'
 import { setDirection } from '@capgo/capacitor-transitions/vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
@@ -9,6 +10,7 @@ import { CHALLENGES } from '~/data/challenges'
 import { formatDate } from '~/lib/date'
 import { checkedCount, runStatus } from '~/lib/progress'
 import { haptic } from '~/services/haptics'
+import { exportNotebook } from '~/services/pdf'
 import { useQuest } from '~/stores/quest'
 import { TRACKERS } from '~/trackers'
 
@@ -27,6 +29,25 @@ function lines(e: (typeof entries.value)[number]) {
   return e.run.days.map((d, i) => ({ i, done: d.done, text: sum?.(d, quest.locale) ?? '', img: d.data.photo || d.data.drawing, items: d.data.items as string[] | undefined }))
 }
 
+const exporting = ref(false)
+
+async function exportPdf() {
+  if (exporting.value)
+    return
+  exporting.value = true
+  haptic.press()
+  try {
+    await exportNotebook({ runs: quest.runs, challenge: id => quest.challenge(id), locale: quest.locale, streak: quest.currentStreak, checks: quest.totalChecks })
+    haptic.success()
+  }
+  catch (e) {
+    toast.error(L('Export impossible', 'Export failed'), { message: String((e as Error)?.message ?? e) })
+  }
+  finally {
+    exporting.value = false
+  }
+}
+
 function open(id: string) {
   haptic.tap()
   setDirection('forward')
@@ -36,9 +57,14 @@ function open(id: string) {
 
 <template>
   <QuestPage>
-    <h1 class="t-display text-[2.6rem]">
-      {{ $t('journal.title') }}
-    </h1>
+    <div class="flex items-end justify-between gap-3">
+      <h1 class="t-display text-[2.6rem]">
+        {{ $t('journal.title') }}
+      </h1>
+      <button v-if="entries.length" class="btn pdf mb-2" :disabled="exporting" @click="exportPdf">
+        {{ exporting ? '…' : 'PDF ↓' }}
+      </button>
+    </div>
 
     <!-- 52 challenges, 52 boxes: a year of Mondays -->
     <section class="mt-6">
@@ -89,6 +115,11 @@ function open(id: string) {
 </template>
 
 <style scoped>
+.pdf {
+  padding: 8px 12px;
+  font-size: 0.75rem;
+}
+
 .cell {
   aspect-ratio: 1;
   border: 2px solid var(--color-ink);

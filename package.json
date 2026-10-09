@@ -1,7 +1,7 @@
 {
   "name": "monday-quest",
   "type": "module",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "private": true,
   "description": "Monday Quest — 30 weekly challenges to become a more resilient version of yourself.",
   "author": "Martin Donadieu <martin@capgo.app>",
@@ -65,6 +65,7 @@
     "@capgo/native-purchases": "^8.9.2",
     "@fontsource/archivo": "^5.3.0",
     "@fontsource/didact-gothic": "^5.3.0",
+    "jspdf": "^4.2.1",
     "pinia": "^4.0.3",
     "vue": "^3.5.43",
     "vue-i18n": "^11.4.13",

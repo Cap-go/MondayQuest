@@ -64,7 +64,7 @@ export const LEVEL_9: Def[] = [
     text: {
       fr: {
         title: 'Fausse note',
-        short: 'Jouez d\'un instrument ou chantez 15 minutes chaque jour pendant une semaine.',
+        short: 'Jouez d\'un instrument ou chantez chaque jour : 10 minutes le premier jour, jusqu\'à 25 le septième.',
         body: [
           'La musique fait travailler le cerveau en entier : mémoire, coordination, écoute, émotions. Quelques minutes par jour suffisent pour sentir les progrès.',
           'Pas besoin d\'être doué. La régularité compte bien plus que le talent, et chanter sous la douche, ça compte aussi !',
@@ -73,7 +73,7 @@ export const LEVEL_9: Def[] = [
       },
       en: {
         title: 'Wrong note',
-        short: 'Play an instrument or sing for 15 minutes every day for a week.',
+        short: 'Play an instrument or sing every day: 10 minutes on day one, building up to 25 by day seven.',
         body: [
           'Music works your whole brain: memory, coordination, listening, emotions. A few minutes a day is enough to feel the progress.',
           'No need to be gifted. Consistency matters far more than talent, and singing in the shower counts too!',

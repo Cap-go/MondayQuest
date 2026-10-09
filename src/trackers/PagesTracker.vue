@@ -8,7 +8,8 @@ import { useDay } from './useDay'
 const props = defineProps<TrackerProps>()
 const L = useL()
 const { data, done, patch, markDone } = useDay(props, { text: '', words: 0 })
-const GOAL = 300
+// 150 words on day one, 50 more every day, 450 on day seven.
+const GOAL = 150 + props.idx * 50
 const text = ref<string>(data.value.text)
 const words = computed(() => (text.value.trim() ? text.value.trim().split(/\s+/).length : 0))
 const C = 2 * Math.PI * 18
@@ -30,7 +31,7 @@ watch(words, (w, old) => {
 <template>
   <div>
     <div class="flex items-center justify-between mb-2">
-      <span class="t-label">{{ L('Écrivez sans vous relire', 'Write without rereading') }}</span>
+      <span class="t-label">{{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ L('mots', 'words') }}</span>
       <div class="flex items-center gap-2">
         <span class="t-label tabular-nums">{{ words }}/{{ GOAL }}</span>
         <svg viewBox="0 0 44 44" class="w-9 h-9 -rotate-90">
@@ -39,6 +40,9 @@ watch(words, (w, old) => {
         </svg>
       </div>
     </div>
+    <p class="t-body text-xs text-pencil mb-2">
+      {{ L('Écrivez sans vous relire.', 'Write without rereading.') }}
+    </p>
     <textarea v-model="text" class="pages" :disabled="!editable" :placeholder="L('Ce matin, je…', 'This morning, I…')" />
   </div>
 </template>

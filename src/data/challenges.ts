@@ -127,21 +127,21 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'Le flâneur',
-        short: 'Sortez faire une marche de 30 minutes chaque jour pendant une semaine.',
+        short: 'Marchez chaque jour : 20 minutes le premier jour, 5 de plus chaque jour, 50 le septième.',
         body: [
           'Les bénéfices de la marche sont nombreux. Marcher régulièrement réduit les risques de développer des maladies cardio-vasculaires, des cancers et du diabète.',
           'En plus de faire baisser vos risques de développer des maladies graves, la marche améliore vos capacités cognitives et vous fait profiter d\'un moment de coupure dans votre journée.',
         ],
-        tip: 'Fixez-vous un créneau chaque jour pour aller vous balader une trentaine de minutes. Faites le vide, essayez de ne penser à rien et appréciez les choses qui vous entourent.',
+        tip: 'Fixez-vous un créneau chaque jour pour aller vous balader. Faites le vide, essayez de ne penser à rien et appréciez les choses qui vous entourent.',
       },
       en: {
         title: 'The stroller',
-        short: 'Go for a 30-minute walk every day for a week.',
+        short: 'Walk every day: 20 minutes on day one, 5 more each day, 50 by day seven.',
         body: [
           'Walking has countless benefits. Walking regularly lowers your risk of cardiovascular disease, cancer and diabetes.',
           'Beyond lowering the risk of serious illness, walking sharpens your thinking and gives you a real break in your day.',
         ],
-        tip: 'Block a slot every day for a thirty-minute stroll. Empty your mind, try to think about nothing and enjoy what surrounds you.',
+        tip: 'Block a slot every day for a stroll. Empty your mind, try to think about nothing and enjoy what surrounds you.',
       },
     },
   },
@@ -403,7 +403,7 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'Zen chef',
-        short: 'Méditez pendant un minimum de 15 minutes chaque jour pendant une semaine.',
+        short: 'Méditez chaque jour : 5 minutes le premier jour, jusqu\'à 15 le septième.',
         body: [
           'La méditation est une pratique essentielle pour maintenir votre équilibre mental (et même physique). La science ne cesse de le prouver. Les futures générations vont regarder ceux qui ne méditent pas comme nous regardons ceux qui ne se brossent pas les dents.',
           'Si vous avez déjà médité il vous suffit de vous asseoir et de commencer votre session. Pour les autres, pas de panique, c\'est « très simple ».',
@@ -413,7 +413,7 @@ const defs: Def[] = [
       },
       en: {
         title: 'Zen chef',
-        short: 'Meditate for at least 15 minutes every day for a week.',
+        short: 'Meditate every day: 5 minutes on day one, building up to 15 by day seven.',
         body: [
           'Meditation is essential to keep your mental (and even physical) balance — science keeps proving it. Future generations will look at people who don\'t meditate the way we look at people who don\'t brush their teeth.',
           'If you have meditated before, just sit down and start. For everyone else, don\'t panic: it is "very simple".',
@@ -432,7 +432,7 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'La douche de James Bond',
-        short: 'Terminez vos douches avec de l\'eau glacée chaque jour pendant une semaine.',
+        short: 'Finissez chaque douche à l\'eau glacée : 20 secondes le premier jour, 10 de plus chaque jour.',
         body: [
           'Le froid ne vous veut pas de mal. Il a été démontré qu\'une exposition répétée au froid stimule vos défenses immunitaires, améliore la qualité de votre sommeil et votre humeur globale.',
           'Les adeptes sont unanimes, les douches froides rendent dépendants. Elles rendent accros au défi, au dépassement de soi, au bien-être et à l\'harmonie intérieure qui en résulte…',
@@ -442,7 +442,7 @@ const defs: Def[] = [
       },
       en: {
         title: 'The James Bond shower',
-        short: 'End every shower with ice-cold water every day for a week.',
+        short: 'End every shower ice-cold: 20 seconds on day one, 10 more every day.',
         body: [
           'The cold means you no harm. Repeated cold exposure has been shown to boost your immune system and improve your sleep and overall mood.',
           'Fans all agree: cold showers are addictive. You get hooked on the challenge, on pushing yourself, and on the inner calm that follows…',
@@ -546,7 +546,7 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'La source',
-        short: 'Buvez huit grands verres d\'eau chaque jour pendant une semaine.',
+        short: 'Buvez de l\'eau chaque jour : 6 grands verres le premier jour, jusqu\'à 8 en fin de semaine.',
         body: [
           'Votre corps est composé à 60 % d\'eau. Une déshydratation de seulement 2 % suffit à réduire votre concentration, votre mémoire et votre énergie.',
           'Boire régulièrement tout au long de la journée améliore votre digestion, l\'éclat de votre peau et votre humeur. C\'est le geste santé le plus simple qui existe.',
@@ -555,7 +555,7 @@ const defs: Def[] = [
       },
       en: {
         title: 'The spring',
-        short: 'Drink eight big glasses of water every day for a week.',
+        short: 'Drink water every day: 6 big glasses on day one, up to 8 by the end of the week.',
         body: [
           'Your body is 60% water. Losing just 2% is enough to dull your focus, memory and energy.',
           'Drinking steadily through the day helps digestion, skin and mood. It is the simplest healthy habit there is.',
@@ -573,21 +573,21 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'Rat de bibliothèque',
-        short: 'Lisez au moins vingt pages d\'un livre chaque jour pendant une semaine.',
+        short: 'Lisez chaque jour : 10 pages le premier jour, 2 de plus chaque jour, 22 le septième.',
         body: [
           'Lire seulement six minutes suffit à réduire le stress de près de 70 %. La lecture développe votre vocabulaire, votre empathie et votre capacité de concentration, mise à mal par les écrans.',
           'Vingt pages par jour, c\'est une quinzaine de livres par an. De quoi changer une vie.',
         ],
-        tip: 'Remplacez les dix dernières minutes de scroll avant de dormir par vos vingt pages.',
+        tip: 'Remplacez les dix dernières minutes de scroll avant de dormir par vos pages du jour.',
       },
       en: {
         title: 'Bookworm',
-        short: 'Read at least twenty pages of a book every day for a week.',
+        short: 'Read every day: 10 pages on day one, 2 more each day, 22 by day seven.',
         body: [
           'Reading for just six minutes can cut stress by almost 70%. It grows your vocabulary, your empathy and the focus that screens keep eroding.',
           'Twenty pages a day is about fifteen books a year. Enough to change a life.',
         ],
-        tip: 'Swap the last ten minutes of scrolling before bed for your twenty pages.',
+        tip: 'Swap the last ten minutes of scrolling before bed for today\'s pages.',
       },
     },
   },
@@ -627,7 +627,7 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'Hors ligne',
-        short: 'Passez une heure complètement déconnecté chaque jour pendant une semaine.',
+        short: 'Déconnectez-vous chaque jour : 30 minutes le premier jour, 10 de plus chaque jour, 1 h 30 le septième.',
         body: [
           'Nous consultons notre téléphone plus de 150 fois par jour. Chaque notification fragmente notre attention et nous empêche d\'être pleinement présents.',
           'Une heure sans internet, sans messages ni réseaux sociaux, c\'est une heure rendue à vous-même, à vos proches ou à l\'ennui — terreau de la créativité.',
@@ -636,7 +636,7 @@ const defs: Def[] = [
       },
       en: {
         title: 'Offline',
-        short: 'Spend one fully disconnected hour every day for a week.',
+        short: 'Go offline every day: 30 minutes on day one, 10 more each day, 90 by day seven.',
         body: [
           'We check our phones more than 150 times a day. Every notification splinters our attention and keeps us from being fully present.',
           'One hour with no internet, no messages, no feeds is an hour given back to yourself, your loved ones, or to boredom — the soil of creativity.',
@@ -683,7 +683,7 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'L\'escalier',
-        short: 'Bannissez ascenseurs et escalators : montez au moins dix étages chaque jour pendant une semaine.',
+        short: 'Bannissez ascenseurs et escalators : 5 étages le premier jour, un de plus chaque jour, 11 le septième.',
         body: [
           'Monter les escaliers brûle deux fois plus de calories que la marche et renforce le cœur, les jambes et les poumons. C\'est une salle de sport gratuite, ouverte partout.',
           'Le baromètre de votre téléphone mesure votre altitude : chaque étage gravi est compté.',
@@ -692,7 +692,7 @@ const defs: Def[] = [
       },
       en: {
         title: 'The staircase',
-        short: 'Ban lifts and escalators: climb at least ten floors every day for a week.',
+        short: 'Ban lifts and escalators: 5 floors on day one, one more each day, 11 by day seven.',
         body: [
           'Climbing stairs burns twice as many calories as walking and strengthens your heart, legs and lungs. It is a free gym, open everywhere.',
           'Your phone\'s barometer measures altitude: every floor you climb is counted.',
@@ -847,7 +847,7 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'Pages du matin',
-        short: 'Écrivez 300 mots au réveil, sans filtre, chaque jour pendant une semaine.',
+        short: 'Écrivez au réveil, sans filtre : 150 mots le premier jour, 50 de plus chaque jour, 450 le septième.',
         body: [
           'Popularisées par Julia Cameron, les pages du matin consistent à écrire tout ce qui vous passe par la tête, sans vous relire ni vous juger.',
           'Vider votre esprit sur le papier libère de la place pour la journée, apaise les angoisses et fait émerger des idées inattendues.',
@@ -856,7 +856,7 @@ const defs: Def[] = [
       },
       en: {
         title: 'Morning pages',
-        short: 'Write 300 unfiltered words when you wake up, every day for a week.',
+        short: 'Write unfiltered when you wake up: 150 words on day one, 50 more each day, 450 by day seven.',
         body: [
           'Popularised by Julia Cameron, morning pages mean writing whatever crosses your mind, without rereading or judging.',
           'Emptying your mind onto the page clears room for the day, calms anxiety and surfaces unexpected ideas.',
@@ -928,21 +928,21 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'Seize huit',
-        short: 'Pratiquez le jeûne intermittent 16:8 chaque jour pendant une semaine.',
+        short: 'Jeûnez chaque jour : 12 heures le premier jour, jusqu\'au 16:8 le septième.',
         body: [
           'Le jeûne 16:8 consiste à concentrer vos repas sur une fenêtre de huit heures et à jeûner les seize autres. Le corps puise dans ses réserves et se régénère.',
           'Au-delà des effets sur le métabolisme, c\'est un exercice de volonté qui transforme votre rapport à la faim.',
         ],
-        tip: 'Le plus simple : sauter le petit-déjeuner et manger entre midi et 20h. Eau, thé et café noir sont autorisés… sauf si vous refaites « Défoncé à la vie ».',
+        tip: 'Allongez le jeûne d\'une heure à la fois, le soir ou le matin. Pour le 16:8, le plus simple : sauter le petit-déjeuner et manger entre midi et 20h. Eau, thé et café noir sont autorisés… sauf si vous refaites « Défoncé à la vie ».',
       },
       en: {
         title: 'Sixteen eight',
-        short: 'Practise 16:8 intermittent fasting every day for a week.',
+        short: 'Fast every day: 12 hours on day one, building up to 16:8 by day seven.',
         body: [
           '16:8 fasting means eating within an eight-hour window and fasting for the other sixteen. Your body taps into its reserves and regenerates.',
           'Beyond the metabolic effects, it is a willpower workout that changes your relationship with hunger.',
         ],
-        tip: 'Easiest version: skip breakfast and eat between noon and 8 p.m. Water, tea and black coffee are fine… unless you\'re redoing "High on life".',
+        tip: 'Stretch the fast one hour at a time, in the evening or the morning. For 16:8, the easiest version: skip breakfast and eat between noon and 8 p.m. Water, tea and black coffee are fine… unless you\'re redoing "High on life".',
       },
     },
   },

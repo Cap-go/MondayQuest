@@ -11,7 +11,8 @@ const L = useL()
 // Remember the book across days.
 const lastBook = props.run.days.slice(0, props.idx).reverse().find(d => d.data.book)?.data.book ?? ''
 const { data, done, patch, markDone } = useDay(props, { pages: 0, book: lastBook as string })
-const GOAL = 20
+// 10 pages on day one, 2 more every day, 22 on day seven.
+const GOAL = 10 + props.idx * 2
 const flipping = ref(0)
 
 function flip(n = 1) {
@@ -51,6 +52,9 @@ function up(e: PointerEvent) {
         </p>
         <p class="t-label text-graphite">
           {{ L('pages lues', 'pages read') }}
+        </p>
+        <p class="t-label text-pencil mt-1">
+          {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} pages
         </p>
       </div>
       <div class="side right">

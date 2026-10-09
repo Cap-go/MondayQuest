@@ -8,18 +8,20 @@ import { sfx } from '~/services/sound'
 import { useDay } from './useDay'
 import { useSession } from './useSession'
 
-// 15 minutes of music with a pendulum metronome to keep you honest.
+// Music practice with a pendulum metronome to keep you honest.
+// 10 minutes on day one, building up to 25 on day seven.
 const props = defineProps<TrackerProps>()
 const L = useL()
-const GOAL = 15 * 60_000
+const MIN = 10 + Math.round(props.idx * 2.5)
+const GOAL = MIN * 60_000
 
 const s = useSession(props, {
   targetMs: GOAL,
   keepAwake: true,
   title: () => L('FAUSSE NOTE', 'WRONG NOTE'),
-  subtitle: () => L('Pratique · 15 min', 'Practice · 15 min'),
+  subtitle: () => L(`Pratique · ${MIN} min`, `Practice · ${MIN} min`),
   short: '♪',
-  doneBody: () => L('15 minutes de musique. Bravo, la case est cochée.', '15 minutes of music. Bravo, the box is ticked.'),
+  doneBody: () => L(`${MIN} minutes de musique. Bravo, la case est cochée.`, `${MIN} minutes of music. Bravo, the box is ticked.`),
   onComplete: () => stopMetro(),
 })
 const { running, elapsed, progress, done, toggle } = s
@@ -107,7 +109,7 @@ const marks = computed(() => Array.from({ length: 41 }, (_, i) => bpm.value - 20
           {{ formatClock(Math.max(0, GOAL - elapsed)) }}
         </p>
         <p class="t-label text-graphite">
-          {{ done ? L('Séance jouée', 'Session played') : running ? L('On joue', 'Playing') : L('Temps de pratique', 'Practice time') }}
+          {{ done ? L('Séance jouée', 'Session played') : running ? L('On joue', 'Playing') : `${L('Aujourd\'hui', 'Today')} · ${MIN} min` }}
         </p>
         <p class="t-label text-pencil mt-3">
           {{ playing ? L('Touchez pour arrêter', 'Tap to stop') : L('Touchez le métronome', 'Tap the metronome') }}
@@ -126,7 +128,7 @@ const marks = computed(() => Array.from({ length: 41 }, (_, i) => bpm.value - 20
     </div>
 
     <button class="btn btn-ink mt-4 w-48" :disabled="!editable || done" @click="toggle">
-      {{ done ? L('15 minutes ✓', '15 minutes ✓') : running ? L('Pause', 'Pause') : elapsed ? L('Reprendre', 'Resume') : L('Commencer', 'Start') }}
+      {{ done ? `${MIN} minutes ✓` : running ? L('Pause', 'Pause') : elapsed ? L('Reprendre', 'Resume') : L('Commencer', 'Start') }}
     </button>
   </div>
 </template>

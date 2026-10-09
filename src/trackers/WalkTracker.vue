@@ -11,14 +11,16 @@ import { useSession } from './useSession'
 
 const props = defineProps<TrackerProps>()
 const L = useL()
-const GOAL = 30 * 60_000
+// 20 minutes on day one, 5 more every day, 50 on day seven.
+const MIN = 20 + props.idx * 5
+const GOAL = MIN * 60_000
 
 const s = useSession(props, {
   targetMs: GOAL,
   title: () => L('LE FLÂNEUR', 'THE STROLLER'),
-  subtitle: () => L('30 minutes de marche', '30-minute walk'),
+  subtitle: () => L(`${MIN} minutes de marche`, `${MIN}-minute walk`),
   short: '👣',
-  doneBody: () => L('30 minutes ! Vous pouvez rentrer, la case est cochée.', '30 minutes! Head home, the box is ticked.'),
+  doneBody: () => L(`${MIN} minutes ! Vous pouvez rentrer, la case est cochée.`, `${MIN} minutes! Head home, the box is ticked.`),
 })
 
 const steps = ref<number>((s.data.value as any).steps ?? 0)
@@ -94,7 +96,10 @@ const prints = computed(() => {
         </g>
       </svg>
     </div>
-    <button class="btn btn-ink mt-5 w-48" :disabled="!editable || s.done.value" @click="s.toggle">
+    <p class="t-label text-graphite mt-4">
+      {{ L('Aujourd\'hui', 'Today') }} · {{ MIN }} min
+    </p>
+    <button class="btn btn-ink mt-3 w-48" :disabled="!editable || s.done.value" @click="s.toggle">
       {{ s.done.value ? L('Marche faite ✓', 'Walk done ✓') : s.running.value ? L('Pause', 'Pause') : s.elapsed.value ? L('Reprendre', 'Resume') : L('Je pars marcher', 'Start walking') }}
     </button>
     <p v-if="todaySteps != null" class="t-body text-sm text-graphite mt-3">

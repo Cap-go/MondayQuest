@@ -12,15 +12,17 @@ import { useSession } from './useSession'
 
 const props = defineProps<TrackerProps>()
 const L = useL()
-const GOAL = 20 * 60_000
-const LEAVES = 20
+// 15 minutes on day one, building up to 30 on day seven. One leaf a minute.
+const MIN = 15 + Math.round(props.idx * 2.5)
+const GOAL = MIN * 60_000
+const LEAVES = MIN
 
 const s = useSession(props, {
   targetMs: GOAL,
   title: () => L('AU VERT', 'INTO THE GREEN'),
-  subtitle: () => L('20 minutes dehors', '20 minutes outside'),
+  subtitle: () => L(`${MIN} minutes dehors`, `${MIN} minutes outside`),
   short: '🌿',
-  doneBody: () => L('20 minutes au grand air. La case est cochée.', '20 minutes of fresh air. The box is ticked.'),
+  doneBody: () => L(`${MIN} minutes au grand air. La case est cochée.`, `${MIN} minutes of fresh air. The box is ticked.`),
 })
 
 const lux = ref<number | null>(null)
@@ -97,10 +99,10 @@ onBeforeUnmount(() => {
       </g>
     </svg>
     <p class="t-display text-5xl tabular-nums">
-      {{ s.done.value ? '20:00' : formatClock(s.running.value || s.elapsed.value ? s.remaining.value : GOAL) }}
+      {{ s.done.value ? formatClock(GOAL) : formatClock(s.running.value || s.elapsed.value ? s.remaining.value : GOAL) }}
     </p>
     <p class="t-label text-graphite mt-1">
-      {{ shown }}/{{ LEAVES }} {{ L('feuilles', 'leaves') }}
+      {{ L('Aujourd\'hui', 'Today') }} · {{ MIN }} min · {{ shown }}/{{ LEAVES }} {{ L('feuilles', 'leaves') }}
       <template v-if="light">
         · {{ L('lumière', 'sunlight') }} : {{ light }}
       </template>

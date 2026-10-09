@@ -14,7 +14,10 @@ const L = useL()
 // The fast usually starts the evening before: carry yesterday's last meal over.
 const carried = props.idx > 0 ? props.run.days[props.idx - 1]!.data.lastMeal : undefined
 const { data, done, patch, markDone } = useDay(props, { fastStart: carried as number | undefined, fasted: 0, lastMeal: undefined as number | undefined })
-const GOAL = 16 * 3_600_000
+// 12 hours of fasting on day one, building up to 16:8 on day seven.
+const HOURS = [12, 12, 13, 14, 14, 15, 16][props.idx] ?? 16
+const RATIO = `${HOURS}:${24 - HOURS}`
+const GOAL = HOURS * 3_600_000
 const key = `${props.run.id}-fast-${props.idx}`
 
 const now = ref(Date.now())
@@ -30,7 +33,7 @@ const progress = computed(() => Math.min(1, elapsed.value / GOAL))
 const arc = computed(() => {
   const start = data.value.fastStart ? new Date(data.value.fastStart) : new Date(new Date().setHours(20, 0, 0, 0))
   const a0 = ((start.getHours() + start.getMinutes() / 60) / 24) * 360
-  return { a0, a1: a0 + 240 }
+  return { a0, a1: a0 + HOURS * 15 }
 })
 
 function polar(a: number, r = 80) {
@@ -43,8 +46,8 @@ function startFast() {
   patch({ fastStart: start })
   sfx.play('chime')
   haptic.press()
-  void scheduleTimerEnd(key, L('SEIZE HUIT', 'SIXTEEN EIGHT'), L('16 heures de jeûne ! Bon appétit.', '16 hours fasted! Enjoy your meal.'), GOAL)
-  void startSessionActivity({ title: L('SEIZE HUIT', 'SIXTEEN EIGHT'), subtitle: L('Jeûne en cours', 'Fasting'), short: '◔', icon: 'clock', durationMs: GOAL, startedAt: start })
+  void scheduleTimerEnd(key, L('SEIZE HUIT', 'SIXTEEN EIGHT'), L(`${HOURS} heures de jeûne ! Bon appétit.`, `${HOURS} hours fasted! Enjoy your meal.`), GOAL)
+  void startSessionActivity({ title: L('SEIZE HUIT', 'SIXTEEN EIGHT'), subtitle: L(`Jeûne ${RATIO}`, `Fasting ${RATIO}`), short: '◔', icon: 'clock', durationMs: GOAL, startedAt: start })
 }
 
 function breakFast() {
@@ -72,10 +75,10 @@ function lastMealNow() {
     <svg viewBox="0 0 200 200" class="w-56 h-56">
       <circle cx="100" cy="100" r="80" fill="none" stroke="var(--color-rule)" stroke-width="16" />
       <path :d="`M ${polar(arc.a0)} A 80 80 0 1 1 ${polar(arc.a1)}`" fill="none" stroke="var(--color-ink)" stroke-width="16" :opacity="fasting || done ? 1 : 0.18" />
-      <path v-if="fasting" :d="`M ${polar(arc.a0)} A 80 80 0 ${progress > 0.75 ? 1 : 0} 1 ${polar(arc.a0 + 240 * progress)}`" fill="none" stroke="var(--color-sun)" stroke-width="6" stroke-linecap="round" />
+      <path v-if="fasting" :d="`M ${polar(arc.a0)} A 80 80 0 ${HOURS * 15 * progress > 180 ? 1 : 0} 1 ${polar(arc.a0 + HOURS * 15 * progress)}`" fill="none" stroke="var(--color-sun)" stroke-width="6" stroke-linecap="round" />
       <text v-for="h in [0, 6, 12, 18]" :key="h" :x="polar(h * 15, 58).split(' ')[0]" :y="Number(polar(h * 15, 58).split(' ')[1]) + 4" text-anchor="middle" font-family="Archivo" font-size="10" fill="var(--color-pencil)">{{ h }}h</text>
-      <text x="100" y="100" text-anchor="middle" font-family="Archivo" font-weight="800" font-size="24">{{ fasting ? formatClock(elapsed) : done ? '16:8 ✓' : '16:8' }}</text>
-      <text x="100" y="120" text-anchor="middle" font-family="Archivo" font-size="10" fill="var(--color-graphite)">{{ fasting ? L(`depuis ${formatHM(new Date(data.fastStart!))}`, `since ${formatHM(new Date(data.fastStart!))}`) : L('jeûne · fenêtre', 'fast · window') }}</text>
+      <text x="100" y="100" text-anchor="middle" font-family="Archivo" font-weight="800" font-size="24">{{ fasting ? formatClock(elapsed) : done ? `${RATIO} ✓` : RATIO }}</text>
+      <text x="100" y="120" text-anchor="middle" font-family="Archivo" font-size="10" fill="var(--color-graphite)">{{ fasting ? L(`depuis ${formatHM(new Date(data.fastStart!))}`, `since ${formatHM(new Date(data.fastStart!))}`) : L(`aujourd'hui · ${HOURS} h de jeûne`, `today · ${HOURS} h fast`) }}</text>
     </svg>
     <div class="grid grid-cols-2 gap-3 w-full mt-3">
       <button v-if="!fasting" class="btn btn-ink col-span-2" :disabled="!editable || done" @click="startFast">

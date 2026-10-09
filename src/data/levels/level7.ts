@@ -91,19 +91,19 @@ export const LEVEL_7: Def[] = [
     category: 'growth',
     text: {
       fr: {
-        title: 'Cinq mots',
-        short: 'Apprenez 5 mots d\'une nouvelle langue chaque jour pendant une semaine.',
+        title: 'Mot à mot',
+        short: 'Apprenez des mots d\'une nouvelle langue : 3 le premier jour, un de plus chaque jour, 9 le septième.',
         body: [
-          'Apprendre une langue paraît immense. Cinq mots par jour, beaucoup moins. En une semaine, vous en aurez 35 : de quoi saluer, commander un café et remercier quelqu\'un dans sa langue.',
+          'Apprendre une langue paraît immense. Quelques mots par jour, beaucoup moins. En une semaine, vous en aurez 42 : de quoi saluer, commander un café et remercier quelqu\'un dans sa langue.',
           'Apprendre du vocabulaire stimule la mémoire et ouvre une petite fenêtre sur une autre culture. Et chaque mot appris rend le suivant un peu plus facile à retenir.',
         ],
         tip: 'Choisissez des mots utiles plutôt que rares, et prononcez-les à voix haute. Relisez les mots de la veille avant d\'en ajouter de nouveaux.',
       },
       en: {
-        title: 'Five words',
-        short: 'Learn 5 words of a new language every day for a week.',
+        title: 'Word by word',
+        short: 'Learn words in a new language: 3 on day one, one more each day, 9 by day seven.',
         body: [
-          'Learning a language feels huge. Five words a day, much less so. In a week you will have 35: enough to say hello, order a coffee and thank someone in their own language.',
+          'Learning a language feels huge. A few words a day, much less so. In a week you will have 42: enough to say hello, order a coffee and thank someone in their own language.',
           'Learning vocabulary trains your memory and opens a small window onto another culture. And every word you learn makes the next one a little easier to keep.',
         ],
         tip: 'Pick useful words over rare ones, and say them out loud. Review yesterday\'s words before adding new ones.',

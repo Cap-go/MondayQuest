@@ -9,12 +9,14 @@ import { useDay } from './useDay'
 
 interface Card { w: string, t: string }
 
-// Five flashcards a day: write the word, flip to check the meaning, hear it.
+// A few flashcards a day: write the word, flip to check the meaning, hear it.
+// 3 words on day one, one more every day, 9 on day seven.
 const props = defineProps<TrackerProps>()
 const L = useL()
-const GOAL = 5
-const empty = (): Card[] => Array.from({ length: GOAL }, () => ({ w: '', t: '' }))
-const { data, done, patch, markDone } = useDay(props, { lang: '', cards: empty() })
+const GOAL = 3 + props.idx
+const { data, done, patch, markDone } = useDay(props, { lang: '', cards: [] as Card[] })
+// Always show today's slots (or more, if an older day stored more cards).
+const cards = computed<Card[]>(() => Array.from({ length: Math.max(GOAL, data.value.cards.length) }, (_, i) => data.value.cards[i] ?? { w: '', t: '' }))
 
 // Carry yesterday's language over so the user only picks it once.
 const lang = computed(() => data.value.lang || [...props.run.days.slice(0, props.idx)].reverse().find(d => d.data?.lang)?.data.lang || 'es-ES')
@@ -36,10 +38,10 @@ const flipped = ref<number[]>([])
 const editing = ref<number | null>(null)
 const w = ref('')
 const t = ref('')
-const count = computed(() => data.value.cards.filter(c => c.w.trim() && c.t.trim()).length)
+const count = computed(() => cards.value.filter(c => c.w.trim() && c.t.trim()).length)
 
 function tapCard(i: number) {
-  const c = data.value.cards[i]!
+  const c = cards.value[i]!
   if (!c.w.trim()) {
     if (!props.editable)
       return
@@ -58,14 +60,14 @@ function save() {
   const i = editing.value
   if (i == null || !w.value.trim() || !t.value.trim())
     return
-  const cards = data.value.cards.map((c, j) => (j === i ? { w: w.value.trim(), t: t.value.trim() } : c))
+  const next = cards.value.map((c, j) => (j === i ? { w: w.value.trim(), t: t.value.trim() } : c))
   editing.value = null
   sfx.play('pop')
   haptic.press()
-  patch({ cards, lang: lang.value })
-  void say(cards[i]!.w)
-  if (cards.filter(c => c.w && c.t).length >= GOAL && !done.value)
-    markDone({ cards, lang: lang.value })
+  patch({ cards: next, lang: lang.value })
+  void say(next[i]!.w)
+  if (next.filter(c => c.w && c.t).length >= GOAL && !done.value)
+    markDone({ cards: next, lang: lang.value })
 }
 
 async function say(text: string) {
@@ -90,9 +92,12 @@ function setLang(v: string) {
         {{ count }}<span class="text-pencil text-base">/{{ GOAL }}</span>
       </p>
     </div>
+    <p class="t-label text-graphite mt-2">
+      {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ L('mots', 'words') }}
+    </p>
 
     <div class="grid grid-cols-2 gap-2.5 mt-3">
-      <div v-for="(c, i) in data.cards" :key="i" class="scene" :class="{ wide: i === GOAL - 1 || editing === i, open: editing === i }">
+      <div v-for="(c, i) in cards" :key="i" class="scene" :class="{ wide: (cards.length % 2 === 1 && i === cards.length - 1) || editing === i, open: editing === i }">
         <div v-if="editing === i" class="face front edit">
           <input v-model="w" class="ink-input text-center" :placeholder="L('Mot', 'Word')" autofocus>
           <input v-model="t" class="ink-input text-center text-sm" :placeholder="L('Traduction', 'Translation')" @keyup.enter="save">
@@ -122,7 +127,7 @@ function setLang(v: string) {
       </div>
     </div>
     <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ done ? L('Cinq mots de plus dans la poche.', 'Five more words in your pocket.') : L('Touchez une carte pour la retourner', 'Tap a card to flip it') }}
+      {{ done ? L(`${GOAL} mots de plus dans la poche.`, `${GOAL} more words in your pocket.`) : L('Touchez une carte pour la retourner', 'Tap a card to flip it') }}
     </p>
   </div>
 </template>

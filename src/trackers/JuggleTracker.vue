@@ -10,14 +10,16 @@ import { useSession } from './useSession'
 
 const props = defineProps<TrackerProps>()
 const L = useL()
-const GOAL = 10 * 60_000
+// 5 minutes on day one, building up to 15 on day seven.
+const MIN = 5 + Math.round(props.idx * 10 / 6)
+const GOAL = MIN * 60_000
 
 const s = useSession(props, {
   targetMs: GOAL,
   title: () => L('LE JONGLEUR', 'THE JUGGLER'),
-  subtitle: () => L('10 min d\'entraînement', '10 min of practice'),
+  subtitle: () => L(`${MIN} min d'entraînement`, `${MIN} min of practice`),
   short: '◦◦◦',
-  doneBody: () => L('10 minutes de jonglage. Les balles vous remercient.', '10 minutes of juggling. The balls thank you.'),
+  doneBody: () => L(`${MIN} minutes de jonglage. Les balles vous remercient.`, `${MIN} minutes of juggling. The balls thank you.`),
 })
 const { running, elapsed, progress, done } = s
 const extra = useDay(props, { best: 0, catches: 0 })
@@ -94,7 +96,7 @@ function drop() {
       <span :key="pop" class="t-display text-5xl tabular-nums count">{{ streak }}</span>
     </button>
     <p class="t-label text-graphite mt-1">
-      {{ L('Tapez à chaque rattrapage', 'Tap on every catch') }}
+      {{ L('Aujourd\'hui', 'Today') }} · {{ MIN }} min · {{ L('tapez à chaque rattrapage', 'tap on every catch') }}
     </p>
     <div class="grid grid-cols-3 w-full mt-4 text-center">
       <div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { TrackerProps } from './useDay'
 import { computed, ref } from 'vue'
+import CameraCapture from '~/components/CameraCapture.vue'
 import { useL } from '~/composables/useL'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
@@ -9,7 +10,7 @@ import { useDay } from './useDay'
 // A recipe card: name the dish, drop raw ingredients into the pot, serve.
 const props = defineProps<TrackerProps>()
 const L = useL()
-const { data, done, patch, markDone, unmark } = useDay(props, { dish: '', ingredients: [] as string[] })
+const { data, done, patch, markDone, unmark } = useDay(props, { dish: '', ingredients: [] as string[], photo: '' })
 const MIN = 3
 
 const draft = ref('')
@@ -49,6 +50,14 @@ function remove(i: number) {
   patch({ ingredients: data.value.ingredients.filter((_, j) => j !== i) })
 }
 
+const cam = ref<InstanceType<typeof CameraCapture> | null>(null)
+
+function setPhoto(photo: string) {
+  patch({ photo })
+  sfx.play('shutter')
+  haptic.success()
+}
+
 function serve() {
   if (!ready.value || done.value)
     return
@@ -68,7 +77,18 @@ function serve() {
       :placeholder="L('Soupe de potiron', 'Pumpkin soup')" @change="setDish(($event.target as HTMLInputElement).value)"
     >
 
-    <div class="relative flex justify-center mt-3">
+    <!-- the plated dish replaces the pot once photographed -->
+    <figure v-if="data.photo" class="plate mt-3">
+      <img :src="data.photo" alt="">
+      <figcaption class="t-body text-sm text-center mt-2">
+        {{ data.dish || L('Fait maison', 'Homemade') }}
+      </figcaption>
+      <div v-if="done" class="stamp t-display">
+        {{ L('Servi', 'Served') }}
+      </div>
+    </figure>
+
+    <div v-else class="relative flex justify-center mt-3">
       <svg viewBox="0 0 200 130" class="w-48">
         <!-- steam -->
         <g v-if="heat > 0" fill="none" stroke="var(--color-pencil)" stroke-width="2.5" stroke-linecap="round">
@@ -104,6 +124,16 @@ function serve() {
       </button>
     </form>
 
+    <div v-if="editable" class="grid grid-cols-2 gap-2 mt-3">
+      <button class="btn" @click="cam?.open()">
+        {{ data.photo ? L('Reprendre', 'Retake') : L('Photo du plat', 'Photo of the dish') }}
+      </button>
+      <button class="btn" @click="cam?.pick()">
+        {{ L('Galerie', 'Gallery') }}
+      </button>
+    </div>
+    <CameraCapture ref="cam" position="rear" :hint="L('Votre plat, sous son meilleur jour', 'Your dish, at its best')" @shot="setPhoto" />
+
     <button v-if="!done" class="btn btn-ink w-full mt-3" :disabled="!editable || !ready" @click="serve">
       {{ ready ? L('Servir', 'Serve') : L(`Encore ${Math.max(0, MIN - data.ingredients.length)} ingrédient(s)`, `${Math.max(0, MIN - data.ingredients.length)} more ingredient(s)`) }}
     </button>
@@ -111,6 +141,31 @@ function serve() {
 </template>
 
 <style scoped>
+.plate {
+  position: relative;
+  margin-inline: auto;
+  width: 220px;
+  padding: 10px 10px 6px;
+  background: #fff;
+  border: 1.5px solid var(--color-rule);
+  box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.35);
+  transform: rotate(2deg);
+  animation: develop 700ms var(--ease-spring);
+}
+
+.plate img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+@keyframes develop {
+  from {
+    transform: rotate(-6deg) translateY(24px) scale(0.92);
+    opacity: 0;
+  }
+}
+
 .chip {
   padding: 3px 9px;
   border: 1.5px solid var(--color-ink);

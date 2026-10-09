@@ -11,7 +11,8 @@ import { useDay } from './useDay'
 const props = defineProps<TrackerProps>()
 const L = useL()
 const { data, done, patch, markDone } = useDay(props, { glasses: 0 })
-const GOAL = 8
+// 6 glasses on day one, one more every two days, 8 from day five.
+const GOAL = Math.min(8, 6 + Math.floor(props.idx / 2))
 
 // The water surface follows the phone's tilt.
 const tilt = ref(0)
@@ -62,14 +63,14 @@ function undo() {
         </g>
       </g>
       <path d="M38 4h24v14c0 6 14 10 14 24v106c0 4-3 8-8 8H32c-5 0-8-4-8-8V42c0-14 14-18 14-24z" fill="none" stroke="var(--color-ink)" stroke-width="3" />
-      <line v-for="i in GOAL - 1" :key="i" x1="70" :x2="76" :y1="150 - i * 16" :y2="150 - i * 16" stroke="var(--color-ink)" stroke-width="1.5" />
+      <line v-for="i in GOAL - 1" :key="i" x1="70" :x2="76" :y1="150 - i * 128 / GOAL" :y2="150 - i * 128 / GOAL" stroke="var(--color-ink)" stroke-width="1.5" />
     </svg>
     <div class="flex-1 min-w-0">
       <p class="t-display text-5xl tabular-nums">
         {{ data.glasses }}<span class="text-pencil text-2xl">/{{ GOAL }}</span>
       </p>
       <p class="t-label text-graphite">
-        {{ L('verres d\'eau', 'glasses of water') }}
+        {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ L('verres d\'eau', 'glasses of water') }}
       </p>
       <div class="grid grid-cols-4 gap-1.5 mt-3">
         <span v-for="i in GOAL" :key="i" class="h-3 border-[1.5px] border-ink" :class="i <= data.glasses ? 'bg-ink' : ''" />

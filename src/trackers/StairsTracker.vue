@@ -13,7 +13,11 @@ import { useDay } from './useDay'
 const props = defineProps<TrackerProps>()
 const L = useL()
 const { data, done, patch, markDone } = useDay(props, { floors: 0 })
-const GOAL = 10
+// 5 floors on day one, one more every day, 11 on day seven.
+const GOAL = 5 + props.idx
+// the staircase drawing always spans 112 px, whatever today's floor count
+const W = 112 / GOAL
+const outline = `M4 116 ${Array.from({ length: GOAL }, (_, i) => `V${116 - (i + 1) * W} H${4 + (i + 1) * W}`).join(' ')} H116`
 const FLOOR_M = 3
 
 const tracking = ref(false)
@@ -87,10 +91,10 @@ const steps = computed(() => Array.from({ length: GOAL }, (_, i) => i < data.val
       <svg viewBox="0 0 120 120" class="w-32 shrink-0">
         <path d="M4 116 H16" stroke="var(--color-ink)" stroke-width="3" />
         <g v-for="(on, i) in steps" :key="i">
-          <rect :x="4 + i * 11.2" :y="116 - (i + 1) * 11.2" width="11.2" :height="(i + 1) * 11.2" :fill="on ? 'var(--color-ink)' : 'none'" class="step" :style="{ transitionDelay: `${i * 30}ms` }" />
+          <rect :x="4 + i * W" :y="116 - (i + 1) * W" :width="W" :height="(i + 1) * W" :fill="on ? 'var(--color-ink)' : 'none'" class="step" :style="{ transitionDelay: `${i * 30}ms` }" />
         </g>
-        <path d="M4 116 V104.8 H15.2 V93.6 H26.4 V82.4 H37.6 V71.2 H48.8 V60 H60 V48.8 H71.2 V37.6 H82.4 V26.4 H93.6 V15.2 H104.8 V4 H116" fill="none" stroke="var(--color-ink)" stroke-width="3" />
-        <circle :cx="10 + Math.min(data.floors, GOAL - 1) * 11.2" :cy="110 - (Math.min(data.floors, GOAL - 1) + 1) * 11.2" r="4" fill="var(--color-ink)" class="climber" />
+        <path :d="outline" fill="none" stroke="var(--color-ink)" stroke-width="3" />
+        <circle :cx="4 + (Math.min(data.floors, GOAL - 1) + 0.5) * W" :cy="110 - (Math.min(data.floors, GOAL - 1) + 1) * W" r="4" fill="var(--color-ink)" class="climber" />
       </svg>
       <div>
         <p class="t-display text-5xl tabular-nums">
@@ -98,6 +102,9 @@ const steps = computed(() => Array.from({ length: GOAL }, (_, i) => i < data.val
         </p>
         <p class="t-label text-graphite">
           {{ L('étages gravis', 'floors climbed') }}
+        </p>
+        <p class="t-label text-pencil mt-1">
+          {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ L('étages', 'floors') }}
         </p>
         <p v-if="tracking" class="t-body text-xs mt-1 tabular-nums">
           {{ L('Altitude', 'Altitude') }} {{ altitude >= 0 ? '+' : '' }}{{ altitude.toFixed(1) }} m

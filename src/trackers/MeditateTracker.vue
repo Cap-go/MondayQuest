@@ -12,16 +12,18 @@ import { useSession } from './useSession'
 
 const props = defineProps<TrackerProps>()
 const L = useL()
-const GOAL = 15 * 60_000
+// 5 minutes on day one, building up to 15 on day seven.
+const MIN = Math.round(5 + props.idx * 10 / 6)
+const GOAL = MIN * 60_000
 const zen = ref(false)
 
 const s = useSession(props, {
   targetMs: GOAL,
   keepAwake: true,
   title: () => 'ZEN CHEF',
-  subtitle: () => L('Méditation · 15 min', 'Meditation · 15 min'),
+  subtitle: () => L(`Méditation · ${MIN} min`, `Meditation · ${MIN} min`),
   short: '◯',
-  doneBody: () => L('15 minutes de calme. Revenez doucement.', '15 minutes of calm. Come back gently.'),
+  doneBody: () => L(`${MIN} minutes de calme. Revenez doucement.`, `${MIN} minutes of calm. Come back gently.`),
   onComplete: () => void logMindful(),
 })
 const { running, elapsed, progress, done, start, pause } = s
@@ -56,7 +58,7 @@ async function logMindful() {
   const ok = await Health.requestAuthorization({ write: ['mindfulness'] }).catch(() => null)
   if (!ok?.writeAuthorized.includes('mindfulness'))
     return
-  await Health.saveSample({ dataType: 'mindfulness', value: 15, unit: 'minute', startDate: new Date(Date.now() - GOAL).toISOString(), endDate: new Date().toISOString(), mindfulnessSessionType: 'meditation' }).catch(() => {})
+  await Health.saveSample({ dataType: 'mindfulness', value: MIN, unit: 'minute', startDate: new Date(Date.now() - GOAL).toISOString(), endDate: new Date().toISOString(), mindfulnessSessionType: 'meditation' }).catch(() => {})
 }
 
 onBeforeUnmount(() => void HomeIndicator.show().catch(() => {}))
@@ -81,7 +83,10 @@ onBeforeUnmount(() => void HomeIndicator.show().catch(() => {}))
         </div>
       </div>
     </div>
-    <button class="btn btn-ink mt-5 w-48" :disabled="!editable || done" @click="running ? end() : begin()">
+    <p class="t-label text-graphite mt-4">
+      {{ L('Aujourd\'hui', 'Today') }} · {{ MIN }} min
+    </p>
+    <button class="btn btn-ink mt-3 w-48" :disabled="!editable || done" @click="running ? end() : begin()">
       {{ done ? L('Méditation faite ✓', 'Meditated ✓') : running ? L('Pause', 'Pause') : elapsed ? L('Reprendre', 'Resume') : L('S\'asseoir', 'Sit down') }}
     </button>
     <p class="t-body text-xs text-pencil mt-3 text-center">

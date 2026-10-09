@@ -11,19 +11,19 @@ export const LEVEL_8: Def[] = [
     text: {
       fr: {
         title: 'Le grand vide',
-        short: 'Débarrassez-vous de 10 objets chaque jour pendant une semaine.',
+        short: 'Débarrassez-vous d\'objets chaque jour : 5 le premier jour, 2 de plus chaque jour, 17 le septième.',
         body: [
           'Nous possédons des milliers d\'objets, et la plupart dorment dans des placards. Chaque chose en trop demande de la place, du rangement et un peu de votre attention.',
-          'Donner, vendre ou recycler 70 objets en une semaine allège votre intérieur et votre tête. Vous découvrirez vite ce qui compte vraiment pour vous.',
+          'Donner, vendre ou recycler 77 objets en une semaine allège votre intérieur et votre tête. Vous découvrirez vite ce qui compte vraiment pour vous.',
         ],
         tip: 'Commencez par les tiroirs et la salle de bain : câbles morts, échantillons, stylos vides. Prévoyez trois sacs : donner, vendre, recycler.',
       },
       en: {
         title: 'Clean slate',
-        short: 'Get rid of 10 things every day for a week.',
+        short: 'Get rid of things every day: 5 on day one, 2 more each day, 17 by day seven.',
         body: [
           'We own thousands of things and most of them sleep in cupboards. Every extra object takes space, tidying time and a little piece of your attention.',
-          'Giving, selling or recycling 70 things in a week lightens your home and your head. You will quickly see what really matters to you.',
+          'Giving, selling or recycling 77 things in a week lightens your home and your head. You will quickly see what really matters to you.',
         ],
         tip: 'Start with drawers and the bathroom: dead cables, samples, empty pens. Keep three bags ready: give, sell, recycle.',
       },
@@ -119,7 +119,7 @@ export const LEVEL_8: Def[] = [
     text: {
       fr: {
         title: 'Au vert',
-        short: 'Passez 20 minutes dehors dans la nature chaque jour pendant une semaine.',
+        short: 'Sortez dans la nature chaque jour : 15 minutes le premier jour, jusqu\'à 30 le septième.',
         body: [
           'Vingt minutes dans un parc suffisent à faire baisser le cortisol, l\'hormone du stress. La lumière du jour règle aussi votre horloge interne et améliore votre sommeil.',
           'Les arbres, le vent, les oiseaux : la nature repose l\'attention fatiguée par les écrans. Vous rentrerez plus calme et plus concentré.',
@@ -128,7 +128,7 @@ export const LEVEL_8: Def[] = [
       },
       en: {
         title: 'Into the green',
-        short: 'Spend 20 minutes outside in nature every day for a week.',
+        short: 'Get out into nature every day: 15 minutes on day one, building up to 30 by day seven.',
         body: [
           'Twenty minutes in a park is enough to lower cortisol, the stress hormone. Daylight also sets your body clock and improves your sleep.',
           'Trees, wind, birds: nature rests an attention worn out by screens. You will come back calmer and more focused.',
