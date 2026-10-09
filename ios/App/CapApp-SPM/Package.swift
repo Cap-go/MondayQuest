@@ -1,0 +1,95 @@
+// swift-tools-version: 5.9
+import PackageDescription
+
+// DO NOT MODIFY THIS FILE - managed by Capacitor CLI commands
+let package = Package(
+    name: "CapApp-SPM",
+    platforms: [.iOS(.v17)],
+    products: [
+        .library(
+            name: "CapApp-SPM",
+            targets: ["CapApp-SPM"])
+    ],
+    dependencies: [
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.5.3"),
+        .package(name: "CapacitorApp", path: "../../../node_modules/@capacitor/app"),
+        .package(name: "CapacitorHaptics", path: "../../../node_modules/@capacitor/haptics"),
+        .package(name: "CapacitorKeyboard", path: "../../../node_modules/@capacitor/keyboard"),
+        .package(name: "CapacitorNetwork", path: "../../../node_modules/@capacitor/network"),
+        .package(name: "CapacitorPreferences", path: "../../../node_modules/@capacitor/preferences"),
+        .package(name: "CapacitorSplashScreen", path: "../../../node_modules/@capacitor/splash-screen"),
+        .package(name: "CapacitorStatusBar", path: "../../../node_modules/@capacitor/status-bar"),
+        .package(name: "CapgoCameraPreview", path: "../../../node_modules/@capgo/camera-preview"),
+        .package(name: "CapgoCapacitorAccelerometer", path: "../../../node_modules/@capgo/capacitor-accelerometer"),
+        .package(name: "CapgoCapacitorAlarm", path: "../../../node_modules/@capgo/capacitor-alarm"),
+        .package(name: "CapgoCapacitorBarometer", path: "../../../node_modules/@capgo/capacitor-barometer"),
+        .package(name: "CapgoCapacitorBrightness", path: "../../../node_modules/@capgo/capacitor-brightness"),
+        .package(name: "CapgoCapacitorCompass", path: "../../../node_modules/@capgo/capacitor-compass"),
+        .package(name: "CapgoCapacitorDatePicker", path: "../../../node_modules/@capgo/capacitor-date-picker"),
+        .package(name: "CapgoCapacitorFileSharer", path: "../../../node_modules/@capgo/capacitor-file-sharer"),
+        .package(name: "CapgoCapacitorHealth", path: "../../../node_modules/@capgo/capacitor-health"),
+        .package(name: "CapgoCapacitorHomeIndicator", path: "../../../node_modules/@capgo/capacitor-home-indicator"),
+        .package(name: "CapgoCapacitorInAppReview", path: "../../../node_modules/@capgo/capacitor-in-app-review"),
+        .package(name: "CapgoCapacitorInappbrowser", path: "../../../node_modules/@capgo/capacitor-inappbrowser"),
+        .package(name: "CapgoCapacitorKeepAwake", path: "../../../node_modules/@capgo/capacitor-keep-awake"),
+        .package(name: "CapgoCapacitorLightSensor", path: "../../../node_modules/@capgo/capacitor-light-sensor"),
+        .package(name: "CapgoCapacitorNativeAudio", path: "../../../node_modules/@capgo/capacitor-native-audio"),
+        .package(name: "CapgoCapacitorNativeNavigation", path: "../../../node_modules/@capgo/capacitor-native-navigation"),
+        .package(name: "CapgoCapacitorNavigationBar", path: "../../../node_modules/@capgo/capacitor-navigation-bar"),
+        .package(name: "CapgoCapacitorPedometer", path: "../../../node_modules/@capgo/capacitor-pedometer"),
+        .package(name: "CapgoCapacitorPhotoLibrary", path: "../../../node_modules/@capgo/capacitor-photo-library"),
+        .package(name: "CapgoCapacitorPrettyToast", path: "../../../node_modules/@capgo/capacitor-pretty-toast"),
+        .package(name: "CapgoCapacitorPrivacyScreen", path: "../../../node_modules/@capgo/capacitor-privacy-screen"),
+        .package(name: "CapgoCapacitorRichNotifications", path: "../../../node_modules/@capgo/capacitor-rich-notifications"),
+        .package(name: "CapgoCapacitorShake", path: "../../../node_modules/@capgo/capacitor-shake"),
+        .package(name: "CapgoCapacitorSpeechRecognition", path: "../../../node_modules/@capgo/capacitor-speech-recognition"),
+        .package(name: "CapgoCapacitorSpeechSynthesis", path: "../../../node_modules/@capgo/capacitor-speech-synthesis"),
+        .package(name: "CapgoCapacitorUpdater", path: "../../../node_modules/@capgo/capacitor-updater"),
+        .package(name: "CapgoCapacitorVolumeButtons", path: "../../../node_modules/@capgo/capacitor-volume-buttons"),
+        .package(name: "CapgoCapacitorWidgetKit", path: "../../../node_modules/@capgo/capacitor-widget-kit")
+    ],
+    targets: [
+        .target(
+            name: "CapApp-SPM",
+            dependencies: [
+                .product(name: "Capacitor", package: "capacitor-swift-pm"),
+                .product(name: "Cordova", package: "capacitor-swift-pm"),
+                .product(name: "CapacitorApp", package: "CapacitorApp"),
+                .product(name: "CapacitorHaptics", package: "CapacitorHaptics"),
+                .product(name: "CapacitorKeyboard", package: "CapacitorKeyboard"),
+                .product(name: "CapacitorNetwork", package: "CapacitorNetwork"),
+                .product(name: "CapacitorPreferences", package: "CapacitorPreferences"),
+                .product(name: "CapacitorSplashScreen", package: "CapacitorSplashScreen"),
+                .product(name: "CapacitorStatusBar", package: "CapacitorStatusBar"),
+                .product(name: "CapgoCameraPreview", package: "CapgoCameraPreview"),
+                .product(name: "CapgoCapacitorAccelerometer", package: "CapgoCapacitorAccelerometer"),
+                .product(name: "CapgoCapacitorAlarm", package: "CapgoCapacitorAlarm"),
+                .product(name: "CapgoCapacitorBarometer", package: "CapgoCapacitorBarometer"),
+                .product(name: "CapgoCapacitorBrightness", package: "CapgoCapacitorBrightness"),
+                .product(name: "CapgoCapacitorCompass", package: "CapgoCapacitorCompass"),
+                .product(name: "CapgoCapacitorDatePicker", package: "CapgoCapacitorDatePicker"),
+                .product(name: "CapgoCapacitorFileSharer", package: "CapgoCapacitorFileSharer"),
+                .product(name: "CapgoCapacitorHealth", package: "CapgoCapacitorHealth"),
+                .product(name: "CapgoCapacitorHomeIndicator", package: "CapgoCapacitorHomeIndicator"),
+                .product(name: "CapgoCapacitorInAppReview", package: "CapgoCapacitorInAppReview"),
+                .product(name: "CapgoCapacitorInappbrowser", package: "CapgoCapacitorInappbrowser"),
+                .product(name: "CapgoCapacitorKeepAwake", package: "CapgoCapacitorKeepAwake"),
+                .product(name: "CapgoCapacitorLightSensor", package: "CapgoCapacitorLightSensor"),
+                .product(name: "CapgoCapacitorNativeAudio", package: "CapgoCapacitorNativeAudio"),
+                .product(name: "CapgoCapacitorNativeNavigation", package: "CapgoCapacitorNativeNavigation"),
+                .product(name: "CapgoCapacitorNavigationBar", package: "CapgoCapacitorNavigationBar"),
+                .product(name: "CapgoCapacitorPedometer", package: "CapgoCapacitorPedometer"),
+                .product(name: "CapgoCapacitorPhotoLibrary", package: "CapgoCapacitorPhotoLibrary"),
+                .product(name: "CapgoCapacitorPrettyToast", package: "CapgoCapacitorPrettyToast"),
+                .product(name: "CapgoCapacitorPrivacyScreen", package: "CapgoCapacitorPrivacyScreen"),
+                .product(name: "CapgoCapacitorRichNotifications", package: "CapgoCapacitorRichNotifications"),
+                .product(name: "CapgoCapacitorShake", package: "CapgoCapacitorShake"),
+                .product(name: "CapgoCapacitorSpeechRecognition", package: "CapgoCapacitorSpeechRecognition"),
+                .product(name: "CapgoCapacitorSpeechSynthesis", package: "CapgoCapacitorSpeechSynthesis"),
+                .product(name: "CapgoCapacitorUpdater", package: "CapgoCapacitorUpdater"),
+                .product(name: "CapgoCapacitorVolumeButtons", package: "CapgoCapacitorVolumeButtons"),
+                .product(name: "CapgoCapacitorWidgetKit", package: "CapgoCapacitorWidgetKit")
+            ]
+        )
+    ]
+)

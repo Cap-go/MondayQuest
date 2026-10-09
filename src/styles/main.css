@@ -1,0 +1,274 @@
+@import 'tailwindcss';
+@import '@fontsource/archivo/600.css';
+@import '@fontsource/archivo/700.css';
+@import '@fontsource/archivo/800.css';
+@import '@fontsource/didact-gothic/400.css';
+
+@theme {
+  --color-paper: #f6f4ef;
+  --color-sheet: #fbfaf7;
+  --color-ink: #141414;
+  --color-graphite: #4a4a48;
+  --color-pencil: #8c8a85;
+  --color-rule: #d9d6cf;
+  --color-ice: #cfe3ef;
+  --color-sun: #f2c14e;
+
+  --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Didact Gothic', ui-sans-serif, system-ui, sans-serif;
+
+  --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --tabbar-h: 0px;
+  color-scheme: light;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+input,
+textarea,
+[contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Typography straight out of the booklet */
+.t-display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+
+.t-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.8rem;
+}
+
+.t-body {
+  font-family: var(--font-body);
+  line-height: 1.55;
+}
+
+/* Booklet page with the signature clipped top-right corner and a bold ink frame. */
+.sheet {
+  --cut: 26px;
+  position: relative;
+  background: var(--color-sheet);
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+}
+
+.frame {
+  --cut: 22px;
+  --bw: 2.5px;
+  position: relative;
+  background: var(--color-ink);
+  padding: var(--bw);
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+}
+
+.frame > .frame-inner {
+  background: var(--color-sheet);
+  height: 100%;
+  clip-path: polygon(0 0, calc(100% - var(--cut) + var(--bw) * 0.41) 0, 100% calc(var(--cut) - var(--bw) * 0.41), 100% 100%, 0 100%);
+}
+
+.frame-plain {
+  border: 2.5px solid var(--color-ink);
+}
+
+.dashed-line {
+  background-image: linear-gradient(to right, var(--color-ink) 50%, transparent 0);
+  background-size: 6px 1px;
+  background-repeat: repeat-x;
+  background-position: bottom;
+}
+
+/* Inputs written on paper */
+.ink-input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1.5px dashed var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  padding: 0.35rem 0;
+  outline: none;
+  color: var(--color-ink);
+  border-radius: 0;
+}
+
+.ink-input::placeholder {
+  color: var(--color-pencil);
+}
+
+.ink-input:focus {
+  border-bottom-style: solid;
+}
+
+.btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 2.5px solid var(--color-ink);
+  padding: 0.85rem 0.9rem;
+  font-size: 0.88rem;
+  line-height: 1.2;
+  background: var(--color-sheet);
+  color: var(--color-ink);
+  transition:
+    transform 160ms var(--ease-spring),
+    background 160ms,
+    color 160ms;
+}
+
+.btn:active {
+  transform: scale(0.96) translateY(1px);
+}
+
+cap-sheet-handle:focus,
+cap-sheet-handle:focus-visible {
+  outline: none;
+}
+
+.btn-ink {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+}
+
+.scroll-area {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: calc(var(--safe-top) + 12px);
+  padding-bottom: calc(var(--safe-bottom) + var(--tabbar-h) + 32px);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Page transitions (web fallback; native uses @capgo/capacitor-transitions) */
+.page-push-enter-active,
+.page-push-leave-active,
+.page-pop-enter-active,
+.page-pop-leave-active {
+  transition:
+    transform 420ms var(--ease-out-quint),
+    opacity 420ms var(--ease-out-quint);
+  position: absolute;
+  inset: 0;
+}
+
+.page-push-enter-from {
+  transform: translateX(100%);
+}
+.page-push-leave-to {
+  transform: translateX(-28%);
+  opacity: 0.6;
+}
+.page-pop-enter-from {
+  transform: translateX(-28%);
+  opacity: 0.6;
+}
+.page-pop-leave-to {
+  transform: translateX(100%);
+}
+
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+  position: absolute;
+  inset: 0;
+}
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.page-fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes ink-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.stagger > * {
+  animation: ink-in 520ms var(--ease-out-quint) both;
+}
+.stagger > *:nth-child(1) {
+  animation-delay: 30ms;
+}
+.stagger > *:nth-child(2) {
+  animation-delay: 80ms;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 130ms;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 180ms;
+}
+.stagger > *:nth-child(5) {
+  animation-delay: 230ms;
+}
+.stagger > *:nth-child(6) {
+  animation-delay: 280ms;
+}
+.stagger > *:nth-child(7) {
+  animation-delay: 330ms;
+}
+.stagger > *:nth-child(n + 8) {
+  animation-delay: 380ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
