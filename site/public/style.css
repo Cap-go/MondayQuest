@@ -1,0 +1,34 @@
+@font-face{font-family:Archivo;font-weight:800;font-display:swap;src:url(/fonts/archivo-800.woff2) format('woff2')}
+@font-face{font-family:Didact;font-weight:400;font-display:swap;src:url(/fonts/didact-400.woff2) format('woff2')}
+:root{--paper:#f6f4ef;--ink:#141414;--pencil:#77746e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Didact,system-ui,sans-serif;line-height:1.55}
+a{color:inherit}
+h1,h2,.d{font-family:Archivo,system-ui,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:-.01em;line-height:.95;margin:0}
+.wrap{max-width:1040px;margin:auto;padding:28px 24px 64px}
+nav{display:flex;align-items:center;justify-content:space-between}
+nav a{text-decoration:none}
+.mark{display:flex;align-items:center;gap:10px}
+.mark img{width:34px;height:34px}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;margin-top:56px}
+.hero h1{font-size:clamp(56px,9vw,112px)}
+.lead{font-size:20px;margin:22px 0 30px;max-width:30ch}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;padding:14px 22px;border:3px solid var(--ink);font-family:Archivo,system-ui;font-weight:800;text-transform:uppercase;text-decoration:none;font-size:14px}
+.btn.ink{background:var(--ink);color:var(--paper)}
+.phones{display:flex;gap:14px;justify-content:center}
+.phones img{width:46%;max-width:220px;border:3px solid var(--ink);border-radius:22px;box-shadow:0 30px 50px -30px rgba(0,0,0,.5)}
+.phones img:nth-child(2){transform:translateY(40px)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:96px;border:3px solid var(--ink)}
+.grid>div{padding:22px}
+.grid>div+div{border-left:3px solid var(--ink)}
+.grid h2{font-size:22px;margin-bottom:8px}
+.levels{margin-top:72px}
+.levels ol{list-style:none;padding:0;margin:18px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.levels li{border:2px solid var(--ink);padding:14px 16px}
+.levels li span{color:var(--pencil);font-size:13px;display:block}
+footer{margin-top:80px;padding-top:20px;border-top:2px solid var(--ink);display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;font-size:14px;color:var(--pencil)}
+.doc{max-width:680px}
+.doc h1{font-size:48px;margin:48px 0 24px}
+.doc h2{font-size:20px;margin:32px 0 8px}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.grid>div+div{border-left:0;border-top:3px solid var(--ink)}.levels ol{grid-template-columns:1fr 1fr}}

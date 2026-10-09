@@ -40,7 +40,7 @@ export type TrackerKind
 export type IconName
   = | 'foot' | 'sunrise' | 'apple' | 'pill' | 'broom' | 'cutlery' | 'dot' | 'nodes' | 'stretch' | 'minus'
     | 'stones' | 'shower' | 'ok' | 'frame' | 'heart' | 'drop' | 'book' | 'pencil' | 'plane' | 'band'
-    | 'stairs' | 'arms' | 'bubble' | 'cube' | 'compass' | 'moon' | 'lines' | 'flame' | 'envelope' | 'clock' | 'star'
+    | 'stairs' | 'arms' | 'bubble' | 'cube' | 'compass' | 'moon' | 'lines' | 'flame' | 'envelope' | 'clock' | 'star' | 'lock'
 
 export interface ChallengeText {
   title: string
@@ -927,8 +927,4 @@ export function challengeById(id: string): Challenge | undefined {
 
 export function challengesOfLevel(level: number): Challenge[] {
   return CHALLENGES.filter(c => c.level === level)
-}
-
-export function hashtag(c: Challenge): string {
-  return `#MondayQuest${String(c.n).padStart(2, '0')}`
 }

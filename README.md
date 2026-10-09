@@ -1,10 +1,9 @@
 # Monday Quest
 
-30 weekly challenges, each starting on a Monday morning. A mobile take on the **LUNDI MATIN©** booklet (1026.studio): same white-paper minimalism, black ink, the clipped page corner, and real ink checks.
+30 weekly challenges, each starting on a Monday morning. White-paper minimalism, black ink, the clipped page corner, and real ink checks. Website: https://mondayquest.com
 
-- **Levels I–III (challenges 1–15)** are transcribed from the booklet, in French with an English translation.
-- **Levels IV–VI (challenges 16–30)** are Monday Quest originals written in the same voice. Replace them with the booklet's own once the remaining pages are photographed.
-- **Bonus level**: create your own challenges, like the blank pages at the end of the booklet.
+- **6 levels of 5 challenges**, English by default with a French translation. A level unlocks once the previous one is finished.
+- **Bonus level**: create your own challenges.
 - **Hardcore mode**: start all 5 challenges of a level in the same week.
 
 Stack: Vue 3 + Vite + Tailwind 4 + Pinia, Capacitor 8, Bun.
@@ -30,7 +29,7 @@ Stack: Vue 3 + Vite + Tailwind 4 + Pinia, Capacitor 8, Bun.
 | 15 | Gratitude | 3 lines, heart fills | speech recognition, reply from the notification |
 | 16–30 | water bottle that follows the tilt, page flip reader, sketchbook, offline hour that pauses when you reconnect, wrist band, barometer stairs, nose-tap push-ups, compass explorer, sugar cube, curfew with light sensor, morning pages word count, fear flame before/after, envelope, 16:8 fasting clock | accelerometer, network, barometer, compass, light sensor, notifications |
 
-Everywhere: hand-drawn check animation with a pen-scratch sound and haptics, long-press to erase, booklet page-turn between "Read" and "Track", DONE rubber stamp with confetti, shareable card, in-app review after the first DONE.
+Everywhere: hand-drawn check animation with a pen-scratch sound and haptics, long-press to erase, page-turn between "Read" and "Track", DONE rubber stamp with confetti, shareable card, in-app review after the first DONE.
 
 ## Capgo plugins used
 

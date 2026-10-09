@@ -5,7 +5,6 @@ import { CapgoInAppReview } from '@capgo/capacitor-in-app-review'
 import { computed, onMounted, ref } from 'vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import { useL } from '~/composables/useL'
-import { hashtag } from '~/data/challenges'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 import { useQuest } from '~/stores/quest'
@@ -65,9 +64,9 @@ async function share() {
   ctx.fillText('DONE', 0, 52)
   ctx.restore()
   ctx.font = '600 34px Archivo'
-  ctx.fillText(`${hashtag(props.challenge)} · MONDAY QUEST`, 540, 1200)
+  ctx.fillText('MONDAYQUEST.COM', 540, 1200)
   const base64Data = canvas.toDataURL('image/png').split(',')[1]!
-  await FileSharer.share({ filename: `monday-quest-${props.challenge.n}.png`, base64Data, contentType: 'image/png', title: text.value.title, text: `${text.value.title} — DONE ${hashtag(props.challenge)}` }).catch(() => {})
+  await FileSharer.share({ filename: `monday-quest-${props.challenge.n}.png`, base64Data, contentType: 'image/png', title: text.value.title, text: `${text.value.title} — DONE · mondayquest.com` }).catch(() => {})
 }
 
 function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, max: number, lh: number) {

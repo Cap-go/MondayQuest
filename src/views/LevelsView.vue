@@ -27,6 +27,8 @@ function state(c: Challenge) {
     return 'done'
   if (quest.runFor(c.id))
     return 'live'
+  if (quest.isLocked(c))
+    return 'locked'
   return 'todo'
 }
 
@@ -46,7 +48,7 @@ function newCustom() {
       {{ L('6 niveaux de 5 challenges. Terminez un niveau avant de passer au suivant.', '6 levels of 5 challenges. Finish a level before moving on.') }}
     </p>
 
-    <section v-for="lvl in levels" :key="lvl.n" class="sheet level mt-8 px-5 pt-6 pb-3" :class="{ current: lvl.n === quest.currentLevel }">
+    <section v-for="lvl in levels" :key="lvl.n" class="sheet level mt-8 px-5 pt-6 pb-3" :class="{ 'current': lvl.n === quest.currentLevel, 'level-locked': lvl.n > quest.currentLevel }">
       <div class="flex items-end justify-between">
         <div>
           <p class="t-label">
@@ -56,16 +58,14 @@ function newCustom() {
             {{ lvl.text[quest.locale] }}
           </h2>
         </div>
-        <div class="flex gap-1 pb-1">
+        <QuestIcon v-if="lvl.n > quest.currentLevel" name="lock" :size="26" :stroke="3" class="mb-0.5" />
+        <div v-else class="flex gap-1 pb-1">
           <span v-for="i in 5" :key="i" class="pip" :class="{ on: i <= lvl.done }" />
         </div>
       </div>
-      <p v-if="lvl.n > 3" class="t-label text-[0.6rem] text-pencil mt-2">
-        Monday Quest
-      </p>
 
       <ul class="mt-4">
-        <li v-for="c in lvl.items" :key="c.id" class="row" @click="open(c)">
+        <li v-for="c in lvl.items" :key="c.id" class="row" :class="{ 'is-locked': state(c) === 'locked' }" @click="open(c)">
           <QuestIcon :name="c.icon" :size="30" :stroke="3" class="shrink-0 mt-0.5" />
           <div class="flex-1 min-w-0">
             <p class="t-display text-[0.95rem]">
@@ -75,7 +75,8 @@ function newCustom() {
               {{ c.text[quest.locale].short }}
             </p>
           </div>
-          <span class="box" :class="state(c)">
+          <QuestIcon v-if="state(c) === 'locked'" name="lock" :size="22" :stroke="3" class="shrink-0 text-pencil mr-1" />
+          <span v-else class="box" :class="state(c)">
             <svg v-if="state(c) === 'done'" viewBox="0 0 100 100" class="overflow-visible"><path d="M20 50 C27 55 33 63 40 77 C53 52 72 25 104 2" fill="none" stroke="var(--color-ink)" stroke-width="11" stroke-linecap="round" /></svg>
             <span v-else-if="state(c) === 'live'" class="live-dot" />
           </span>
@@ -113,6 +114,15 @@ function newCustom() {
 </template>
 
 <style scoped>
+.level-locked {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--color-rule);
+}
+
+.is-locked p {
+  opacity: 0.55;
+}
+
 .level {
   border: 0;
   box-shadow: 0 1px 0 var(--color-rule), 0 18px 40px -30px rgb(0 0 0 / 0.35);

@@ -1,0 +1,11 @@
+{
+  
+  "name": "mondayquest-site",
+  "account_id": "9ee3d7479a3c359681e3fab2c8cb22c0",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./public", "html_handling": "auto-trailing-slash", "not_found_handling": "404-page" },
+  "routes": [
+    { "pattern": "mondayquest.com", "custom_domain": true },
+    { "pattern": "www.mondayquest.com", "custom_domain": true }
+  ]
+}

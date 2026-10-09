@@ -41,6 +41,13 @@ async function boot() {
   if (!quest.settings.onboarded)
     await router.replace('/onboarding')
 
+  // Fonts are bundled but load lazily (font-display: swap): wait for them under the
+  // splash so the first screen never reflows from the system font.
+  await Promise.race([
+    Promise.all(['800 1em Archivo', '700 1em Archivo', '600 1em Archivo', '400 1em "Didact Gothic"'].map(f => document.fonts.load(f))),
+    new Promise(r => setTimeout(r, 1500)),
+  ]).catch(() => {})
+
   app.mount('#app')
 
   const native = Capacitor.isNativePlatform()

@@ -1,21 +1,47 @@
 <script setup lang="ts">
 import { Capacitor } from '@capacitor/core'
 import { setNavigation } from '@capgo/capacitor-transitions/vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BrandMark from '~/components/BrandMark.vue'
 import InkCheck from '~/components/InkCheck.vue'
 import QuestPage from '~/components/QuestPage.vue'
+import { useL } from '~/composables/useL'
+import { alarmSupport, requestAlarmPermission } from '~/services/alarm'
 import { haptic } from '~/services/haptics'
-import { requestNotifications } from '~/services/notifications'
+import { notificationsAllowed, requestNotifications } from '~/services/notifications'
 import { sfx } from '~/services/sound'
 import { useQuest } from '~/stores/quest'
 
 const quest = useQuest()
 const router = useRouter()
+const L = useL()
 const step = ref(0)
 const demo = ref(false)
-const STEPS = 4
+const STEPS = 5
+const native = Capacitor.isNativePlatform()
+const notifOk = ref(false)
+const alarmOk = ref(false)
+const alarmNative = ref(false)
+
+onMounted(async () => {
+  notifOk.value = await notificationsAllowed()
+  alarmNative.value = (await alarmSupport()).native
+})
+
+async function allowNotifications() {
+  haptic.tap()
+  notifOk.value = await requestNotifications()
+  if (notifOk.value)
+    haptic.success()
+}
+
+async function allowAlarm() {
+  haptic.tap()
+  alarmOk.value = await requestAlarmPermission()
+  if (alarmOk.value)
+    haptic.success()
+}
 
 function next() {
   haptic.tap()
@@ -23,9 +49,7 @@ function next() {
   step.value = Math.min(STEPS - 1, step.value + 1)
 }
 
-async function finish() {
-  if (Capacitor.isNativePlatform())
-    await requestNotifications()
+function finish() {
   quest.settings.onboarded = true
   haptic.success()
   setNavigation('root', 'forward')
@@ -86,8 +110,28 @@ async function finish() {
           </p>
         </section>
 
+        <!-- reminders: notifications + real alarms -->
+        <section v-else-if="step === 3" key="3" class="flex-1 pt-10 stagger">
+          <h1 class="t-display text-3xl">
+            {{ L('Rappels', 'Reminders') }}
+          </h1>
+          <p class="t-body text-lg mt-4">
+            {{ L('Un mot chaque matin pour le challenge du jour, un autre le soir pour cocher. Et un vrai réveil pour les levers avant le soleil.', 'A note every morning for today\'s challenge, another in the evening to tick it. And a real alarm for the before-sunrise mornings.') }}
+          </p>
+          <div class="mt-8 flex flex-col gap-3">
+            <button class="perm" :class="{ ok: notifOk }" :disabled="notifOk" @click="allowNotifications">
+              <span class="flex-1 text-left">{{ L('Notifications', 'Notifications') }}</span>
+              <span>{{ notifOk ? '✓' : L('Autoriser', 'Allow') }}</span>
+            </button>
+            <button v-if="native && alarmNative" class="perm" :class="{ ok: alarmOk }" :disabled="alarmOk" @click="allowAlarm">
+              <span class="flex-1 text-left">{{ L('Réveils', 'Alarms') }}</span>
+              <span>{{ alarmOk ? '✓' : L('Autoriser', 'Allow') }}</span>
+            </button>
+          </div>
+        </section>
+
         <!-- health -->
-        <section v-else key="3" class="flex-1 pt-10 stagger">
+        <section v-else key="4" class="flex-1 pt-10 stagger">
           <h1 class="t-display text-3xl">
             {{ $t('settings.health') }}
           </h1>
@@ -108,6 +152,23 @@ async function finish() {
 </template>
 
 <style scoped>
+.perm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 2.5px solid var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  transition: background 200ms, color 200ms;
+}
+
+.perm.ok {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
 .cover-card {
   width: 220px;
   height: 330px;

@@ -3,6 +3,7 @@ import type { Settings } from '~/stores/quest'
 import { Capacitor } from '@capacitor/core'
 import { DatePicker } from '@capgo/capacitor-date-picker'
 import { CapgoInAppReview } from '@capgo/capacitor-in-app-review'
+import { InAppBrowser } from '@capgo/capacitor-inappbrowser'
 import { toast } from '@capgo/capacitor-pretty-toast'
 import { setDirection } from '@capgo/capacitor-transitions/vue'
 import { onMounted, ref } from 'vue'
@@ -63,6 +64,21 @@ async function refreshWidget() {
   await syncTodayWidget()
   toast.success(L('Widget mis à jour', 'Widget refreshed'))
 }
+
+function link(url: string) {
+  haptic.tap()
+  if (native)
+    void InAppBrowser.open({ url }).catch(() => window.open(url, '_blank'))
+  else
+    window.open(url, '_blank')
+}
+
+const LINKS = [
+  { label: () => L('Créé par Martin Donadieu', 'Made by Martin Donadieu'), hint: '@martindonadieu', url: 'https://x.com/martindonadieu' },
+  { label: () => L('Mises à jour en direct par Capgo', 'Live updates by Capgo'), hint: 'capgo.app', url: 'https://capgo.app/?utm_source=mondayquest&utm_medium=app' },
+  { label: () => L('Site web', 'Website'), hint: 'mondayquest.com', url: 'https://mondayquest.com' },
+  { label: () => L('Confidentialité', 'Privacy'), hint: '', url: 'https://mondayquest.com/privacy' },
+]
 
 function custom() {
   setDirection('forward')
@@ -148,6 +164,42 @@ function custom() {
       </p>
     </section>
 
+    <section class="mt-8">
+      <p class="t-label">
+        {{ L('À propos', 'About') }}
+      </p>
+      <button v-for="l in LINKS" :key="l.url" class="row" @click="link(l.url)">
+        <span class="t-body flex-1 text-left">{{ l.label() }}</span>
+        <span class="t-body text-sm text-pencil">{{ l.hint }}</span><span class="ml-2">↗</span>
+      </button>
+      <div class="version mt-4">
+        <div>
+          <p class="t-label text-[0.6rem] text-pencil">
+            App
+          </p>
+          <p class="t-display tabular-nums">
+            {{ nativeVersion || 'web' }}
+          </p>
+        </div>
+        <div>
+          <p class="t-label text-[0.6rem] text-pencil">
+            Bundle
+          </p>
+          <p class="t-display tabular-nums">
+            {{ bundleVersion }}
+          </p>
+        </div>
+        <div>
+          <p class="t-label text-[0.6rem] text-pencil">
+            {{ L('Canal', 'Channel') }}
+          </p>
+          <p class="t-display">
+            {{ channel || '—' }}
+          </p>
+        </div>
+      </div>
+    </section>
+
     <section class="mt-8 text-center">
       <BrandMark :size="40" class="mx-auto" />
       <p class="t-display mt-2">
@@ -155,9 +207,6 @@ function custom() {
       </p>
       <p class="t-body text-xs text-pencil mt-2 px-4">
         {{ $t('settings.aboutText') }}
-      </p>
-      <p class="t-label text-[0.6rem] text-pencil mt-3">
-        {{ $t('settings.version') }} {{ nativeVersion || 'web' }} · bundle {{ bundleVersion }}{{ channel ? ` · ${channel}` : '' }}
       </p>
       <div class="flex justify-center gap-3 mt-5">
         <button v-if="native" class="btn" @click="CapgoInAppReview.requestReview()">
@@ -172,6 +221,22 @@ function custom() {
 </template>
 
 <style scoped>
+.version {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 2.5px solid var(--color-ink);
+}
+
+.version > div {
+  padding: 10px 12px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.version > div + div {
+  border-left: 2.5px solid var(--color-ink);
+}
+
 .seg {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

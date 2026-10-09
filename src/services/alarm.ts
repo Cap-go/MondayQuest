@@ -34,6 +34,14 @@ export async function setSystemAlarm(hm: string, label: string): Promise<boolean
   return res.success
 }
 
+/** AlarmKit (iOS 26+) / exact alarms (Android) permission, asked from onboarding. */
+export async function requestAlarmPermission(): Promise<boolean> {
+  if (!(await alarmSupport()).native)
+    return false
+  const perm = await CapgoAlarm.requestPermissions({ exactAlarm: true }).catch(() => ({ granted: false }))
+  return perm.granted
+}
+
 export async function openSystemAlarms() {
   await CapgoAlarm.openAlarms().catch(() => {})
 }

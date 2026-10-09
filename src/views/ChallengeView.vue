@@ -6,9 +6,10 @@ import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import TrackerShell from '~/components/TrackerShell.vue'
 import { useL } from '~/composables/useL'
-import { CATEGORY_LABEL, challengesOfLevel, hashtag } from '~/data/challenges'
+import { CATEGORY_LABEL, challengesOfLevel } from '~/data/challenges'
 import { formatDate, isMonday, nextMonday } from '~/lib/date'
 import { haptic } from '~/services/haptics'
+import { ensureReminders } from '~/services/notifications'
 import { sfx } from '~/services/sound'
 import { useQuest } from '~/stores/quest'
 
@@ -62,7 +63,13 @@ function back() {
     void router.replace('/today')
 }
 
+const locked = computed(() => !!c.value && quest.isLocked(c.value))
+
 function askStart() {
+  if (locked.value) {
+    haptic.error()
+    return
+  }
   haptic.press()
   sheet.value?.present?.()
 }
@@ -79,6 +86,7 @@ function start(when: 'monday' | 'now' | 'hardcore') {
     quest.start(id.value, date)
   }
   sheet.value?.dismiss?.()
+  void ensureReminders()
   sfx.play('chime')
   haptic.success()
   setTimeout(goPage, 350, 1)
@@ -124,7 +132,7 @@ function capitalize(s: string) {
                 {{ text.short }}
               </p>
               <p class="t-body text-sm mt-4">
-                - {{ CATEGORY_LABEL[c.category][quest.locale] }} {{ hashtag(c) }}
+                - {{ CATEGORY_LABEL[c.category][quest.locale] }}
               </p>
             </div>
             <div class="mt-7 space-y-4 stagger">
@@ -135,13 +143,12 @@ function capitalize(s: string) {
                 {{ $t('common.tips') }} : {{ text.tip }}
               </p>
             </div>
-            <p class="t-label text-[0.6rem] text-pencil text-center mt-8">
-              {{ c.source === 'book' ? $t('detail.fromBook') : $t('detail.original') }}
-            </p>
-
-            <div class="mt-6">
+            <div class="mt-8">
               <button v-if="run" class="btn btn-ink w-full" @click="goPage(1)">
                 {{ $t('common.continue') }} →
+              </button>
+              <button v-else-if="locked" class="btn w-full locked" disabled>
+                <QuestIcon name="lock" :size="18" :stroke="3" class="inline -mt-1 mr-1" /> {{ L('Verrouillé', 'Locked') }}
               </button>
               <button v-else class="btn btn-ink w-full" @click="askStart">
                 {{ completed ? $t('common.restart') : $t('common.start') }}
@@ -149,7 +156,7 @@ function capitalize(s: string) {
               <p v-if="completed" class="t-label text-center mt-3">
                 ✓ {{ $t('detail.completedOn', { date: formatDate(new Date(completed).toISOString().slice(0, 10), L.tag(), { day: 'numeric', month: 'long' }) }) }}
               </p>
-              <p v-if="c.level > quest.currentLevel && c.level <= 6 && !run" class="t-body text-xs text-pencil text-center mt-3">
+              <p v-if="locked" class="t-body text-xs text-pencil text-center mt-3">
                 {{ $t('detail.locked') }}
               </p>
             </div>
@@ -173,7 +180,10 @@ function capitalize(s: string) {
                   <span class="w-14 h-14 border-[2.5px] border-ink" />
                 </div>
               </div>
-              <button class="btn btn-ink w-full mt-10" @click="askStart">
+              <p v-if="locked" class="t-body text-sm text-graphite mt-10">
+                {{ $t('detail.locked') }}
+              </p>
+              <button v-else class="btn btn-ink w-full mt-10" @click="askStart">
                 {{ $t('common.start') }}
               </button>
             </div>

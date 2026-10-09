@@ -3,7 +3,7 @@ import antfu from '@antfu/eslint-config'
 export default antfu({
   vue: true,
   typescript: true,
-  ignores: ['ios/**', 'android/**', 'dist/**', 'public/**'],
+  ignores: ['ios/**', 'android/**', 'dist/**', 'public/**', 'site/**'],
 }, {
   rules: {
     // `slot="…"` here is the native web-component slot of @capgo/capacitor-transitions elements.

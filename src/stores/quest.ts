@@ -82,6 +82,11 @@ export const useQuest = defineStore('quest', () => {
     return LEVELS.length
   })
 
+  /** Book rule: a level opens once the previous one is finished. Future challenges stay readable. */
+  function isLocked(c: Challenge): boolean {
+    return c.level <= LEVELS.length && c.level > currentLevel.value && !completedIds.value.has(c.id) && !runFor(c.id)
+  }
+
   function challenge(id: string): Challenge | undefined {
     return allChallenges.value.find(c => c.id === id)
   }
@@ -189,6 +194,7 @@ export const useQuest = defineStore('quest', () => {
     currentStreak,
     totalChecks,
     currentLevel,
+    isLocked,
     challenge,
     runFor,
     lastRun,

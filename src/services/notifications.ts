@@ -42,6 +42,16 @@ export async function requestNotifications(): Promise<boolean> {
   return status === 'granted'
 }
 
+/** Ask once a challenge starts (or from onboarding) and schedule the week's reminders. */
+export async function ensureReminders(): Promise<boolean> {
+  if (!native)
+    return false
+  const ok = (await notificationsAllowed()) || (await requestNotifications())
+  if (ok)
+    await rescheduleAll()
+  return ok
+}
+
 export async function initNotifications() {
   await RichNotifications.createChannel({ id: 'quest', name: 'Monday Quest', description: 'Daily challenge reminders', importance: 'default', vibration: true }).catch(() => {})
   await RichNotifications.createChannel({ id: 'wake', name: 'Réveil', description: 'Wake-up and timed challenges', importance: 'high', vibration: true }).catch(() => {})
