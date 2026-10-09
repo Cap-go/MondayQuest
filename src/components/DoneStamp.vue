@@ -5,6 +5,7 @@ import { CapgoInAppReview } from '@capgo/capacitor-in-app-review'
 import { computed, onMounted, ref } from 'vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import { useL } from '~/composables/useL'
+import { COMMUNITY_URL, openExternal } from '~/config'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 import { useQuest } from '~/stores/quest'
@@ -114,6 +115,9 @@ function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, ma
             {{ L('Continuer', 'Continue') }}
           </button>
         </div>
+        <button v-if="COMMUNITY_URL" class="t-label underline text-graphite w-full text-center mt-4" @click="openExternal(COMMUNITY_URL)">
+          {{ L('Raconter ça dans le groupe Monday Quest', 'Tell the Monday Quest group') }} ↗
+        </button>
       </div>
     </div>
   </Teleport>

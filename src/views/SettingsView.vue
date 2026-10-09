@@ -12,6 +12,7 @@ import BrandMark from '~/components/BrandMark.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import ToggleRow from '~/components/ToggleRow.vue'
 import { useL } from '~/composables/useL'
+import { COMMUNITY_URL, openExternal } from '~/config'
 import { openSystemAlarms } from '~/services/alarm'
 import { buildEnv, isTestBuild } from '~/services/env'
 import { haptic } from '~/services/haptics'
@@ -68,6 +69,8 @@ async function refreshWidget() {
 
 function link(url: string) {
   haptic.tap()
+  if (url.includes('t.me/'))
+    return openExternal(url)
   if (native)
     void InAppBrowser.open({ url }).catch(() => window.open(url, '_blank'))
   else
@@ -75,6 +78,7 @@ function link(url: string) {
 }
 
 const LINKS = [
+  ...(COMMUNITY_URL ? [{ label: () => L('Le groupe Monday Quest', 'Monday Quest group'), hint: 'Telegram', url: COMMUNITY_URL }] : []),
   { label: () => L('Créé par Martin Donadieu', 'Made by Martin Donadieu'), hint: '@martindonadieu', url: 'https://x.com/martindonadieu' },
   { label: () => L('Mises à jour en direct par Capgo', 'Live updates by Capgo'), hint: 'capgo.app', url: 'https://capgo.app/?utm_source=mondayquest&utm_medium=app' },
   { label: () => L('Site web', 'Website'), hint: 'mondayquest.com', url: 'https://mondayquest.com' },
