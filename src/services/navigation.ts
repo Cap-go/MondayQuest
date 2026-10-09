@@ -53,18 +53,22 @@ export async function setupNativeNavigation(router: Router) {
 
   router.afterEach((to) => {
     const tab = to.meta.tab as TabId | undefined
-    const hidden = !!to.meta.hideTabs
     if (tab)
       activeTab.value = tab
-    void NativeNavigation.setTabbar({ hidden, selectedId: activeTab.value, animated: true }).catch(() => {})
+    void renderTabbar(!!to.meta.hideTabs, true)
   })
 }
 
-export async function renderTabbar(hidden?: boolean) {
+/**
+ * setTabbar replaces the whole bar (tabs, colors, selection): a partial call
+ * leaves it with zero tabs, so always send the full definition.
+ */
+export async function renderTabbar(hidden = false, animated = false) {
   if (!nativeTabs)
     return
   await NativeNavigation.setTabbar({
     hidden,
+    animated,
     selectedId: activeTab.value,
     labels: true,
     tabs: TABS.map(id => ({
@@ -74,13 +78,5 @@ export async function renderTabbar(hidden?: boolean) {
       selectedIcon: { svg: TAB_ICONS[id].svg, template: true, ios: { sfSymbol: TAB_ICONS[id].sfOn } },
     })),
     colors: { tint: '#141414', inactiveTint: '#8c8a85', background: '#f6f4ef' },
-  }).catch(() => {})
-}
-
-export async function setTabBadge(id: TabId, badge?: string | number) {
-  if (!nativeTabs)
-    return
-  await NativeNavigation.setTabbar({
-    tabs: TABS.map(t => ({ id: t, title: tabTitle(t), badge: t === id ? badge : undefined, icon: { svg: TAB_ICONS[t].svg, template: true, ios: { sfSymbol: TAB_ICONS[t].sf } } })),
   }).catch(() => {})
 }

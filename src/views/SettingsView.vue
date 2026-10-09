@@ -193,7 +193,7 @@ function custom() {
           <p class="t-label text-[0.6rem] text-pencil">
             {{ L('Canal', 'Channel') }}
           </p>
-          <p class="t-display">
+          <p class="t-display text-sm normal-case truncate">
             {{ channel || '—' }}
           </p>
         </div>

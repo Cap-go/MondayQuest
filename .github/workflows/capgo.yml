@@ -96,7 +96,9 @@ jobs:
           CAPGO_TOKEN: ${{ secrets.CAPGO_TOKEN }}
         run: |
           : "${CAPGO_TOKEN:?Missing CAPGO_TOKEN secret}"
-          RELEASE_TYPE="$(bunx @capgo/cli@latest bundle releaseType "$APP_ID" --channel "$CAPGO_CHANNEL" -a "$CAPGO_TOKEN" | tail -n 1 | tr -d '\r')"
+          OUTPUT="$(bunx @capgo/cli@latest bundle releaseType "$APP_ID" --channel "$CAPGO_CHANNEL" -a "$CAPGO_TOKEN" 2>/dev/null | tr -d '\r')"
+          echo "$OUTPUT"
+          RELEASE_TYPE="$(printf '%s\n' "$OUTPUT" | sed -n 's/^Recommendation: *//p' | tail -n 1)"
           if [[ "$RELEASE_TYPE" != "OTA" && "$RELEASE_TYPE" != "native" ]]; then
             echo "Unexpected release type: $RELEASE_TYPE" >&2
             exit 1
