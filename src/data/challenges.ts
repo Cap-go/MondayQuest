@@ -154,21 +154,21 @@ const defs: Def[] = [
     text: {
       fr: {
         title: 'Soleil levant',
-        short: 'Réveillez-vous avant 6h00 du matin chaque jour pendant une semaine.',
+        short: 'Réveillez-vous avant le lever du soleil chaque jour pendant une semaine.',
         body: [
           'Se lever tôt a de nombreux avantages. Des best-sellers en font la promotion, comme le Miracle Morning de Hal Elrod. Se réveiller avant tout le monde vous permet de renforcer votre discipline et de dompter votre volonté.',
           'C\'est aussi l\'occasion de profiter de la quiétude du matin, de réfléchir calmement à votre journée, vos obligations et vos envies avant d\'entrer dans le rush !',
         ],
-        tip: 'Programmez votre réveil, ne « snoozez » pas et jetez-vous hors du lit dès la première sonnerie !',
+        tip: 'L\'app calcule le lever du soleil là où vous êtes et règle un vrai réveil 15 minutes avant. Ne « snoozez » pas : jetez-vous hors du lit dès la première sonnerie !',
       },
       en: {
         title: 'Rising sun',
-        short: 'Wake up before 6:00 a.m. every day for a week.',
+        short: 'Wake up before sunrise every day for a week.',
         body: [
           'Getting up early has many perks. Best-sellers like Hal Elrod\'s Miracle Morning swear by it. Waking before everyone else strengthens your discipline and tames your willpower.',
           'It is also a chance to enjoy the quiet of the morning and think calmly about your day, your duties and your desires before the rush begins!',
         ],
-        tip: 'Set your alarm, don\'t snooze, and jump out of bed at the very first ring!',
+        tip: 'The app works out sunrise where you are and sets a real alarm 15 minutes before. Don\'t snooze: jump out of bed at the very first ring!',
       },
     },
   },

@@ -21,6 +21,8 @@ export interface Settings {
   evening: string
   /** Wake-up alarm used by Soleil levant */
   wakeAlarm: string
+  /** Follow the sunrise at the user's location (default) instead of the fixed wakeAlarm time. */
+  wakeAuto: boolean
   hardcore: boolean
   onboarded: boolean
   privacy: boolean
@@ -59,6 +61,7 @@ export const DEFAULT_SETTINGS: Settings = {
   reminder: '09:00',
   evening: '21:30',
   wakeAlarm: '05:45',
+  wakeAuto: true,
   hardcore: false,
   onboarded: false,
   privacy: false,

@@ -20,6 +20,7 @@ if [ -d ios/App ]; then
   plist_set "$INFO" NSSpeechRecognitionUsageDescription string "Turn your voice into text in your journal."
   plist_set "$INFO" NSHealthShareUsageDescription string "Read your steps and floors to tick your challenges automatically."
   plist_set "$INFO" NSHealthUpdateUsageDescription string "Save your meditation minutes to Health."
+  plist_set "$INFO" NSLocationWhenInUseUsageDescription string "Your approximate location is used on this phone only to work out the next sunrise for the Rising sun alarm."
   plist_set "$INFO" NSAlarmKitUsageDescription string "Set a real wake-up alarm for the Sunrise challenge, even in silent mode."
   plist_set "$INFO" NSSupportsLiveActivities bool true
   plist_set "$INFO" CapgoWidgetKitAppGroup string group.ee.forgr.mondayquest.widgetkit
@@ -75,6 +76,7 @@ perms = [
   'android.permission.WAKE_LOCK',
   'android.permission.HIGH_SAMPLING_RATE_SENSORS',
   'android.permission.health.WRITE_MINDFULNESS',
+  'android.permission.ACCESS_COARSE_LOCATION',
 ]
 for perm in perms:
     tag = f'<uses-permission android:name="{perm}" />'

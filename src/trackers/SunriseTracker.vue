@@ -3,12 +3,14 @@ import type { TrackerProps } from './useDay'
 import { Capacitor } from '@capacitor/core'
 import { CapgoBrightness } from '@capgo/capacitor-brightness'
 import { DatePicker } from '@capgo/capacitor-date-picker'
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useL } from '~/composables/useL'
-import { formatHM } from '~/lib/date'
+import { addDays, formatHM, fromISO } from '~/lib/date'
+import { dateOfDay } from '~/lib/progress'
 import { setSystemAlarm } from '~/services/alarm'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
+import { locate, sunriseHM, wakeHM } from '~/services/sun'
 import { useQuest } from '~/stores/quest'
 import { useDay } from './useDay'
 
@@ -17,20 +19,35 @@ const L = useL()
 const quest = useQuest()
 const { data, done, markDone, patch } = useDay(props, { wake: '' as string })
 
+// The goal is the real sunrise of that day at your location, not a fixed 6:00.
+const coords = ref<Awaited<ReturnType<typeof locate>> | null>(null)
+onMounted(async () => {
+  coords.value = await locate(props.isToday && props.editable)
+})
+const day = computed(() => fromISO(dateOfDay(props.run, props.idx)))
+function toMin(hm: string) {
+  const [h, m] = hm.split(':').map(Number)
+  return h! * 60 + m!
+}
+const sunrise = computed(() => sunriseHM(day.value, coords.value ?? undefined))
+const sunriseMin = computed(() => toMin(sunrise.value))
+/** Tonight's alarm: tomorrow's sunrise minus a few minutes (or the fixed time if set manually). */
+const alarmHM = computed(() => quest.settings.wakeAuto ? wakeHM(fromISO(addDays(dateOfDay(props.run, props.idx), 1)), coords.value ?? undefined) : quest.settings.wakeAlarm)
+
 const minutes = computed(() => {
   if (!data.value.wake)
     return null
   const [h, m] = data.value.wake.split(':').map(Number)
   return h! * 60 + m!
 })
-// Sun height: 4:00 → high in the sky, 6:00 → on the horizon, later → below.
+// Sun height: two hours before sunrise → high, at sunrise → on the horizon, later → below.
 const sunY = computed(() => {
   if (minutes.value == null)
     return 112
-  const t = (minutes.value - 240) / 120 // 0 at 4:00, 1 at 6:00
+  const t = (minutes.value - (sunriseMin.value - 120)) / 120
   return 30 + Math.min(1.4, Math.max(0, t)) * 62
 })
-const beforeSix = computed(() => minutes.value != null && minutes.value < 360)
+const beforeSix = computed(() => minutes.value != null && minutes.value < sunriseMin.value)
 
 async function boost() {
   if (!Capacitor.isNativePlatform())
@@ -43,7 +60,7 @@ async function boost() {
 function record(hm: string) {
   patch({ wake: hm })
   const [h, m] = hm.split(':').map(Number)
-  if (h! * 60 + m! < 360) {
+  if (h! * 60 + m! < sunriseMin.value) {
     markDone({ wake: hm })
   }
   else {
@@ -58,14 +75,14 @@ function awake() {
 }
 
 async function pick() {
-  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, locale: L.tag(), title: L('Heure du réveil', 'Wake-up time'), doneText: 'OK', cancelText: L('Annuler', 'Cancel'), date: data.value.wake || '05:45' }).catch(() => null)
+  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, locale: L.tag(), title: L('Heure du réveil', 'Wake-up time'), doneText: 'OK', cancelText: L('Annuler', 'Cancel'), date: data.value.wake || alarmHM.value }).catch(() => null)
   if (res?.value)
     record(res.value)
 }
 
 function alarm() {
   haptic.press()
-  void setSystemAlarm(quest.settings.wakeAlarm, L('Soleil levant — debout !', 'Rising sun — up you get!'))
+  void setSystemAlarm(alarmHM.value, L(`Soleil levant à ${sunrise.value} — debout !`, `Sunrise at ${sunrise.value} — up you get!`))
 }
 </script>
 
@@ -88,13 +105,13 @@ function alarm() {
 
     <div class="text-center mt-2">
       <p class="t-label text-graphite">
-        {{ L('Heure du réveil', 'Wake-up time') }}
+        {{ L('Lever du soleil', 'Sunrise') }} {{ sunrise }}{{ coords?.approx ? ' ~' : '' }} · {{ L('Heure du réveil', 'Wake-up time') }}
       </p>
       <button class="t-display text-5xl tabular-nums mt-1 underline decoration-dashed decoration-2 underline-offset-8" :disabled="!editable" @click="pick">
         {{ data.wake || '--:--' }}
       </button>
       <p v-if="data.wake" class="t-body text-sm mt-3" :class="beforeSix ? '' : 'text-graphite'">
-        {{ beforeSix ? L('Avant le soleil. Bravo.', 'Before the sun. Well done.') : L('Après 6h00… demain sera le bon.', 'After 6:00… tomorrow is the day.') }}
+        {{ beforeSix ? L('Avant le soleil. Bravo.', 'Before the sun. Well done.') : L(`Après le lever (${sunrise})… demain sera le bon.`, `After sunrise (${sunrise})… tomorrow is the day.`) }}
       </p>
     </div>
 
@@ -103,11 +120,13 @@ function alarm() {
         {{ L('Je suis debout', 'I\'m up') }}
       </button>
       <button class="btn" @click="alarm">
-        ⏰ {{ quest.settings.wakeAlarm }}
+        ⏰ {{ alarmHM }}
       </button>
     </div>
     <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('Le réveil est un vrai réveil système : il sonne même en mode silencieux.', 'The alarm is a real system alarm: it rings even in silent mode.') }}
+      {{ quest.settings.wakeAuto
+        ? L('Réveil 15 min avant le lever du soleil de demain, calculé ici même selon votre position (jamais envoyée). Un vrai réveil système, même en silencieux.', 'Alarm 15 min before tomorrow\'s sunrise, computed right here from your location (never sent anywhere). A real system alarm, even in silent mode.')
+        : L('Heure fixe choisie dans Réglages. Un vrai réveil système, même en silencieux.', 'Fixed time set in Settings. A real system alarm, even in silent mode.') }}
     </p>
   </div>
 </template>

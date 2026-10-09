@@ -17,6 +17,7 @@ import { openSystemAlarms } from '~/services/alarm'
 import { buildEnv, isTestBuild } from '~/services/env'
 import { haptic } from '~/services/haptics'
 import { notificationsAllowed, requestNotifications, rescheduleAll } from '~/services/notifications'
+import { locate, wakeHM } from '~/services/sun'
 import { bundleVersion, currentChannel, nativeVersion } from '~/services/updater'
 import { syncTodayWidget } from '~/services/widgets'
 import { useQuest } from '~/stores/quest'
@@ -46,6 +47,28 @@ async function pickTime(key: 'reminder' | 'evening' | 'wakeAlarm', title: string
   const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, date: quest.settings[key], title, locale: L.tag(), doneText: 'OK', cancelText: L('Annuler', 'Cancel') }).catch(() => null)
   if (res?.value)
     quest.settings[key] = res.value
+}
+
+const autoWake = ref(wakeHM(new Date(Date.now() + 86_400_000)))
+onMounted(async () => {
+  const c = await locate(false)
+  autoWake.value = wakeHM(new Date(Date.now() + 86_400_000), c)
+})
+
+/** Picking a time switches the Rising sun alarm from automatic (sunrise) to fixed. */
+async function pickWake() {
+  haptic.tap()
+  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, date: quest.settings.wakeAuto ? autoWake.value : quest.settings.wakeAlarm, title: L('Réveil fixe', 'Fixed alarm'), locale: L.tag(), doneText: 'OK', cancelText: L('Annuler', 'Cancel') }).catch(() => null)
+  if (res?.value) {
+    quest.settings.wakeAlarm = res.value
+    quest.settings.wakeAuto = false
+  }
+}
+
+async function followSunrise() {
+  haptic.select()
+  quest.settings.wakeAuto = true
+  autoWake.value = wakeHM(new Date(Date.now() + 86_400_000), await locate(true))
 }
 
 function setLocale(l: Settings['locale']) {
@@ -140,8 +163,13 @@ function custom() {
       <button class="row" @click="pickTime('evening', $t('settings.evening'))">
         <span class="t-body flex-1 text-left">{{ $t('settings.evening') }}</span><span class="t-display tabular-nums">{{ quest.settings.evening }}</span>
       </button>
-      <button class="row" @click="pickTime('wakeAlarm', $t('settings.wakeAlarm'))">
-        <span class="t-body flex-1 text-left">{{ $t('settings.wakeAlarm') }}</span><span class="t-display tabular-nums">{{ quest.settings.wakeAlarm }}</span>
+      <button class="row" @click="pickWake">
+        <span class="t-body flex-1 text-left">{{ $t('settings.wakeAlarm') }}</span>
+        <span v-if="quest.settings.wakeAuto" class="t-label text-pencil mr-2">{{ L('lever du soleil', 'sunrise') }}</span>
+        <span class="t-display tabular-nums">{{ quest.settings.wakeAuto ? autoWake : quest.settings.wakeAlarm }}</span>
+      </button>
+      <button v-if="!quest.settings.wakeAuto" class="t-label text-graphite underline mt-1" @click="followSunrise">
+        {{ L('Revenir au lever du soleil', 'Follow the sunrise again') }}
       </button>
       <button v-if="native" class="row" @click="openSystemAlarms">
         <span class="t-body flex-1 text-left">{{ L('Ouvrir l\'app Horloge', 'Open the Clock app') }}</span><span>↗</span>
