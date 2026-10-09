@@ -49,9 +49,11 @@ on:
 permissions:
   contents: read
 
+# Queue releases on main instead of cancelling them: a cancelled job does not stop
+# the Capgo cloud build it started, which then blocks the next build slot.
 concurrency:
   group: capgo-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   APP_ID: ee.forgr.mondayquest
