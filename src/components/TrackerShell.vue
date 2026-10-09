@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Challenge } from '~/data/challenges'
 import type { Run } from '~/lib/progress'
+import { toast } from '@capgo/capacitor-pretty-toast'
 import { computed, ref, watch } from 'vue'
 import DoneStamp from '~/components/DoneStamp.vue'
 import InkCheck from '~/components/InkCheck.vue'
@@ -43,6 +44,19 @@ function select(i: number) {
     sfx.play('page', 0.35)
   }
   selected.value = i
+}
+
+const panel = ref<HTMLElement | null>(null)
+const nudge = ref(false)
+
+/** Boxes are ticked by doing the challenge: point to the day's panel instead. */
+function needsAction(i: number) {
+  select(i)
+  panel.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  nudge.value = false
+  requestAnimationFrame(() => (nudge.value = true))
+  setTimeout(() => (nudge.value = false), 700)
+  toast.info(L('Faites le challenge ci-dessus pour cocher la journée', 'Do the challenge above to tick the day'))
 }
 
 function toggle(i: number, v: boolean) {
@@ -89,7 +103,7 @@ function dayDate(i: number) {
     </p>
 
     <!-- interactive panel for the selected day -->
-    <section v-if="status !== 'upcoming' && !run.completedAt" class="panel frame mb-7">
+    <section v-if="status !== 'upcoming' && !run.completedAt" ref="panel" class="panel frame mb-7" :class="{ nudge }">
       <div class="frame-inner px-4 pt-4 pb-5">
         <div class="flex items-baseline justify-between mb-3">
           <span class="t-display text-lg">{{ dayLabel(selected) }}</span>
@@ -121,7 +135,9 @@ function dayDate(i: number) {
             :model-value="run.days[i - 1]!.done"
             :size="58"
             :disabled="!canEditDay(run, i - 1, quest.today)"
+            :manual="challenge.tracker === 'custom'"
             @update:model-value="v => toggle(i - 1, v)"
+            @needs-action="needsAction(i - 1)"
           />
           <p class="summary t-body text-[0.8rem] leading-tight text-graphite line-clamp-3">
             {{ summary(i - 1) }}
@@ -196,5 +212,21 @@ function dayDate(i: number) {
 .panel-leave-to {
   opacity: 0;
   transform: translateX(-18px);
+}
+
+.panel.nudge {
+  animation: nudge 600ms var(--ease-spring);
+}
+
+@keyframes nudge {
+  25% {
+    transform: translateX(-6px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-3px);
+  }
 }
 </style>

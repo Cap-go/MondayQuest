@@ -11,11 +11,14 @@ const props = withDefaults(defineProps<{
   eraseHold?: number
   label?: string
   variant?: 'day' | 'done'
-}>(), { size: 76, eraseHold: 650, variant: 'day' })
+  /** false: a tap cannot tick it, the challenge's own interaction does (erasing still works). */
+  manual?: boolean
+}>(), { size: 76, eraseHold: 650, variant: 'day', manual: true })
 
 const emit = defineEmits<{
   'update:modelValue': [boolean]
   'denied': []
+  'needsAction': []
 }>()
 
 const pressing = ref(false)
@@ -57,7 +60,13 @@ function up() {
   const wasChecked = checked.value
   const held = erasing.value
   reset()
-  if (!wasChecked && !props.disabled) {
+  if (!wasChecked && !props.disabled && !props.manual) {
+    haptic.warning()
+    bump.value = true
+    setTimeout(() => (bump.value = false), 420)
+    emit('needsAction')
+  }
+  else if (!wasChecked && !props.disabled) {
     bump.value = true
     setTimeout(() => (bump.value = false), 420)
     sfx.play('check')
