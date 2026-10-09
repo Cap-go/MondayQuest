@@ -40,7 +40,7 @@ function open(id: string) {
       {{ $t('journal.title') }}
     </h1>
 
-    <!-- 30 challenges, 30 boxes -->
+    <!-- 52 challenges, 52 boxes: a year of Mondays -->
     <section class="mt-6">
       <p class="t-label mb-2">
         {{ $t('journal.stats') }}

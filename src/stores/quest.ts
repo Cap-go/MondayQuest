@@ -8,6 +8,9 @@ import { today as todayISO } from '~/lib/date'
 import { allChecked, completeRun, dayIndex, isLive, newRun, patchDayData, runStatus, setDay, streak } from '~/lib/progress'
 import { loadJSON, saveJSON } from '~/lib/storage'
 
+/** Bonus level for user-made challenges, never locked. */
+export const CUSTOM_LEVEL = 99
+
 export interface Settings {
   locale: Locale | 'auto'
   sound: boolean
@@ -21,6 +24,10 @@ export interface Settings {
   hardcore: boolean
   onboarded: boolean
   privacy: boolean
+  /** Debug menu unlocked (TestFlight, or 7 taps on the version box). */
+  debug: boolean
+  /** Debug: every level open. */
+  unlockAll: boolean
 }
 
 interface Persisted {
@@ -42,6 +49,8 @@ export const DEFAULT_SETTINGS: Settings = {
   hardcore: false,
   onboarded: false,
   privacy: false,
+  debug: false,
+  unlockAll: false,
 }
 
 export const useQuest = defineStore('quest', () => {
@@ -84,7 +93,7 @@ export const useQuest = defineStore('quest', () => {
 
   /** Book rule: a level opens once the previous one is finished. Future challenges stay readable. */
   function isLocked(c: Challenge): boolean {
-    return c.level <= LEVELS.length && c.level > currentLevel.value && !completedIds.value.has(c.id) && !runFor(c.id)
+    return !settings.value.unlockAll && c.level <= LEVELS.length && c.level > currentLevel.value && !completedIds.value.has(c.id) && !runFor(c.id)
   }
 
   function challenge(id: string): Challenge | undefined {
@@ -141,7 +150,7 @@ export const useQuest = defineStore('quest', () => {
 
   function addCustom(c: Omit<Challenge, 'id' | 'n' | 'source' | 'level'>) {
     const n = 100 + custom.value.length + 1
-    const created: Challenge = { ...c, id: `custom-${Date.now().toString(36)}`, n, level: 7, source: 'custom' }
+    const created: Challenge = { ...c, id: `custom-${Date.now().toString(36)}`, n, level: CUSTOM_LEVEL, source: 'custom' }
     custom.value.push(created)
     return created
   }
@@ -160,7 +169,8 @@ export const useQuest = defineStore('quest', () => {
   async function load() {
     const data = await loadJSON<Persisted>(KEY, { version: 1, runs: [], custom: [], settings: { ...DEFAULT_SETTINGS } })
     runs.value = data.runs
-    custom.value = data.custom
+    // Custom challenges used to sit on level 7, which is now a real level.
+    custom.value = data.custom.map(c => ({ ...c, level: CUSTOM_LEVEL }))
     settings.value = { ...DEFAULT_SETTINGS, ...data.settings }
     ready.value = true
     setInterval(tick, 60_000)

@@ -44,6 +44,7 @@ dependencies {
     implementation project(':capgo-capacitor-updater')
     implementation project(':capgo-capacitor-volume-buttons')
     implementation project(':capgo-capacitor-widget-kit')
+    implementation project(':capgo-native-purchases')
 
 }
 

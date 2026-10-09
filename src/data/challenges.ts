@@ -1,5 +1,10 @@
-// Challenges 1–15 are transcribed from the LUNDI MATIN© booklet (levels I–III).
-// Challenges 16–30 are Monday Quest originals written in the same voice.
+import { LEVEL_7 } from './levels/level7'
+import { LEVEL_8 } from './levels/level8'
+import { LEVEL_9 } from './levels/level9'
+// 52 challenges, one for every week of the year: 10 levels of 5 plus a 2-week finale.
+// Levels VII–XI live in ./levels/ to keep this file readable.
+import { LEVEL_10 } from './levels/level10'
+import { LEVEL_11 } from './levels/level11'
 
 export type Locale = 'fr' | 'en'
 export type Category = 'health' | 'growth' | 'wellbeing'
@@ -35,12 +40,35 @@ export type TrackerKind
     | 'fear' // fear thermometer before/after
     | 'messenger' // envelope to a loved one
     | 'fast' // 16:8 fasting clock
+    | 'plank'
+    | 'firsthour'
+    | 'cook'
+    | 'words'
+    | 'standup'
+    | 'declutter'
+    | 'nospend'
+    | 'call'
+    | 'kindness'
+    | 'nature'
+    | 'memory'
+    | 'detox'
+    | 'practice'
+    | 'dance'
+    | 'bed'
+    | 'still'
+    | 'compliment'
+    | 'juggle'
+    | 'sunset'
+    | 'focus'
+    | 'review'
+    | 'share'
     | 'custom' // user-made challenge
 
 export type IconName
   = | 'foot' | 'sunrise' | 'apple' | 'pill' | 'broom' | 'cutlery' | 'dot' | 'nodes' | 'stretch' | 'minus'
     | 'stones' | 'shower' | 'ok' | 'frame' | 'heart' | 'drop' | 'book' | 'pencil' | 'plane' | 'band'
     | 'stairs' | 'arms' | 'bubble' | 'cube' | 'compass' | 'moon' | 'lines' | 'flame' | 'envelope' | 'clock' | 'star' | 'lock'
+    | 'plank' | 'phone' | 'pot' | 'cards' | 'chair' | 'box' | 'coin' | 'dial' | 'seed' | 'leaf' | 'calendar' | 'nosign' | 'note' | 'wave' | 'bed' | 'still' | 'ribbon' | 'balls' | 'sunset' | 'tomato' | 'loop' | 'share'
 
 export interface ChallengeText {
   title: string
@@ -73,6 +101,11 @@ export const LEVELS: Level[] = [
   { n: 4, roman: 'IV', text: { fr: 'L\'ascension', en: 'The climb' } },
   { n: 5, roman: 'V', text: { fr: 'La crête', en: 'The ridge' } },
   { n: 6, roman: 'VI', text: { fr: 'Le sommet', en: 'The summit' } },
+  { n: 7, roman: 'VII', text: { fr: 'Le second souffle', en: 'Second wind' } },
+  { n: 8, roman: 'VIII', text: { fr: 'Le cap', en: 'The headland' } },
+  { n: 9, roman: 'IX', text: { fr: 'Le large', en: 'Open sea' } },
+  { n: 10, roman: 'X', text: { fr: 'L\'horizon', en: 'The horizon' } },
+  { n: 11, roman: 'XI', text: { fr: 'La boucle', en: 'Full circle' } },
 ]
 
 export const CATEGORY_LABEL: Record<Category, Record<Locale, string>> = {
@@ -81,7 +114,7 @@ export const CATEGORY_LABEL: Record<Category, Record<Locale, string>> = {
   wellbeing: { fr: 'Bien-être', en: 'Well-being' },
 }
 
-type Def = Omit<Challenge, 'id' | 'source'>
+export type Def = Omit<Challenge, 'id' | 'source'>
 
 const defs: Def[] = [
   // ───────────── NIVEAU I — L'AFFRANCHISSEMENT ─────────────
@@ -915,7 +948,7 @@ const defs: Def[] = [
   },
 ]
 
-export const CHALLENGES: Challenge[] = defs.map(d => ({
+export const CHALLENGES: Challenge[] = [...defs, ...LEVEL_7, ...LEVEL_8, ...LEVEL_9, ...LEVEL_10, ...LEVEL_11].map(d => ({
   ...d,
   id: `mq${String(d.n).padStart(2, '0')}`,
   source: d.n <= 15 ? 'book' : 'quest',

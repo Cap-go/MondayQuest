@@ -74,7 +74,7 @@ function daysUntil(run: Run) {
       </div>
       <div class="stat">
         <p class="t-display text-3xl tabular-nums">
-          {{ quest.completedIds.size }}<span class="text-pencil text-lg">/30</span>
+          {{ quest.completedIds.size }}<span class="text-pencil text-lg">/{{ CHALLENGES.length }}</span>
         </p>
         <p class="t-label text-[0.6rem] text-graphite leading-tight">
           {{ $t('home.completed') }}

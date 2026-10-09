@@ -11,6 +11,7 @@ import { createApp, watch } from 'vue'
 import App from './App.vue'
 import { i18n } from './i18n'
 import { router } from './router'
+import { detectBuildEnv } from './services/env'
 import { setHapticsEnabled } from './services/haptics'
 import { renderTabbar, setupNativeNavigation } from './services/navigation'
 import { clearBadge, initNotifications, onNotificationOpen, rescheduleAll } from './services/notifications'
@@ -62,6 +63,7 @@ async function boot() {
   await router.isReady()
   await SplashScreen.hide({ fadeOutDuration: 350 }).catch(() => {})
 
+  void detectBuildEnv()
   void sfx.preload()
   void setupNativeNavigation(router)
   if (native) {

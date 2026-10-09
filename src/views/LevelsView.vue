@@ -45,7 +45,7 @@ function newCustom() {
       {{ $t('tabs.levels') }}
     </h1>
     <p class="t-body text-graphite mt-1">
-      {{ L('6 niveaux de 5 challenges. Terminez un niveau avant de passer au suivant.', '6 levels of 5 challenges. Finish a level before moving on.') }}
+      {{ L('52 challenges, un par semaine pendant un an. Terminez un niveau pour débloquer le suivant.', '52 challenges, one a week for a year. Finish a level to unlock the next.') }}
     </p>
 
     <section v-for="lvl in levels" :key="lvl.n" class="sheet level mt-8 px-5 pt-6 pb-3" :class="{ 'current': lvl.n === quest.currentLevel, 'level-locked': lvl.n > quest.currentLevel }">
@@ -60,7 +60,7 @@ function newCustom() {
         </div>
         <QuestIcon v-if="lvl.n > quest.currentLevel" name="lock" :size="26" :stroke="3" class="mb-0.5" />
         <div v-else class="flex gap-1 pb-1">
-          <span v-for="i in 5" :key="i" class="pip" :class="{ on: i <= lvl.done }" />
+          <span v-for="i in lvl.items.length" :key="i" class="pip" :class="{ on: i <= lvl.done }" />
         </div>
       </div>
 

@@ -10,6 +10,7 @@ export const router = createRouter({
     { path: '/settings', component: () => import('~/views/SettingsView.vue'), meta: { tab: 'settings' } },
     { path: '/challenge/:id/:page(read|track)?', component: () => import('~/views/ChallengeView.vue'), meta: { hideTabs: true } },
     { path: '/onboarding', component: () => import('~/views/OnboardingView.vue'), meta: { hideTabs: true } },
+    { path: '/debug', component: () => import('~/views/DebugView.vue'), meta: { hideTabs: true } },
     { path: '/custom/new', component: () => import('~/views/CustomView.vue'), meta: { hideTabs: true } },
     { path: '/:pathMatch(.*)*', redirect: '/today' },
   ],

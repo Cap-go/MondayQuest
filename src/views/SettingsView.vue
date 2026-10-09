@@ -13,6 +13,7 @@ import QuestPage from '~/components/QuestPage.vue'
 import ToggleRow from '~/components/ToggleRow.vue'
 import { useL } from '~/composables/useL'
 import { openSystemAlarms } from '~/services/alarm'
+import { buildEnv, isTestBuild } from '~/services/env'
 import { haptic } from '~/services/haptics'
 import { notificationsAllowed, requestNotifications, rescheduleAll } from '~/services/notifications'
 import { bundleVersion, currentChannel, nativeVersion } from '~/services/updater'
@@ -79,6 +80,25 @@ const LINKS = [
   { label: () => L('Site web', 'Website'), hint: 'mondayquest.com', url: 'https://mondayquest.com' },
   { label: () => L('Confidentialité', 'Privacy'), hint: '', url: 'https://mondayquest.com/privacy' },
 ]
+
+let taps = 0
+let tapTimer: ReturnType<typeof setTimeout> | undefined
+function versionTap() {
+  taps++
+  clearTimeout(tapTimer)
+  tapTimer = setTimeout(() => (taps = 0), 1500)
+  if (taps >= 7 && !quest.settings.debug) {
+    quest.settings.debug = true
+    haptic.success()
+    toast.success('Debug menu unlocked')
+  }
+}
+
+function openDebug() {
+  haptic.tap()
+  setDirection('forward')
+  void router.push('/debug')
+}
 
 function custom() {
   setDirection('forward')
@@ -172,7 +192,7 @@ function custom() {
         <span class="t-body flex-1 text-left">{{ l.label() }}</span>
         <span class="t-body text-sm text-pencil">{{ l.hint }}</span><span class="ml-2">↗</span>
       </button>
-      <div class="version mt-4">
+      <div class="version mt-4" @click="versionTap">
         <div>
           <p class="t-label text-[0.6rem] text-pencil">
             App
@@ -198,6 +218,12 @@ function custom() {
           </p>
         </div>
       </div>
+    </section>
+
+    <section v-if="isTestBuild || quest.settings.debug" class="mt-8">
+      <button class="btn w-full" @click="openDebug">
+        Debug · {{ buildEnv }}
+      </button>
     </section>
 
     <section class="mt-8 text-center">

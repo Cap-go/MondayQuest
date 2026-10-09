@@ -140,7 +140,6 @@ jobs:
             --bundle "$BUNDLE_VERSION" \
             --comment "GitHub ${GITHUB_SHA::7}" \
             --delta \
-            --auto-min-update-version \
             --fail-on-incompatible \
             --version-exists-ok \
             -a "$CAPGO_TOKEN"

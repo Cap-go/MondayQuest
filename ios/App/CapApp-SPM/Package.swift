@@ -46,7 +46,8 @@ let package = Package(
         .package(name: "CapgoCapacitorSpeechSynthesis", path: "../../../node_modules/@capgo/capacitor-speech-synthesis"),
         .package(name: "CapgoCapacitorUpdater", path: "../../../node_modules/@capgo/capacitor-updater"),
         .package(name: "CapgoCapacitorVolumeButtons", path: "../../../node_modules/@capgo/capacitor-volume-buttons"),
-        .package(name: "CapgoCapacitorWidgetKit", path: "../../../node_modules/@capgo/capacitor-widget-kit")
+        .package(name: "CapgoCapacitorWidgetKit", path: "../../../node_modules/@capgo/capacitor-widget-kit"),
+        .package(name: "CapgoNativePurchases", path: "../../../node_modules/@capgo/native-purchases")
     ],
     targets: [
         .target(
@@ -88,7 +89,8 @@ let package = Package(
                 .product(name: "CapgoCapacitorSpeechSynthesis", package: "CapgoCapacitorSpeechSynthesis"),
                 .product(name: "CapgoCapacitorUpdater", package: "CapgoCapacitorUpdater"),
                 .product(name: "CapgoCapacitorVolumeButtons", package: "CapgoCapacitorVolumeButtons"),
-                .product(name: "CapgoCapacitorWidgetKit", package: "CapgoCapacitorWidgetKit")
+                .product(name: "CapgoCapacitorWidgetKit", package: "CapgoCapacitorWidgetKit"),
+                .product(name: "CapgoNativePurchases", package: "CapgoNativePurchases")
             ]
         )
     ]

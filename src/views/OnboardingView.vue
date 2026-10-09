@@ -74,7 +74,7 @@ function finish() {
             </p>
           </div>
           <p class="t-body text-graphite mt-8 px-6">
-            30 challenges. 30 {{ $t('common.monday') }}s.
+            52 challenges. 52 {{ $t('common.monday') }}s.
           </p>
         </section>
 

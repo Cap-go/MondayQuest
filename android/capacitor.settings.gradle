@@ -106,3 +106,6 @@ project(':capgo-capacitor-volume-buttons').projectDir = new File('../node_module
 
 include ':capgo-capacitor-widget-kit'
 project(':capgo-capacitor-widget-kit').projectDir = new File('../node_modules/@capgo/capacitor-widget-kit/android')
+
+include ':capgo-native-purchases'
+project(':capgo-native-purchases').projectDir = new File('../node_modules/@capgo/native-purchases/android')

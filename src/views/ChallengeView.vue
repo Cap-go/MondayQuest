@@ -209,7 +209,7 @@ function capitalize(s: string) {
                 <span class="t-display text-lg">{{ $t('start.now') }}</span>
                 <span class="t-body text-sm text-graphite">{{ $t('start.nowHint') }}</span>
               </button>
-              <button v-if="quest.settings.hardcore && c.level <= 6" class="choice inverted" @click="start('hardcore')">
+              <button v-if="quest.settings.hardcore && c.source !== 'custom'" class="choice inverted" @click="start('hardcore')">
                 <span class="t-display text-lg">Hardcore</span>
                 <span class="t-body text-sm">{{ $t('start.hardcore') }}</span>
               </button>
