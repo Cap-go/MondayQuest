@@ -16,6 +16,7 @@ const MIN = 10 + Math.round(props.idx * 2.5)
 const GOAL = MIN * 60_000
 
 const s = useSession(props, {
+  lockHint: false,
   targetMs: GOAL,
   keepAwake: true,
   title: () => L('FAUSSE NOTE', 'WRONG NOTE'),

@@ -141,20 +141,21 @@ export interface SessionInfo {
 }
 
 /** Live Activity on the lock screen + Dynamic Island for timed sessions (walk, meditation, cold shower…). */
-export async function startSessionActivity(info: SessionInfo) {
+/** Returns true when the Live Activity is showing on the lock screen / Dynamic Island. */
+export async function startSessionActivity(info: SessionInfo): Promise<boolean> {
   if (!native)
-    return
+    return false
   const { supported } = await CapgoWidgetKit.areActivitiesSupported().catch(() => ({ supported: false }))
   if (!supported)
-    return
+    return false
   await CapgoWidgetKit.endTemplateActivity({ activityId: SESSION_ID }).catch(() => {})
-  await CapgoWidgetKit.startTemplateActivity({
+  return CapgoWidgetKit.startTemplateActivity({
     activityId: SESSION_ID,
     definition: sessionDefinition(info.durationMs),
     state: { ...info, endsAt: info.startedAt + info.durationMs },
     openUrl: 'mondayquest://today',
     startLiveActivity: true,
-  }).catch(() => {})
+  }).then(() => true).catch(() => false)
 }
 
 export async function updateSessionActivity(patch: Partial<SessionInfo> & Record<string, string | number | boolean>) {

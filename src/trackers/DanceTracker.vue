@@ -17,6 +17,7 @@ const GOAL = 3 * 60_000
 const NEED = 2 * 60_000
 
 const s = useSession(props, {
+  lockHint: false,
   targetMs: GOAL,
   autoCheck: false,
   keepAwake: true,

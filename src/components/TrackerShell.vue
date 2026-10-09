@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { Challenge } from '~/data/challenges'
 import type { Run } from '~/lib/progress'
+import { Capacitor } from '@capacitor/core'
 import { toast } from '@capgo/capacitor-pretty-toast'
 import { computed, ref, watch } from 'vue'
 import DoneStamp from '~/components/DoneStamp.vue'
 import InkCheck from '~/components/InkCheck.vue'
+import QuestIcon from '~/components/QuestIcon.vue'
 import { useL } from '~/composables/useL'
 import { formatDate } from '~/lib/date'
 import { allChecked, canEditDay, dateOfDay, runStatus, WEEK } from '~/lib/progress'
@@ -45,6 +47,10 @@ function select(i: number) {
   }
   selected.value = i
 }
+
+/** Timed challenges whose session shows as a Live Activity (walk has its own line). */
+const LOCKABLE = ['meditate', 'stretch', 'offline', 'nature', 'still', 'focus', 'firsthour', 'listen', 'fast']
+const lockable = computed(() => Capacitor.isNativePlatform() && LOCKABLE.includes(props.challenge.tracker))
 
 const panel = ref<HTMLElement | null>(null)
 const nudge = ref(false)
@@ -121,6 +127,10 @@ function dayDate(i: number) {
             :is-today="selected === todayIdx"
           />
         </Transition>
+        <p v-if="lockable && editable && selected === todayIdx" class="lock-line t-body">
+          <QuestIcon name="lock" :size="14" :stroke="3" class="inline -mt-0.5" />
+          {{ L('Lancé, vous pouvez verrouiller le téléphone : le chrono reste sur l\'écran de verrouillage.', 'Once started, you can lock the phone: the timer stays on your lock screen.') }}
+        </p>
       </div>
     </section>
 
@@ -229,5 +239,14 @@ function dayDate(i: number) {
   75% {
     transform: translateX(-3px);
   }
+}
+
+.lock-line {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1.5px dashed var(--color-rule);
+  font-size: 0.75rem;
+  color: var(--color-graphite);
+  text-align: center;
 }
 </style>
