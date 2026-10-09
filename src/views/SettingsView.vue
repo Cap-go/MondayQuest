@@ -19,7 +19,6 @@ import { haptic } from '~/services/haptics'
 import { notificationsAllowed, requestNotifications, rescheduleAll } from '~/services/notifications'
 import { locate, wakeHM } from '~/services/sun'
 import { bundleVersion, currentChannel, nativeVersion } from '~/services/updater'
-import { syncTodayWidget } from '~/services/widgets'
 import { useQuest } from '~/stores/quest'
 
 const quest = useQuest()
@@ -83,11 +82,6 @@ function reset() {
     quest.resetAll()
     toast.info(L('Carnet vierge', 'Blank notebook'))
   }
-}
-
-async function refreshWidget() {
-  await syncTodayWidget()
-  toast.success(L('Widget mis à jour', 'Widget refreshed'))
 }
 
 function link(url: string) {
@@ -192,9 +186,6 @@ function custom() {
       <p class="t-body text-sm text-graphite mt-2">
         {{ $t('settings.widgetHint') }}
       </p>
-      <button v-if="native" class="btn w-full mt-3" @click="refreshWidget">
-        {{ L('Rafraîchir le widget', 'Refresh widget') }}
-      </button>
     </section>
 
     <section class="mt-8">
