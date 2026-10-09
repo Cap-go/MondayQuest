@@ -135,7 +135,7 @@ function newCustom() {
   text-transform: uppercase;
 }
 
-.level-locked {
+.level.level-locked {
   background: transparent;
   box-shadow: inset 0 0 0 2px var(--color-rule);
 }
@@ -152,6 +152,32 @@ function newCustom() {
 .level.current {
   outline: 2.5px solid var(--color-ink);
   outline-offset: -2.5px;
+}
+
+/* Outlines and inset shadows ignore the clipped corner: draw its diagonal edge by hand.
+   A bar starting where the cut begins, rotated 45°, its thickness falling inside the page. */
+.level.current::after,
+.level-locked::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(100% - var(--cut));
+  width: calc(var(--cut) * 1.4142);
+  height: var(--edge-w);
+  background: var(--edge);
+  transform: rotate(45deg);
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.level.current {
+  --edge: var(--color-ink);
+  --edge-w: 2.5px;
+}
+
+.level-locked {
+  --edge: var(--color-rule);
+  --edge-w: 2px;
 }
 
 .row {
