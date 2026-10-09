@@ -26,7 +26,7 @@ nav a{text-decoration:none}
 .levels{margin-top:72px}
 .levels ol{list-style:none;padding:0;margin:18px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .levels li{border:2px solid var(--ink);padding:14px 16px}
-.levels li span{color:var(--pencil);font-size:13px;display:block}
+.levels li span{color:var(--pencil);font-size:13px;display:block;margin-top:4px;font-family:Didact,system-ui,sans-serif;font-weight:400;text-transform:none;letter-spacing:0;line-height:1.35}
 footer{margin-top:80px;padding-top:20px;border-top:2px solid var(--ink);display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;font-size:14px;color:var(--pencil)}
 .doc{max-width:680px}
 .doc h1{font-size:48px;margin:48px 0 24px}
