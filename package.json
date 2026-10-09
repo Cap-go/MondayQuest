@@ -1,7 +1,7 @@
 {
   "name": "monday-quest",
   "type": "module",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "private": true,
   "description": "Monday Quest — 30 weekly challenges to become a more resilient version of yourself.",
   "author": "Martin Donadieu <martin@capgo.app>",
