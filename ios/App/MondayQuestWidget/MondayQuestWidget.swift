@@ -11,6 +11,11 @@ import WidgetKit
 private let paper = Color(red: 0.965, green: 0.957, blue: 0.937)
 private let ink = Color(red: 0.078, green: 0.078, blue: 0.078)
 private let pencil = Color(red: 0.55, green: 0.54, blue: 0.52)
+// Live Activities: iOS blends the background tint with the lock screen (translucent, darker in
+// dark mode), so ink-on-paper loses contrast. Use an inverted opaque card instead.
+private let laBackground = Color(red: 0.08, green: 0.08, blue: 0.08)
+private let laText = Color(red: 0.965, green: 0.957, blue: 0.937)
+private let laMuted = Color(red: 0.78, green: 0.77, blue: 0.74)
 
 struct TodayState: Decodable {
     var title: String = "MONDAY QUEST"
@@ -201,35 +206,37 @@ struct SessionLiveActivity: Widget {
         ActivityConfiguration(for: CapgoTemplateActivityAttributes.self) { context in
             let s = Store.decode(context.attributes.activityId, as: SessionState.self) ?? SessionState()
             LockScreenSession(state: s)
-                .activityBackgroundTint(paper)
-                .activitySystemActionForegroundColor(ink)
+                .activityBackgroundTint(laBackground.opacity(0.92))
+                .activitySystemActionForegroundColor(laText)
                 .widgetURL(URL(string: "mondayquest://today"))
         } dynamicIsland: { context in
             let s = Store.decode(context.attributes.activityId, as: SessionState.self) ?? SessionState()
             return DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Text(s.short).font(.title2)
+                    Text(s.short).font(.title2).foregroundStyle(.white)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     Text(timerInterval: s.interval, countsDown: true)
                         .font(.title2.weight(.heavy).monospacedDigit())
+                        .foregroundStyle(.white)
                         .frame(maxWidth: 90)
                 }
                 DynamicIslandExpandedRegion(.center) {
-                    Text(s.title).font(.headline.weight(.black)).lineLimit(1)
+                    Text(s.title).font(.headline.weight(.black)).lineLimit(1).foregroundStyle(.white)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     ProgressView(timerInterval: s.interval, countsDown: false) { EmptyView() } currentValueLabel: { EmptyView() }
                         .tint(.white)
                 }
             } compactLeading: {
-                Text(s.short)
+                Text(s.short).foregroundStyle(.white)
             } compactTrailing: {
                 Text(timerInterval: s.interval, countsDown: true)
                     .monospacedDigit()
+                    .foregroundStyle(.white)
                     .frame(maxWidth: 52)
             } minimal: {
-                Text(s.short)
+                Text(s.short).foregroundStyle(.white)
             }
         }
     }
@@ -250,20 +257,20 @@ struct LockScreenSession: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(state.title).font(.system(size: 18, weight: .black)).foregroundStyle(ink)
+                    Text(state.title).font(.system(size: 18, weight: .black)).foregroundStyle(laText)
                     if !state.subtitle.isEmpty {
-                        Text(state.subtitle).font(.system(size: 13)).foregroundStyle(pencil)
+                        Text(state.subtitle).font(.system(size: 13)).foregroundStyle(laMuted)
                     }
                 }
                 Spacer()
                 Text(timerInterval: state.interval, countsDown: true)
                     .font(.system(size: 34, weight: .heavy).monospacedDigit())
-                    .foregroundStyle(ink)
+                    .foregroundStyle(laText)
                     .multilineTextAlignment(.trailing)
                     .frame(maxWidth: 140, alignment: .trailing)
             }
             ProgressView(timerInterval: state.interval, countsDown: false) { EmptyView() } currentValueLabel: { EmptyView() }
-                .tint(ink)
+                .tint(laText)
         }
         .padding(18)
     }
