@@ -9,6 +9,7 @@ import BackButton from '~/components/BackButton.vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import ToggleRow from '~/components/ToggleRow.vue'
+import { useL } from '~/composables/useL'
 import { CHALLENGES, LEVELS } from '~/data/challenges'
 import { addDays } from '~/lib/date'
 import { setSystemAlarm } from '~/services/alarm'
@@ -22,8 +23,11 @@ import { useQuest } from '~/stores/quest'
 // Test-build only (TestFlight / dev / unlocked): jump into any challenge's UI without waiting weeks.
 const quest = useQuest()
 const router = useRouter()
+const L = useL()
 const filter = ref(0)
-const list = computed(() => CHALLENGES.filter(c => !filter.value || c.level === filter.value))
+const groups = computed(() => LEVELS
+  .filter(l => !filter.value || l.n === filter.value)
+  .map(l => ({ level: l, items: CHALLENGES.filter(c => c.level === l.n) })))
 
 function go(path: string) {
   setDirection('forward')
@@ -116,11 +120,17 @@ function hideDebug() {
       {{ buildEnv }} · app {{ nativeVersion || 'web' }} · bundle {{ bundleVersion }}
     </p>
 
-    <section class="mt-6">
+    <h2 class="group-head mt-6">
+      <span>Settings</span>
+    </h2>
+    <section>
       <ToggleRow v-model="quest.settings.unlockAll" label="Unlock every level" />
     </section>
 
-    <section class="mt-6 grid grid-cols-2 gap-2">
+    <h2 class="group-head mt-8">
+      <span>Native features</span>
+    </h2>
+    <section class="grid grid-cols-2 gap-2">
       <button class="btn" @click="testNotification">
         Notification
       </button>
@@ -141,22 +151,22 @@ function hideDebug() {
       </button>
     </section>
 
-    <section class="mt-8">
-      <p class="t-label">
-        Complete a level
-      </p>
-      <div class="flex flex-wrap gap-1.5 mt-2">
+    <h2 class="group-head mt-8">
+      <span>Complete a level</span>
+    </h2>
+    <section>
+      <div class="flex flex-wrap gap-1.5">
         <button v-for="l in LEVELS" :key="l.n" class="chip" @click="completeLevel(l.n)">
           {{ l.roman }}
         </button>
       </div>
     </section>
 
-    <section class="mt-8">
-      <p class="t-label">
-        All {{ CHALLENGES.length }} challenges
-      </p>
-      <div class="flex flex-wrap gap-1.5 mt-2">
+    <h2 class="group-head mt-8">
+      <span>All {{ CHALLENGES.length }} challenges</span>
+    </h2>
+    <section>
+      <div class="flex flex-wrap gap-1.5">
         <button class="chip" :class="{ on: !filter }" @click="filter = 0">
           All
         </button>
@@ -164,30 +174,75 @@ function hideDebug() {
           {{ l.roman }}
         </button>
       </div>
-      <ul class="mt-3">
-        <li v-for="c in list" :key="c.id" class="row">
-          <QuestIcon :name="c.icon" :size="26" :stroke="3" class="shrink-0" />
-          <button class="flex-1 min-w-0 text-left" @click="go(`/challenge/${c.id}/read`)">
-            <p class="t-display text-[0.85rem] truncate">
-              {{ c.n }}. {{ c.text[quest.locale].title }}
-            </p>
-            <p class="t-label text-[0.55rem] text-pencil">
-              {{ c.tracker }} · L{{ c.level }}
-            </p>
-          </button>
-          <button class="chip" @click="tryToday(c)">
-            Try
-          </button>
-          <button class="chip" @click="tryDone(c)">
-            Done
-          </button>
-        </li>
-      </ul>
+      <template v-for="g in groups" :key="g.level.n">
+        <h3 class="level-head">
+          <span>{{ L('Niveau', 'Level') }} {{ g.level.roman }} · {{ g.level.text[quest.locale] }}</span>
+          <span class="count">{{ quest.levelDone(g.level.n) }}/{{ g.items.length }}</span>
+        </h3>
+        <ul>
+          <li v-for="c in g.items" :key="c.id" class="row">
+            <QuestIcon :name="c.icon" :size="26" :stroke="3" class="shrink-0" />
+            <button class="flex-1 min-w-0 text-left" @click="go(`/challenge/${c.id}/read`)">
+              <p class="t-display text-[0.85rem] truncate">
+                {{ c.n }}. {{ c.text[quest.locale].title }}
+              </p>
+              <p class="t-label text-[0.55rem] text-pencil">
+                {{ c.tracker }} · L{{ c.level }}
+              </p>
+            </button>
+            <button class="chip" @click="tryToday(c)">
+              Try
+            </button>
+            <button class="chip" @click="tryDone(c)">
+              Done
+            </button>
+          </li>
+        </ul>
+      </template>
     </section>
   </QuestPage>
 </template>
 
 <style scoped>
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.group-head::after {
+  content: '';
+  flex: 1;
+  height: 2.5px;
+  background: var(--color-ink);
+}
+
+.level-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 6px 10px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.level-head .count {
+  opacity: 0.7;
+}
+
 .row {
   display: flex;
   align-items: center;
