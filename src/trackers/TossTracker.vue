@@ -101,13 +101,13 @@ onBeforeUnmount(() => void shake?.remove())
         {{ name }}
       </div>
       <p v-else class="t-body text-sm text-pencil text-center">
-        {{ L('Écrivez l\'objet, puis jetez-le vers la poubelle (ou secouez le téléphone).', 'Write the object, then flick it to the bin (or shake your phone).') }}
+        {{ L('Write the object, then flick it to the bin (or shake your phone).') }}
       </p>
     </div>
 
     <label class="block">
-      <span class="t-label">{{ L('Objet(s) jeté(s)', 'Object(s) thrown away') }}</span>
-      <input v-model="name" class="ink-input mt-1" :disabled="!editable" :placeholder="L('ex. le vieux chargeur en double', 'e.g. the duplicate old charger')" @keyup.enter="toss">
+      <span class="t-label">{{ L('Object(s) thrown away') }}</span>
+      <input v-model="name" class="ink-input mt-1" :disabled="!editable" :placeholder="L('e.g. the duplicate old charger')" @keyup.enter="toss">
     </label>
 
     <ul v-if="data.objects.length" class="mt-4 flex flex-wrap gap-2">

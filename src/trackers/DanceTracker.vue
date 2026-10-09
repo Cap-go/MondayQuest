@@ -21,10 +21,10 @@ const s = useSession(props, {
   targetMs: GOAL,
   autoCheck: false,
   keepAwake: true,
-  title: () => L('PISTE DE DANSE', 'DANCE FLOOR'),
-  subtitle: () => L('Une chanson entière', 'One full song'),
+  title: () => L('DANCE FLOOR'),
+  subtitle: () => L('One full song'),
   short: '♫',
-  doneBody: () => L('Fin du morceau ! Revenez valider.', 'Song over! Come back to tick it.'),
+  doneBody: () => L('Song over! Come back to tick it.'),
 })
 const { running, elapsed, done, start, pause } = s
 const extra = useDay(props, { groove: 0 })
@@ -125,7 +125,7 @@ const grooveP = computed(() => Math.min(1, groove.value / NEED))
           <line x1="60" y1="88" x2="60" y2="140" :transform="`rotate(${-20 + legR} 60 88)`" />
         </g>
       </svg>
-      <div class="meter" :aria-label="L('Groove', 'Groove')">
+      <div class="meter" :aria-label="L('Groove')">
         <div class="fill" :style="{ height: `${(running ? amp : 0) * 100}%` }" />
       </div>
     </div>
@@ -134,12 +134,12 @@ const grooveP = computed(() => Math.min(1, groove.value / NEED))
       {{ formatClock(Math.max(0, GOAL - elapsed)) }}
     </p>
     <p class="t-label mt-1" :class="nudge ? 'text-ink' : 'text-graphite'">
-      {{ done ? L('Vous avez dansé', 'You danced') : nudge ? L('Bougez ! Ça ne compte pas assis', 'Move! Sitting doesn\'t count') : running ? L('Dansez, téléphone en poche', 'Dance, phone in your pocket') : L('Une chanson, trois minutes', 'One song, three minutes') }}
+      {{ done ? L('You danced') : nudge ? L('Move! Sitting doesn\'t count') : running ? L('Dance, phone in your pocket') : L('One song, three minutes') }}
     </p>
 
     <div class="w-full max-w-72 mt-4">
       <div class="flex justify-between t-label text-graphite">
-        <span>{{ L('Temps en mouvement', 'Time moving') }}</span>
+        <span>{{ L('Time moving') }}</span>
         <span class="tabular-nums">{{ formatClock(Math.min(groove, NEED)) }} / 2:00</span>
       </div>
       <div class="bar mt-1">
@@ -148,10 +148,10 @@ const grooveP = computed(() => Math.min(1, groove.value / NEED))
     </div>
 
     <button class="btn btn-ink mt-5 w-48" :disabled="!editable || done" @click="go">
-      {{ done ? L('Dansé ✓', 'Danced ✓') : running ? L('Pause', 'Pause') : elapsed ? L('Reprendre', 'Resume') : L('Lancer la musique', 'Drop the beat') }}
+      {{ done ? L('Danced ✓') : running ? L('Pause') : elapsed ? L('Resume') : L('Drop the beat') }}
     </button>
     <p v-if="elapsed >= GOAL && !done" class="t-body text-xs text-graphite mt-2 text-center">
-      {{ L('Le morceau est fini, mais il manque du mouvement. Encore un peu !', 'The song is over but you need more movement. A bit more!') }}
+      {{ L('The song is over but you need more movement. A bit more!') }}
     </p>
   </div>
 </template>

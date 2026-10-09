@@ -2,7 +2,7 @@
 
 30 weekly challenges, each starting on a Monday morning. White-paper minimalism, black ink, the clipped page corner, and real ink checks. Website: https://mondayquest.com
 
-- **6 levels of 5 challenges**, English by default with a French translation. A level unlocks once the previous one is finished.
+- **52 challenges in 11 levels**, one a week for a year. A level unlocks once the previous one is finished.
 - **Bonus level**: create your own challenges.
 - **Hardcore mode**: start all 5 challenges of a level in the same week.
 
@@ -36,6 +36,15 @@ Everywhere: hand-drawn check animation with a pen-scratch sound and haptics, lon
 `capacitor-updater` (live updates), `capacitor-native-navigation` (native tab bar, Liquid Glass on iOS 26), `capacitor-transitions` (page transitions + swipe back), `capacitor-sheets`, `capacitor-pretty-toast`, `capacitor-alarm`, `capacitor-rich-notifications` (actions + inline reply), `capacitor-widget-kit` (home/lock-screen widget with an interactive check + Live Activity / Dynamic Island), `capacitor-native-audio`, `capacitor-pedometer`, `capacitor-health`, `camera-preview`, `capacitor-photo-library`, `capacitor-speech-recognition`, `capacitor-speech-synthesis`, `capacitor-keep-awake`, `capacitor-shake`, `capacitor-volume-buttons`, `capacitor-accelerometer`, `capacitor-barometer`, `capacitor-compass`, `capacitor-light-sensor`, `capacitor-brightness`, `capacitor-home-indicator`, `capacitor-navigation-bar`, `capacitor-inappbrowser`, `capacitor-date-picker`, `capacitor-file-sharer`, `capacitor-in-app-review`.
 
 All sounds are synthesised by `scripts/gen-sounds.ts` (`bun run sounds`), no third-party samples.
+
+## Languages
+
+All copy is written once, in English: the challenge data (`src/data`), the UI messages (`src/i18n.ts`) and inline strings `L('…')`. The app follows the phone language (or the one picked in Settings) and translates on the fly:
+
+- `translate/` is the **mondayquest-translate** Cloudflare Worker on `translate.mondayquest.com`. It takes `POST /v1/translate { lang, texts[], context? }`, translates in batches of 12 with Workers AI (Llama 4 Scout, strict JSON schema), protects brand names and `{placeholders}`, falls back to English when an output looks wrong, and caches every string forever in KV (`VERSION` in the key; bump it to retranslate everything). Per-IP rate limit.
+- The app (`src/i18n/translate.ts`) shows English instantly, asks for what is on screen first, prefetches every known string (`src/i18n/static-strings.json`, regenerated before each build), and keeps the translations on the device for offline use.
+- French uses the original hand-written copy, seeded into the cache. `bun translate/warm.ts [lang…]` pre-translates common languages.
+- Deploy: `cd translate && bunx wrangler deploy`.
 
 ## Develop
 

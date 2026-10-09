@@ -6,6 +6,7 @@ import { computed, onMounted, ref } from 'vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import { useL } from '~/composables/useL'
 import { COMMUNITY_URL, openExternal } from '~/config'
+import { ct } from '~/i18n/content'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 import { useQuest } from '~/stores/quest'
@@ -15,7 +16,7 @@ const emit = defineEmits<{ stamped: [], close: [] }>()
 
 const quest = useQuest()
 const L = useL()
-const text = computed(() => props.challenge.text[quest.locale])
+const text = computed(() => ct(props.challenge))
 const landed = ref(false)
 
 const confetti = Array.from({ length: 46 }, (_, i) => ({
@@ -112,11 +113,11 @@ function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, ma
             {{ $t('done.share') }}
           </button>
           <button class="btn btn-ink" @click="emit('close')">
-            {{ L('Continuer', 'Continue') }}
+            {{ L('Continue') }}
           </button>
         </div>
         <button v-if="COMMUNITY_URL" class="t-label underline text-graphite w-full text-center mt-4" @click="openExternal(COMMUNITY_URL)">
-          {{ L('Raconter ça dans le groupe Monday Quest', 'Tell the Monday Quest group') }} ↗
+          {{ L('Tell the Monday Quest group') }} ↗
         </button>
       </div>
     </div>

@@ -19,10 +19,10 @@ const s = useSession(props, {
   lockHint: false,
   targetMs: GOAL,
   keepAwake: true,
-  title: () => L('FAUSSE NOTE', 'WRONG NOTE'),
-  subtitle: () => L(`Pratique · ${MIN} min`, `Practice · ${MIN} min`),
+  title: () => L('WRONG NOTE'),
+  subtitle: () => L(`Practice · ${MIN} min`),
   short: '♪',
-  doneBody: () => L(`${MIN} minutes de musique. Bravo, la case est cochée.`, `${MIN} minutes of music. Bravo, the box is ticked.`),
+  doneBody: () => L(`${MIN} minutes of music. Bravo, the box is ticked.`),
   onComplete: () => stopMetro(),
 })
 const { running, elapsed, progress, done, toggle } = s
@@ -93,7 +93,7 @@ const marks = computed(() => Array.from({ length: 41 }, (_, i) => bpm.value - 20
 <template>
   <div class="flex flex-col items-center">
     <div class="flex items-center gap-5 w-full justify-center">
-      <button class="metro" :class="{ playing }" :aria-label="L('Métronome', 'Metronome')" @click="toggleMetro">
+      <button class="metro" :class="{ playing }" :aria-label="L('Metronome')" @click="toggleMetro">
         <svg viewBox="0 0 100 130" class="w-28">
           <path d="M34 8h32l24 116H10z" fill="var(--color-sheet)" stroke="var(--color-ink)" stroke-width="3" stroke-linejoin="round" />
           <path d="M22 96h56" stroke="var(--color-ink)" stroke-width="2" />
@@ -110,10 +110,10 @@ const marks = computed(() => Array.from({ length: 41 }, (_, i) => bpm.value - 20
           {{ formatClock(Math.max(0, GOAL - elapsed)) }}
         </p>
         <p class="t-label text-graphite">
-          {{ done ? L('Séance jouée', 'Session played') : running ? L('On joue', 'Playing') : `${L('Aujourd\'hui', 'Today')} · ${MIN} min` }}
+          {{ done ? L('Session played') : running ? L('Playing') : `${L('Today')} · ${MIN} min` }}
         </p>
         <p class="t-label text-pencil mt-3">
-          {{ playing ? L('Touchez pour arrêter', 'Tap to stop') : L('Touchez le métronome', 'Tap the metronome') }}
+          {{ playing ? L('Tap to stop') : L('Tap the metronome') }}
         </p>
       </div>
     </div>
@@ -129,7 +129,7 @@ const marks = computed(() => Array.from({ length: 41 }, (_, i) => bpm.value - 20
     </div>
 
     <button class="btn btn-ink mt-4 w-48" :disabled="!editable || done" @click="toggle">
-      {{ done ? `${MIN} minutes ✓` : running ? L('Pause', 'Pause') : elapsed ? L('Reprendre', 'Resume') : L('Commencer', 'Start') }}
+      {{ done ? `${MIN} minutes ✓` : running ? L('Pause') : elapsed ? L('Resume') : L('Start') }}
     </button>
   </div>
 </template>

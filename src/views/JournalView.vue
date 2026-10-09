@@ -7,6 +7,7 @@ import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import { useL } from '~/composables/useL'
 import { CHALLENGES } from '~/data/challenges'
+import { tr } from '~/i18n/translate'
 import { formatDate } from '~/lib/date'
 import { checkedCount, runStatus } from '~/lib/progress'
 import { haptic } from '~/services/haptics'
@@ -41,7 +42,7 @@ async function exportPdf() {
     haptic.success()
   }
   catch (e) {
-    toast.error(L('Export impossible', 'Export failed'), { message: String((e as Error)?.message ?? e) })
+    toast.error(L('Export failed'), { message: String((e as Error)?.message ?? e) })
   }
   finally {
     exporting.value = false
@@ -72,7 +73,7 @@ function open(id: string) {
         {{ $t('journal.stats') }}
       </p>
       <div class="grid grid-cols-10 gap-1.5">
-        <button v-for="c in CHALLENGES" :key="c.id" class="cell" :class="{ on: quest.completedIds.has(c.id), joker: quest.skippedIds.has(c.id), live: quest.runFor(c.id) }" :aria-label="c.text[quest.locale].title" @click="open(c.id)">
+        <button v-for="c in CHALLENGES" :key="c.id" class="cell" :class="{ on: quest.completedIds.has(c.id), joker: quest.skippedIds.has(c.id), live: quest.runFor(c.id) }" :aria-label="tr(c.text.title)" @click="open(c.id)">
           <span class="t-label text-[0.55rem]">{{ c.n }}</span>
         </button>
       </div>
@@ -90,14 +91,14 @@ function open(id: string) {
             {{ $t('journal.week', { date: formatDate(e.run.start, L.tag(), { day: 'numeric', month: 'long' }) }) }}
           </p>
           <p class="t-display text-lg">
-            {{ e.c.text[quest.locale].title }}
+            {{ tr(e.c.text.title) }}
           </p>
         </div>
         <span class="t-label">{{ runStatus(e.run, quest.today) === 'completed' ? 'DONE' : `${checkedCount(e.run)}/7` }}</span>
       </header>
       <ul class="mt-3 space-y-1.5">
         <li v-for="l in lines(e).filter(x => x.done || x.text || x.img)" :key="l.i" class="flex gap-3 items-start">
-          <span class="t-label w-14 shrink-0 text-[0.7rem] pt-0.5">{{ L('Jour', 'Day') }} {{ l.i + 1 }}</span>
+          <span class="t-label w-14 shrink-0 text-[0.7rem] pt-0.5">{{ L('Day') }} {{ l.i + 1 }}</span>
           <div class="flex-1 min-w-0">
             <p v-if="l.items" class="t-body text-sm">
               {{ l.items.filter(Boolean).join(' · ') }}

@@ -38,23 +38,23 @@ async function ringHourly() {
   busy.value = true
   haptic.press()
   const upcoming = HOURS.filter(h => h > nowHour.value)
-  const res = await scheduleHourlyAlarms(upcoming, L('Debout ! 2 minutes', 'Stand up! 2 minutes'), L('Levez-vous, marchez 2 minutes, puis cochez l\'heure.', 'Get up, move for 2 minutes, then tick the hour.'))
+  const res = await scheduleHourlyAlarms(upcoming, L('Stand up! 2 minutes'), L('Get up, move for 2 minutes, then tick the hour.'))
   busy.value = false
   if (res.kind === 'none') {
-    toast.info(L('Plus d\'heure à sonner aujourd\'hui', 'No hours left to ring today'))
+    toast.info(L('No hours left to ring today'))
     return
   }
   patch({ alarms: res.ids, alarmKind: res.kind })
   sfx.play('chime')
   haptic.success()
-  toast.success(res.kind === 'alarm' ? L(`${res.ids.length} réveils programmés`, `${res.ids.length} alarms set`) : L(`${res.ids.length} rappels programmés`, `${res.ids.length} reminders set`), { message: `${upcoming[0]}h → 18h` })
+  toast.success(res.kind === 'alarm' ? L(`${res.ids.length} alarms set`) : L(`${res.ids.length} reminders set`), { message: `${upcoming[0]}h → 18h` })
 }
 
 async function stopRinging() {
   haptic.tap()
   await cancelHourlyAlarms(data.value.alarms, data.value.alarmKind)
   patch({ alarms: [], alarmKind: 'none' })
-  toast.info(L('Réveils retirés', 'Alarms removed'))
+  toast.info(L('Alarms removed'))
 }
 
 function tap(h: number) {
@@ -101,7 +101,7 @@ function tap(h: number) {
           {{ count }}<span class="text-pencil text-2xl">/{{ GOAL }}</span>
         </p>
         <p class="t-label text-graphite">
-          {{ done ? L('Journée bien remuée', 'A well-moved day') : L('heures debout', 'hours on your feet') }}
+          {{ done ? L('A well-moved day') : L('hours on your feet') }}
         </p>
       </div>
     </div>
@@ -117,14 +117,14 @@ function tap(h: number) {
     </div>
     <template v-if="isToday && editable && !done">
       <button v-if="!ringing" class="btn btn-ink w-full mt-4" :disabled="busy || nowHour >= 18" @click="ringHourly">
-        {{ L('Sonner chaque heure', 'Ring me every hour') }}
+        {{ L('Ring me every hour') }}
       </button>
       <button v-else class="btn w-full mt-4" @click="stopRinging">
-        {{ data.alarmKind === 'alarm' ? L(`${data.alarms.length} réveils · les retirer`, `${data.alarms.length} alarms set · remove`) : L(`${data.alarms.length} rappels · les retirer`, `${data.alarms.length} reminders set · remove`) }}
+        {{ data.alarmKind === 'alarm' ? L(`${data.alarms.length} alarms set · remove`) : L(`${data.alarms.length} reminders set · remove`) }}
       </button>
     </template>
     <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('Une alarme à chaque heure pile jusqu\'à 18h. 2 minutes debout, puis touchez l\'heure.', 'An alarm at the top of every hour until 6 p.m. 2 minutes on your feet, then tap the hour.') }}
+      {{ L('An alarm at the top of every hour until 6 p.m. 2 minutes on your feet, then tap the hour.') }}
     </p>
   </div>
 </template>

@@ -83,12 +83,12 @@ function confirm() {
       <text x="120" y="122" text-anchor="middle" font-size="18" font-weight="800" fill="var(--color-ink)" class="t-display">{{ fmt(total) }}</text>
     </svg>
     <p class="t-label text-graphite">
-      {{ L('Économisé cette semaine', 'Saved this week') }} · {{ daysClean }}/7 {{ L('jours', 'days') }}
+      {{ L('Saved this week') }} · {{ daysClean }}/7 {{ L('days') }}
     </p>
 
     <template v-if="editable && !done">
       <p class="t-body text-sm text-graphite mt-4 text-center">
-        {{ L('Une envie résistée ? Glissez son prix dans le bocal.', 'Resisted something? Drop its price in the jar.') }}
+        {{ L('Resisted something? Drop its price in the jar.') }}
       </p>
       <div class="flex gap-2 mt-3">
         <button v-for="c in CHIPS" :key="c" class="btn px-3 py-1 tabular-nums" @click="add(c)">
@@ -96,21 +96,21 @@ function confirm() {
         </button>
       </div>
       <div class="flex items-end gap-2 mt-3 w-56">
-        <input v-model="custom" class="ink-input text-center" inputmode="decimal" :placeholder="L('Autre montant', 'Other amount')" @keyup.enter="addCustom">
+        <input v-model="custom" class="ink-input text-center" inputmode="decimal" :placeholder="L('Other amount')" @keyup.enter="addCustom">
         <button class="btn px-3 py-1" :disabled="!custom" @click="addCustom">
           +
         </button>
       </div>
       <button v-if="data.coins.length" class="t-label text-pencil underline mt-2" @click="removeLast">
-        {{ L('Retirer la dernière pièce', 'Take the last coin back') }}
+        {{ L('Take the last coin back') }}
       </button>
     </template>
 
     <button class="btn mt-5 w-64" :class="{ 'btn-ink': !done }" :disabled="!editable" @click="confirm">
-      {{ done ? L('Rien dépensé aujourd\'hui ✓', 'Nothing spent today ✓') : L('Je n\'ai rien acheté de superflu', 'I bought nothing non-essential') }}
+      {{ done ? L('Nothing spent today ✓') : L('I bought nothing non-essential') }}
     </button>
     <p v-if="editable && !done" class="t-body text-xs text-pencil mt-2 text-center max-w-64">
-      {{ L('À confirmer le soir, une fois la journée finie.', 'Confirm in the evening, once the day is over.') }}
+      {{ L('Confirm in the evening, once the day is over.') }}
     </p>
   </div>
 </template>

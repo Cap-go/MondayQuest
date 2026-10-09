@@ -39,26 +39,26 @@ function complained() {
           <ellipse v-if="data.wrist === side" :key="data.switches" cx="40" cy="78" rx="22" ry="7" fill="none" stroke="var(--color-ink)" stroke-width="6" class="band" />
         </svg>
         <p class="t-label text-center text-xs">
-          {{ side === 'left' ? L('Gauche', 'Left') : L('Droit', 'Right') }}
+          {{ side === 'left' ? L('Left') : L('Right') }}
         </p>
       </div>
     </div>
     <p class="t-body text-center mt-3">
-      <span class="t-display">{{ cleanFor }}</span> {{ L('sans plainte', 'without complaining') }}
+      <span class="t-display">{{ cleanFor }}</span> {{ L('without complaining') }}
     </p>
     <p v-if="data.switches" class="t-label text-center text-graphite mt-1">
-      {{ data.switches }} {{ L('changement(s) de poignet', 'wrist switch(es)') }}
+      {{ data.switches }} {{ L('wrist switch(es)') }}
     </p>
     <div class="grid grid-cols-2 gap-3 mt-5">
       <button class="btn" :disabled="!editable" @click="complained">
-        {{ L('Je me suis plaint', 'I complained') }}
+        {{ L('I complained') }}
       </button>
       <button class="btn btn-ink" :disabled="!editable || done" @click="markDone()">
-        {{ done ? L('Journée ✓', 'Day ✓') : L('Zéro plainte', 'Zero complaints') }}
+        {{ done ? L('Day ✓') : L('Zero complaints') }}
       </button>
     </div>
     <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('Une plainte = changez le bracelet de poignet et le compteur repart.', 'One complaint = switch wrists and the counter restarts.') }}
+      {{ L('One complaint = switch wrists and the counter restarts.') }}
     </p>
   </div>
 </template>

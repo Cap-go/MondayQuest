@@ -1,11 +1,9 @@
-import type { Locale } from '~/data/challenges'
-import { useQuest } from '~/stores/quest'
+import { lang, langTag, tr } from '~/i18n/translate'
 
-/** Inline bilingual copy for tracker-specific microcopy: L('Bonjour', 'Hello'). */
+/** Inline copy, written in English and translated on the fly: L('Hello'). */
 export function useL() {
-  const quest = useQuest()
-  const L = (fr: string, en: string) => (quest.locale === 'fr' ? fr : en)
-  L.locale = (): Locale => quest.locale
-  L.tag = (): string => (quest.locale === 'fr' ? 'fr-FR' : 'en-GB')
+  const L = (en: string) => tr(en)
+  L.locale = (): string => lang.value
+  L.tag = (): string => langTag.value
   return L
 }

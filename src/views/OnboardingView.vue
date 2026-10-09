@@ -113,19 +113,19 @@ function finish() {
         <!-- reminders: notifications + real alarms -->
         <section v-else-if="step === 3" key="3" class="flex-1 pt-10 stagger">
           <h1 class="t-display text-3xl">
-            {{ L('Rappels', 'Reminders') }}
+            {{ L('Reminders') }}
           </h1>
           <p class="t-body text-lg mt-4">
-            {{ L('Un mot chaque matin pour le challenge du jour, un autre le soir pour cocher. Et un vrai réveil pour les levers avant le soleil.', 'A note every morning for today\'s challenge, another in the evening to tick it. And a real alarm for the before-sunrise mornings.') }}
+            {{ L('A note every morning for today\'s challenge, another in the evening to tick it. And a real alarm for the before-sunrise mornings.') }}
           </p>
           <div class="mt-8 flex flex-col gap-3">
             <button class="perm" :class="{ ok: notifOk }" :disabled="notifOk" @click="allowNotifications">
-              <span class="flex-1 text-left">{{ L('Notifications', 'Notifications') }}</span>
-              <span>{{ notifOk ? '✓' : L('Autoriser', 'Allow') }}</span>
+              <span class="flex-1 text-left">{{ L('Notifications') }}</span>
+              <span>{{ notifOk ? '✓' : L('Allow') }}</span>
             </button>
             <button v-if="native && alarmNative" class="perm" :class="{ ok: alarmOk }" :disabled="alarmOk" @click="allowAlarm">
-              <span class="flex-1 text-left">{{ L('Réveils', 'Alarms') }}</span>
-              <span>{{ alarmOk ? '✓' : L('Autoriser', 'Allow') }}</span>
+              <span class="flex-1 text-left">{{ L('Alarms') }}</span>
+              <span>{{ alarmOk ? '✓' : L('Allow') }}</span>
             </button>
           </div>
         </section>

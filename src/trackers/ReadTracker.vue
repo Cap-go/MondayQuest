@@ -44,17 +44,17 @@ function up(e: PointerEvent) {
 
 <template>
   <div>
-    <input :value="data.book" class="ink-input mb-4 text-center" :disabled="!editable" :placeholder="L('Titre du livre', 'Book title')" @change="patch({ book: ($event.target as HTMLInputElement).value })">
+    <input :value="data.book" class="ink-input mb-4 text-center" :disabled="!editable" :placeholder="L('Book title')" @change="patch({ book: ($event.target as HTMLInputElement).value })">
     <div class="book" @pointerdown="down" @pointerup="up">
       <div class="side left">
         <p class="t-display text-4xl tabular-nums">
           {{ data.pages }}
         </p>
         <p class="t-label text-graphite">
-          {{ L('pages lues', 'pages read') }}
+          {{ L('pages read') }}
         </p>
         <p class="t-label text-pencil mt-1">
-          {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} pages
+          {{ L('Today') }} · {{ GOAL }} pages
         </p>
       </div>
       <div class="side right">
@@ -73,11 +73,11 @@ function up(e: PointerEvent) {
         +5
       </button>
       <button class="btn btn-ink flex-[2]" :disabled="!editable" @click="flip(1)">
-        {{ L('Tourner la page', 'Turn the page') }}
+        {{ L('Turn the page') }}
       </button>
     </div>
     <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('Balayez le livre vers la gauche à chaque page tournée.', 'Swipe the book left for every page you turn.') }}
+      {{ L('Swipe the book left for every page you turn.') }}
     </p>
   </div>
 </template>

@@ -62,15 +62,15 @@ function plant() {
       <line x1="64" y1="200" x2="156" y2="200" stroke="var(--color-ink)" stroke-width="3" />
     </svg>
     <p class="t-label text-graphite mt-1">
-      {{ L('Étape', 'Stage') }} {{ stage }}/7
+      {{ L('Stage') }} {{ stage }}/7
     </p>
 
     <div class="w-64 mt-4">
-      <label class="t-label text-graphite">{{ L('Votre bonne action du jour', 'Today\'s act of kindness') }}</label>
-      <textarea v-model="what" rows="2" class="ink-input mt-1 resize-none" :disabled="!editable || done" :placeholder="L('J\'ai porté les courses de ma voisine', 'Carried my neighbour\'s shopping')" @change="patch({ what: what.trim() })" />
+      <label class="t-label text-graphite">{{ L('Today\'s act of kindness') }}</label>
+      <textarea v-model="what" rows="2" class="ink-input mt-1 resize-none" :disabled="!editable || done" :placeholder="L('Carried my neighbour\'s shopping')" @change="patch({ what: what.trim() })" />
     </div>
     <button class="btn mt-4 w-56" :class="{ 'btn-ink': !done }" :disabled="!editable || (!done && !what.trim())" @click="plant">
-      {{ done ? L('Une feuille de plus ✓', 'One more leaf ✓') : L('Faire pousser', 'Make it grow') }}
+      {{ done ? L('One more leaf ✓') : L('Make it grow') }}
     </button>
   </div>
 </template>

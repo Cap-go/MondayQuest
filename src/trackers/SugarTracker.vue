@@ -35,14 +35,14 @@ const grains = Array.from({ length: 16 }, () => ({ x: (Math.random() - 0.5) * 80
       </div>
     </div>
     <p class="t-label text-graphite">
-      {{ data.temptations }} {{ L('tentation(s) fondue(s)', 'temptation(s) melted') }}
+      {{ data.temptations }} {{ L('temptation(s) melted') }}
     </p>
     <div class="grid grid-cols-2 gap-3 mt-5">
       <button class="btn" :disabled="!editable" @click="resist">
-        {{ L('J\'ai résisté', 'I resisted') }}
+        {{ L('I resisted') }}
       </button>
       <button class="btn btn-ink" :disabled="!editable || done" @click="markDone()">
-        {{ done ? L('Zéro sucre ✓', 'Sugar-free ✓') : L('Journée sans sucre', 'Sugar-free day') }}
+        {{ done ? L('Sugar-free ✓') : L('Sugar-free day') }}
       </button>
     </div>
   </div>

@@ -70,21 +70,21 @@ function serve() {
 <template>
   <div class="card border-[2.5px] border-ink p-4 bg-sheet">
     <p class="t-label text-graphite">
-      {{ L('Au menu', 'On the menu') }}
+      {{ L('On the menu') }}
     </p>
     <input
       class="ink-input t-display text-xl w-full" :value="data.dish" :disabled="!editable || done"
-      :placeholder="L('Soupe de potiron', 'Pumpkin soup')" @change="setDish(($event.target as HTMLInputElement).value)"
+      :placeholder="L('Pumpkin soup')" @change="setDish(($event.target as HTMLInputElement).value)"
     >
 
     <!-- the plated dish replaces the pot once photographed -->
     <figure v-if="data.photo" class="plate mt-3">
       <img :src="data.photo" alt="">
       <figcaption class="t-body text-sm text-center mt-2">
-        {{ data.dish || L('Fait maison', 'Homemade') }}
+        {{ data.dish || L('Homemade') }}
       </figcaption>
       <div v-if="done" class="stamp t-display">
-        {{ L('Servi', 'Served') }}
+        {{ L('Served') }}
       </div>
     </figure>
 
@@ -107,7 +107,7 @@ function serve() {
       </svg>
       <span v-if="falling" :key="falling.id" class="drop t-label">{{ falling.label }}</span>
       <div v-if="done" class="stamp t-display">
-        {{ L('Servi', 'Served') }}
+        {{ L('Served') }}
       </div>
     </div>
 
@@ -118,7 +118,7 @@ function serve() {
     </TransitionGroup>
 
     <form v-if="editable && !done" class="flex gap-2 mt-3" @submit.prevent="add">
-      <input v-model="draft" class="ink-input flex-1" :placeholder="L('Un ingrédient brut…', 'A raw ingredient…')">
+      <input v-model="draft" class="ink-input flex-1" :placeholder="L('A raw ingredient…')">
       <button class="btn px-4" type="submit" :disabled="!draft.trim()">
         +
       </button>
@@ -126,16 +126,16 @@ function serve() {
 
     <div v-if="editable" class="grid grid-cols-2 gap-2 mt-3">
       <button class="btn" @click="cam?.open()">
-        {{ data.photo ? L('Reprendre', 'Retake') : L('Photo du plat', 'Photo of the dish') }}
+        {{ data.photo ? L('Retake') : L('Photo of the dish') }}
       </button>
       <button class="btn" @click="cam?.pick()">
-        {{ L('Galerie', 'Gallery') }}
+        {{ L('Gallery') }}
       </button>
     </div>
-    <CameraCapture ref="cam" position="rear" :hint="L('Votre plat, sous son meilleur jour', 'Your dish, at its best')" @shot="setPhoto" />
+    <CameraCapture ref="cam" position="rear" :hint="L('Your dish, at its best')" @shot="setPhoto" />
 
     <button v-if="!done" class="btn btn-ink w-full mt-3" :disabled="!editable || !ready" @click="serve">
-      {{ ready ? L('Servir', 'Serve') : L(`Encore ${Math.max(0, MIN - data.ingredients.length)} ingrédient(s)`, `${Math.max(0, MIN - data.ingredients.length)} more ingredient(s)`) }}
+      {{ ready ? L('Serve') : L(`${Math.max(0, MIN - data.ingredients.length)} more ingredient(s)`) }}
     </button>
   </div>
 </template>

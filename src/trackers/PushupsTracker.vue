@@ -70,17 +70,17 @@ onBeforeUnmount(() => void KeepAwake.allowSleep().catch(() => {}))
       <span v-for="i in GOAL" :key="i" class="aspect-square border border-ink" :class="i <= data.count ? 'bg-ink' : ''" />
     </div>
     <p v-if="!done" class="t-body text-sm text-graphite mt-5 px-2">
-      {{ L('Posez le téléphone au sol sous votre visage : votre nez touche l\'écran en bas de chaque pompe, et il compte pour vous.', 'Place the phone on the floor under your face: your nose touches the screen at the bottom of each push-up, and it counts for you.') }}
+      {{ L('Place the phone on the floor under your face: your nose touches the screen at the bottom of each push-up, and it counts for you.') }}
     </p>
     <button v-if="done" class="btn btn-ink w-full mt-5" disabled>
-      {{ L(`${GOAL} pompes ✓`, `${GOAL} push-ups ✓`) }}
+      {{ L(`${GOAL} push-ups ✓`) }}
     </button>
     <div v-else class="grid grid-cols-2 gap-3 mt-4">
       <button class="btn" :disabled="!editable" @click="enterFloor">
-        {{ L('Compter au nez', 'Count with my nose') }}
+        {{ L('Count with my nose') }}
       </button>
       <button class="btn btn-ink" :disabled="!editable" @click="didIt">
-        {{ L('C\'est fait', 'I did them') }}
+        {{ L('I did them') }}
       </button>
     </div>
 
@@ -91,10 +91,10 @@ onBeforeUnmount(() => void KeepAwake.allowSleep().catch(() => {}))
           {{ data.count }}
         </p>
         <p class="t-label text-paper/60 mt-4">
-          {{ L('le nez ici', 'nose here') }} ↓
+          {{ L('nose here') }} ↓
         </p>
         <button class="t-label text-paper/70 absolute top-[calc(var(--safe-top)+18px)] right-5 p-3" @pointerdown.stop @click="exitFloor">
-          {{ L('Terminer', 'Finish') }}
+          {{ L('Finish') }}
         </button>
       </div>
     </Teleport>

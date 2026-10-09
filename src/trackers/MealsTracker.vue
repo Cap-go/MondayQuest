@@ -63,17 +63,17 @@ const jaw = computed(() => (chew.value % 2 ? 4 : 0))
 <template>
   <div>
     <div class="flex justify-around">
-      <InkCheck :model-value="data.lunch" :label="L('Déjeuner', 'Lunch')" :size="64" :disabled="!editable" @update:model-value="v => setMeal('lunch', v)" />
-      <InkCheck :model-value="data.dinner" :label="L('Dîner', 'Dinner')" :size="64" :disabled="!editable" @update:model-value="v => setMeal('dinner', v)" />
+      <InkCheck :model-value="data.lunch" :label="L('Lunch')" :size="64" :disabled="!editable" @update:model-value="v => setMeal('lunch', v)" />
+      <InkCheck :model-value="data.dinner" :label="L('Dinner')" :size="64" :disabled="!editable" @update:model-value="v => setMeal('dinner', v)" />
     </div>
 
     <div class="mt-6 border-t-2 border-dashed border-ink pt-5">
       <div v-if="!pacing" class="text-center">
         <p class="t-body text-sm text-graphite mb-3">
-          {{ L('À table ? Le métronome vous aide à poser les couverts.', 'At the table? The pacer helps you put your cutlery down.') }}
+          {{ L('At the table? The pacer helps you put your cutlery down.') }}
         </p>
         <button class="btn btn-ink" :disabled="!editable" @click="startPacer">
-          {{ L('Lancer le métronome', 'Start the pacer') }}
+          {{ L('Start the pacer') }}
         </button>
       </div>
       <div v-else class="flex flex-col items-center">
@@ -88,18 +88,18 @@ const jaw = computed(() => (chew.value % 2 ? 4 : 0))
           {{ Math.min(chew, CHEWS) }}<span class="text-pencil text-xl">/{{ CHEWS }}</span>
         </p>
         <p class="t-label mt-1">
-          {{ forkDown ? L('Couverts posés. Mâchez…', 'Cutlery down. Chew…') : L('Bouchée suivante', 'Next bite') }}
+          {{ forkDown ? L('Cutlery down. Chew…') : L('Next bite') }}
         </p>
         <div class="flex gap-3 mt-4">
           <button class="btn" @click="stopPacer">
-            {{ L('Fin du repas', 'Meal over') }}
+            {{ L('Meal over') }}
           </button>
           <button class="btn btn-ink" :disabled="forkDown" @click="nextBite">
-            {{ L('Bouchée', 'Bite') }} →
+            {{ L('Bite') }} →
           </button>
         </div>
         <p v-if="data.bites" class="t-body text-xs text-pencil mt-3">
-          {{ data.bites }} {{ L('bouchées savourées', 'bites savoured') }}
+          {{ data.bites }} {{ L('bites savoured') }}
         </p>
       </div>
     </div>

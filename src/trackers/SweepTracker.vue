@@ -10,9 +10,7 @@ const props = defineProps<TrackerProps>()
 const L = useL()
 const { data, done, patch, markDone } = useDay(props, { rooms: [] as string[] })
 
-const ROOMS = computed(() => L.locale() === 'fr'
-  ? ['Cuisine', 'Salle de bain', 'Chambre', 'Salon', 'Bureau', 'Draps', 'Entrée', 'Placards']
-  : ['Kitchen', 'Bathroom', 'Bedroom', 'Living room', 'Desk', 'Sheets', 'Hallway', 'Cupboards'])
+const ROOMS = computed(() => ['Kitchen', 'Bathroom', 'Bedroom', 'Living room', 'Desk', 'Sheets', 'Hallway', 'Cupboards'])
 const room = ref<string>(ROOMS.value.find(r => !data.value.rooms.includes(r)) ?? ROOMS.value[0]!)
 
 const canvas = ref<HTMLCanvasElement | null>(null)
@@ -53,7 +51,7 @@ function paintDust() {
   ctx.font = '600 15px Archivo'
   ctx.fillStyle = 'rgba(20,20,20,0.75)'
   ctx.textAlign = 'center'
-  ctx.fillText(L('FROTTEZ POUR NETTOYER', 'RUB TO CLEAN'), rect.width / 2, rect.height / 2 + 5)
+  ctx.fillText(L('RUB TO CLEAN'), rect.width / 2, rect.height / 2 + 5)
   cleared.value = 0
 }
 
@@ -140,17 +138,17 @@ onMounted(paintDust)
   <div>
     <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-2">
       <button v-for="r in ROOMS" :key="r" class="room" :class="{ on: r === room, done: data.rooms.includes(r) }" @click="pickRoom(r)">
-        {{ data.rooms.includes(r) ? '✓ ' : '' }}{{ r }}
+        {{ data.rooms.includes(r) ? '✓ ' : '' }}{{ L(r) }}
       </button>
     </div>
     <div class="relative mt-2 border-[2.5px] border-ink" style="height: 210px">
       <div class="absolute inset-0 grid place-items-center bg-sheet">
         <div class="text-center">
           <p class="t-display text-2xl">
-            {{ room }}
+            {{ L(room) }}
           </p>
           <p class="t-label text-graphite mt-1">
-            {{ L('Immaculé', 'Spotless') }} ✦
+            {{ L('Spotless') }} ✦
           </p>
         </div>
       </div>
@@ -160,7 +158,7 @@ onMounted(paintDust)
       <div class="h-full bg-ink transition-all duration-300" :style="{ width: `${Math.min(100, cleared / 0.88 * 100)}%` }" />
     </div>
     <p class="t-body text-xs text-pencil mt-3">
-      {{ L('Rangez une vraie pièce, puis nettoyez-la ici aussi. Une pièce par jour minimum.', 'Tidy a real room, then wipe it clean here too. At least one room a day.') }}
+      {{ L('Tidy a real room, then wipe it clean here too. At least one room a day.') }}
     </p>
   </div>
 </template>

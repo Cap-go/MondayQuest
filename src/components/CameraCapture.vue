@@ -86,7 +86,7 @@ defineExpose({ open, pick })
       <span v-else />
       <div class="cam-bar">
         <button class="t-label cam-cancel" @click="close">
-          {{ L('Annuler', 'Cancel') }}
+          {{ L('Cancel') }}
         </button>
         <button class="shutter" aria-label="shutter" @click="shoot" />
         <span class="w-14" />

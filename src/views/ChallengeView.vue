@@ -8,6 +8,8 @@ import QuestPage from '~/components/QuestPage.vue'
 import TrackerShell from '~/components/TrackerShell.vue'
 import { useL } from '~/composables/useL'
 import { CATEGORY_LABEL, challengesOfLevel } from '~/data/challenges'
+import { ct } from '~/i18n/content'
+import { tr } from '~/i18n/translate'
 import { formatDate, isMonday, nextMonday } from '~/lib/date'
 import { haptic } from '~/services/haptics'
 import { ensureReminders } from '~/services/notifications'
@@ -21,7 +23,7 @@ const L = useL()
 
 const id = computed(() => String(route.params.id))
 const c = computed(() => quest.challenge(id.value))
-const text = computed(() => c.value?.text[quest.locale])
+const text = computed(() => (c.value ? ct(c.value) : undefined))
 const run = computed(() => quest.runFor(id.value))
 const last = computed(() => quest.lastRun(id.value))
 const completed = computed(() => last.value?.completedAt)
@@ -135,7 +137,7 @@ function capitalize(s: string) {
                 {{ text.short }}
               </p>
               <p class="t-body text-sm mt-4">
-                - {{ CATEGORY_LABEL[c.category][quest.locale] }}
+                - {{ tr(CATEGORY_LABEL[c.category]) }}
               </p>
             </div>
             <div class="mt-7 space-y-4 stagger">
@@ -151,7 +153,7 @@ function capitalize(s: string) {
                 {{ $t('common.continue') }} →
               </button>
               <button v-else-if="locked" class="btn w-full locked" disabled>
-                <QuestIcon name="lock" :size="18" :stroke="3" class="inline -mt-1 mr-1" /> {{ L('Verrouillé', 'Locked') }}
+                <QuestIcon name="lock" :size="18" :stroke="3" class="inline -mt-1 mr-1" /> {{ L('Locked') }}
               </button>
               <button v-else class="btn btn-ink w-full" @click="askStart">
                 {{ completed ? $t('common.restart') : $t('common.start') }}
@@ -160,10 +162,10 @@ function capitalize(s: string) {
                 ✓ {{ $t('detail.completedOn', { date: formatDate(new Date(completed).toISOString().slice(0, 10), L.tag(), { day: 'numeric', month: 'long' }) }) }}
               </p>
               <p v-if="skipped && !run && !completed" class="t-label text-center mt-3 flex items-center justify-center gap-1">
-                <QuestIcon name="joker" :size="16" :stroke="3" /> {{ L('Passé avec un joker', 'Skipped with a joker') }}
+                <QuestIcon name="joker" :size="16" :stroke="3" /> {{ L('Skipped with a joker') }}
               </p>
               <button v-else-if="!run && !completed && !locked && c.source !== 'custom'" class="t-label text-graphite underline w-full text-center mt-4" @click="jokerSheet?.present()">
-                {{ L('Pas pour moi : utiliser un joker', 'Not for me: use a joker') }} ({{ quest.jokerBalance }})
+                {{ L('Not for me: use a joker') }} ({{ quest.jokerBalance }})
               </button>
               <p v-if="locked" class="t-body text-xs text-pencil text-center mt-3">
                 {{ $t('detail.locked') }}

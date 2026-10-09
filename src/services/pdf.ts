@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core'
 import { FileSharer } from '@capgo/capacitor-file-sharer'
 import { jsPDF as JsPDF } from 'jspdf'
 import { CATEGORY_LABEL, CHALLENGES, LEVELS } from '~/data/challenges'
+import { langTag, tr } from '~/i18n/translate'
 import { addDays, formatDate } from '~/lib/date'
 import { checkedCount } from '~/lib/progress'
 import { TRACKERS } from '~/trackers'
@@ -35,7 +36,12 @@ function clean(s: string): string {
     .trim()
 }
 
-const t = (l: Locale, fr: string, en: string) => (l === 'fr' ? fr : en)
+/** Translated text when the built-in PDF fonts can draw it (Latin scripts), English otherwise. */
+function pt(en: string): string {
+  const v = tr(en)
+  // Built-in fonts cover Latin (incl. extended) and a few typographic marks only.
+  return [...v].some(ch => ch.charCodeAt(0) > 0x24F && !'‘’‚“”„…€'.includes(ch)) ? en : v
+}
 
 function paper(doc: JsPDF) {
   doc.setFillColor(...PAPER)
@@ -79,7 +85,6 @@ function imageFormat(src: string): 'JPEG' | 'PNG' | null {
 }
 
 function cover(doc: JsPDF, input: ExportInput, runs: Run[]) {
-  const { locale: l } = input
   paper(doc)
   doc.setTextColor(...INK)
   doc.setFont('helvetica', 'bold')
@@ -88,21 +93,21 @@ function cover(doc: JsPDF, input: ExportInput, runs: Run[]) {
   doc.text('QUEST', M, 92)
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(14)
-  doc.text(clean(t(l, 'Mon carnet', 'My notebook')), M, 106)
+  doc.text(clean(pt('My notebook')), M, 106)
   const first = runs.at(-1)?.start
   const last = runs[0]?.start
   if (first && last) {
     doc.setFontSize(10)
     doc.setTextColor(...PENCIL)
-    doc.text(clean(`${formatDate(first, l === 'fr' ? 'fr-FR' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })} - ${formatDate(addDays(last, 6), l === 'fr' ? 'fr-FR' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}`), M, 114)
+    doc.text(clean(`${formatDate(first, langTag.value, { day: 'numeric', month: 'long', year: 'numeric' })} - ${formatDate(addDays(last, 6), langTag.value, { day: 'numeric', month: 'long', year: 'numeric' })}`), M, 114)
   }
 
   // stats in booklet boxes
   const done = runs.filter(r => r.completedAt).length
   const stats: [string, string][] = [
-    [String(input.streak), t(l, 'JOURS D\'AFFILEE', 'DAYS IN A ROW')],
-    [String(input.checks), t(l, 'CASES COCHEES', 'BOXES TICKED')],
-    [`${done}/${CHALLENGES.length}`, t(l, 'CHALLENGES FINIS', 'CHALLENGES DONE')],
+    [String(input.streak), pt('DAYS IN A ROW')],
+    [String(input.checks), pt('BOXES TICKED')],
+    [`${done}/${CHALLENGES.length}`, pt('CHALLENGES DONE')],
   ]
   const bw = (W - 2 * M) / 3
   stats.forEach(([n, label], i) => {
@@ -136,8 +141,8 @@ function cover(doc: JsPDF, input: ExportInput, runs: Run[]) {
 
 function runPage(doc: JsPDF, input: ExportInput, run: Run, c: Challenge, page: number) {
   const l = input.locale
-  const tag = l === 'fr' ? 'fr-FR' : 'en-US'
-  const text = c.text[l]
+  const tag = langTag.value
+  const text = { title: pt(c.text.title), short: pt(c.text.short) }
   const level = LEVELS.find(x => x.n === c.level)
   paper(doc)
   let y = 30
@@ -146,8 +151,8 @@ function runPage(doc: JsPDF, input: ExportInput, run: Run, c: Challenge, page: n
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(8)
   const kicker = c.source === 'custom'
-    ? t(l, 'MON CHALLENGE', 'MY CHALLENGE')
-    : `${t(l, 'NIVEAU', 'LEVEL')} ${level?.roman ?? ''} - ${clean(level?.text[l] ?? '').toUpperCase()} - N° ${c.n}`
+    ? pt('MY CHALLENGE')
+    : `${pt('LEVEL')} ${level?.roman ?? ''} - ${clean(pt(level?.text ?? '')).toUpperCase()} - N° ${c.n}`
   doc.text(kicker, M, y)
   y += 12
 
@@ -164,7 +169,7 @@ function runPage(doc: JsPDF, input: ExportInput, run: Run, c: Challenge, page: n
   y += short.length * 5.5 + 2
   doc.setFontSize(9)
   doc.setTextColor(...PENCIL)
-  doc.text(clean(`${CATEGORY_LABEL[c.category][l]} - ${formatDate(run.start, tag, { day: 'numeric', month: 'long', year: 'numeric' })} - ${checkedCount(run)}/7`), M, y)
+  doc.text(clean(`${pt(CATEGORY_LABEL[c.category])} - ${formatDate(run.start, tag, { day: 'numeric', month: 'long', year: 'numeric' })} - ${checkedCount(run)}/7`), M, y)
   y += 10
 
   // DONE stamp
@@ -190,7 +195,7 @@ function runPage(doc: JsPDF, input: ExportInput, run: Run, c: Challenge, page: n
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(9)
     doc.setTextColor(...INK)
-    doc.text(clean(`${t(l, 'JOUR', 'DAY')} ${i + 1}`), M + s + 4, y - 2.6)
+    doc.text(clean(`${pt('DAY')} ${i + 1}`), M + s + 4, y - 2.6)
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(8)
     doc.setTextColor(...PENCIL)

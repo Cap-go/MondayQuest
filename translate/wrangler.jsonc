@@ -1,0 +1,13 @@
+{
+  "name": "mondayquest-translate",
+  "account_id": "9ee3d7479a3c359681e3fab2c8cb22c0",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "routes": [{ "pattern": "translate.mondayquest.com", "custom_domain": true }],
+  "ai": { "binding": "AI" },
+  "kv_namespaces": [{ "binding": "CACHE", "id": "a4e5418928ed43dea1f0d0f07c47fbd9" }],
+  // Per-IP limit: first launch in a new language sends ~25 requests of 60 strings.
+  "ratelimits": [{ "name": "LIMITER", "namespace_id": "4501", "simple": { "limit": 120, "period": 60 } }],
+  "limits": { "cpu_ms": 30000 },
+  "observability": { "enabled": true }
+}

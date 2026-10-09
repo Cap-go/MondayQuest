@@ -18,10 +18,10 @@ const GOAL = MIN * 60_000
 const s = useSession(props, {
   targetMs: GOAL,
   keepAwake: true,
-  title: () => L('CALME PLAT', 'DEAD CALM'),
-  subtitle: () => L(`Ne rien faire · ${MIN} min`, `Do nothing · ${MIN} min`),
+  title: () => L('DEAD CALM'),
+  subtitle: () => L(`Do nothing · ${MIN} min`),
   short: '~',
-  doneBody: () => L(`${MIN} minutes de rien. Bien joué.`, `${MIN} minutes of nothing. Well done.`),
+  doneBody: () => L(`${MIN} minutes of nothing. Well done.`),
   onComplete: () => {
     disarm()
     haptic.success()
@@ -106,12 +106,12 @@ onBeforeUnmount(disarm)
 const agitation = computed(() => (done.value ? 0 : armed.value ? motion.value : 0.35))
 const hint = computed(() => {
   if (done.value)
-    return L('Calme plat. Rien de rien.', 'Dead calm. Nothing at all.')
+    return L('Dead calm. Nothing at all.')
   if (!armed.value)
-    return elapsed.value ? L('En pause', 'Paused') : L('Prêt à ne rien faire ?', 'Ready to do nothing?')
+    return elapsed.value ? L('Paused') : L('Ready to do nothing?')
   if (!sensorless && !flat.value)
-    return L('Posez le téléphone face contre table', 'Lay the phone face down')
-  return running.value ? L('Ne bougez plus…', 'Stay still…') : L('L\'eau se calme…', 'The water settles…')
+    return L('Lay the phone face down')
+  return running.value ? L('Stay still…') : L('The water settles…')
 })
 </script>
 
@@ -141,19 +141,19 @@ const hint = computed(() => {
       {{ formatClock(Math.max(0, GOAL - elapsed)) }}
     </p>
     <p class="t-label text-pencil">
-      {{ L('Aujourd\'hui', 'Today') }} · {{ MIN }} min
+      {{ L('Today') }} · {{ MIN }} min
     </p>
     <p class="t-label text-graphite mt-1">
       {{ hint }}
     </p>
     <p v-if="resets && !done" class="t-body text-xs text-pencil mt-1">
-      {{ L(`Recommencé ${resets} fois`, `Started over ${resets}×`) }}
+      {{ L(`Started over ${resets}×`) }}
     </p>
     <button v-if="!done" class="btn btn-ink mt-4 w-52" :disabled="!editable" @click="armed ? stop() : arm()">
-      {{ armed ? L('Arrêter', 'Stop') : elapsed ? L('Reprendre', 'Resume') : L('Ne rien faire', 'Do nothing') }}
+      {{ armed ? L('Stop') : elapsed ? L('Resume') : L('Do nothing') }}
     </button>
     <p class="t-body text-xs text-pencil mt-3 text-center px-4">
-      {{ done ? L(`${MIN} minutes sans rien faire, case cochée.`, `${MIN} minutes of nothing, box ticked.`) : L('Le chrono ne tourne que si le téléphone reste immobile, face contre table.', 'The clock only runs while the phone lies still, face down.') }}
+      {{ done ? L(`${MIN} minutes of nothing, box ticked.`) : L('The clock only runs while the phone lies still, face down.') }}
     </p>
   </div>
 </template>

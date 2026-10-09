@@ -20,20 +20,20 @@ const GOAL = MIN * 60_000
 
 const s = useSession(props, {
   targetMs: GOAL,
-  title: () => L('TOUT OUÏE', 'LEND AN EAR'),
-  subtitle: () => L(`Écouter · ${MIN} min`, `Listening · ${MIN} min`),
+  title: () => L('LEND AN EAR'),
+  subtitle: () => L(`Listening · ${MIN} min`),
   short: '◉',
-  doneBody: () => L('Le temps est passé. Finissez la conversation, puis faites le point.', 'Time is up. Finish the conversation, then check in with yourself.'),
+  doneBody: () => L('Time is up. Finish the conversation, then check in with yourself.'),
   autoCheck: false,
 })
 const { running, elapsed, progress, remaining, done, patch, markDone, data } = s
 
 const who = ref(String((data.value as any).who ?? ''))
 const CHECKS = [
-  { key: 'noAdvice', fr: 'Je n\'ai donné aucun conseil', en: 'I gave no advice' },
-  { key: 'noMeToo', fr: 'Pas de « moi aussi », je n\'ai pas parlé de moi', en: 'No "me too", I didn\'t make it about me' },
-  { key: 'questions', fr: 'J\'ai posé des questions ouvertes', en: 'I asked open questions' },
-  { key: 'reflected', fr: 'J\'ai reformulé ce que j\'entendais', en: 'I reflected back what I heard' },
+  { key: 'noAdvice', en: 'I gave no advice' },
+  { key: 'noMeToo', en: 'No "me too", I didn\'t make it about me' },
+  { key: 'questions', en: 'I asked open questions' },
+  { key: 'reflected', en: 'I reflected back what I heard' },
 ] as const
 const checks = ref<Record<string, boolean>>({ ...((data.value as any).checks ?? {}) })
 const score = computed(() => CHECKS.filter(c => checks.value[c.key]).length)
@@ -131,37 +131,37 @@ onBeforeUnmount(disarm)
         {{ formatClock(running || elapsed ? remaining : GOAL) }}
       </p>
       <p class="t-label mt-1 text-graphite">
-        {{ timeDone ? L('Temps tenu', 'Time held') : armed && !running ? L('Reposez le téléphone', 'Put the phone down') : `${L('Aujourd\'hui', 'Today')} · ${MIN} min` }}
+        {{ timeDone ? L('Time held') : armed && !running ? L('Put the phone down') : `${L('Today')} · ${MIN} min` }}
       </p>
     </TimerRing>
 
     <template v-if="!done && editable">
-      <input v-if="!armed && !timeDone" v-model="who" class="ink-input w-full mt-4 text-center" :placeholder="L('Qui écoutez-vous ? (ma sœur, Karim…)', 'Who are you listening to? (my sister, Sam…)')">
+      <input v-if="!armed && !timeDone" v-model="who" class="ink-input w-full mt-4 text-center" :placeholder="L('Who are you listening to? (my sister, Sam…)')">
       <button v-if="!armed && !timeDone" class="btn btn-ink mt-3 w-60" :disabled="!who.trim()" @click="arm">
-        {{ elapsed ? L('Reprendre l\'écoute', 'Keep listening') : L('Je l\'écoute, téléphone posé', 'Listening, phone down') }}
+        {{ elapsed ? L('Keep listening') : L('Listening, phone down') }}
       </button>
       <button v-else-if="armed && !timeDone" class="btn mt-4 w-60" @click="stop">
-        {{ L('Pause', 'Pause') }}
+        {{ L('Pause') }}
       </button>
       <p v-if="!timeDone" class="t-body text-xs text-pencil mt-3 text-center px-4">
-        {{ L('Posez le téléphone à plat, écran contre la table. Le chrono ne tourne que s\'il ne bouge pas.', 'Lay the phone flat, screen against the table. The clock only runs while it stays there.') }}
+        {{ L('Lay the phone flat, screen against the table. The clock only runs while it stays there.') }}
       </p>
 
       <div v-if="timeDone" class="w-full mt-5">
         <p class="t-label">
-          {{ L('Honnêtement…', 'Honestly…') }}
+          {{ L('Honestly…') }}
         </p>
         <button v-for="c in CHECKS" :key="c.key" class="check-row" :class="{ on: checks[c.key] }" @click="toggleCheck(c.key)">
           <span class="box">{{ checks[c.key] ? '✓' : '' }}</span>
-          <span class="t-body text-sm text-left">{{ L(c.fr, c.en) }}</span>
+          <span class="t-body text-sm text-left">{{ L(c.en) }}</span>
         </button>
         <button class="btn btn-ink w-full mt-4" :disabled="score < 3" @click="finish">
-          {{ score >= 3 ? L('J\'étais vraiment là', 'I was really there') : L(`${score}/4 · au moins 3`, `${score}/4 · at least 3`) }}
+          {{ score >= 3 ? L('I was really there') : L(`${score}/4 · at least 3`) }}
         </button>
       </div>
     </template>
     <p v-else-if="done" class="t-body text-sm text-center mt-4">
-      {{ L(`Vous avez écouté ${(data as any).who}.`, `You listened to ${(data as any).who}.`) }}
+      {{ L(`You listened to ${(data as any).who}.`) }}
     </p>
   </div>
 </template>

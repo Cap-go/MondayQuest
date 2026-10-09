@@ -98,18 +98,18 @@ function save() {
 
 <template>
   <div>
-    <input :value="data.subject" class="ink-input mb-3" :disabled="!editable" :placeholder="L('Ce que je dessine : ma tasse…', 'What I\'m drawing: my mug…')" @change="patch({ subject: ($event.target as HTMLInputElement).value })">
+    <input :value="data.subject" class="ink-input mb-3" :disabled="!editable" :placeholder="L('What I\'m drawing: my mug…')" @change="patch({ subject: ($event.target as HTMLInputElement).value })">
     <canvas ref="canvas" class="w-full aspect-square border-[2.5px] border-ink bg-sheet touch-none" @pointerdown="down" @pointermove="move" @pointerup="up" @pointercancel="up" />
     <div class="flex gap-2 mt-3">
       <button v-for="k in (['fine', 'bold', 'erase'] as const)" :key="k" class="tool" :class="{ on: pen === k }" @click="pen = k; haptic.select()">
         <svg v-if="k !== 'erase'" viewBox="0 0 24 24" width="22" height="22"><line x1="5" y1="19" x2="19" y2="5" stroke="currentColor" :stroke-width="k === 'fine' ? 2 : 5" stroke-linecap="round" /></svg>
         <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16l9-9 6 6-6 6H8z" /></svg>
       </button>
-      <button class="tool" :aria-label="L('Annuler', 'Undo')" @click="undo">
+      <button class="tool" :aria-label="L('Undo')" @click="undo">
         ↶
       </button>
       <button class="btn btn-ink flex-1 py-2" :disabled="!editable || (!strokes && !data.drawing)" @click="save">
-        {{ done ? L('Ré-enregistrer', 'Save again') : L('Croquis du jour', 'Save sketch') }}
+        {{ done ? L('Save again') : L('Save sketch') }}
       </button>
     </div>
   </div>

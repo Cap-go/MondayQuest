@@ -46,8 +46,8 @@ function startFast() {
   patch({ fastStart: start })
   sfx.play('chime')
   haptic.press()
-  void scheduleTimerEnd(key, L('SEIZE HUIT', 'SIXTEEN EIGHT'), L(`${HOURS} heures de jeûne ! Bon appétit.`, `${HOURS} hours fasted! Enjoy your meal.`), GOAL)
-  void startSessionActivity({ title: L('SEIZE HUIT', 'SIXTEEN EIGHT'), subtitle: L(`Jeûne ${RATIO}`, `Fasting ${RATIO}`), short: '◔', icon: 'clock', durationMs: GOAL, startedAt: start })
+  void scheduleTimerEnd(key, L('SIXTEEN EIGHT'), L(`${HOURS} hours fasted! Enjoy your meal.`), GOAL)
+  void startSessionActivity({ title: L('SIXTEEN EIGHT'), subtitle: L(`Fasting ${RATIO}`), short: '◔', icon: 'clock', durationMs: GOAL, startedAt: start })
 }
 
 function breakFast() {
@@ -78,23 +78,23 @@ function lastMealNow() {
       <path v-if="fasting" :d="`M ${polar(arc.a0)} A 80 80 0 ${HOURS * 15 * progress > 180 ? 1 : 0} 1 ${polar(arc.a0 + HOURS * 15 * progress)}`" fill="none" stroke="var(--color-sun)" stroke-width="6" stroke-linecap="round" />
       <text v-for="h in [0, 6, 12, 18]" :key="h" :x="polar(h * 15, 58).split(' ')[0]" :y="Number(polar(h * 15, 58).split(' ')[1]) + 4" text-anchor="middle" font-family="Archivo" font-size="10" fill="var(--color-pencil)">{{ h }}h</text>
       <text x="100" y="100" text-anchor="middle" font-family="Archivo" font-weight="800" font-size="24">{{ fasting ? formatClock(elapsed) : done ? `${RATIO} ✓` : RATIO }}</text>
-      <text x="100" y="120" text-anchor="middle" font-family="Archivo" font-size="10" fill="var(--color-graphite)">{{ fasting ? L(`depuis ${formatHM(new Date(data.fastStart!))}`, `since ${formatHM(new Date(data.fastStart!))}`) : L(`aujourd'hui · ${HOURS} h de jeûne`, `today · ${HOURS} h fast`) }}</text>
+      <text x="100" y="120" text-anchor="middle" font-family="Archivo" font-size="10" fill="var(--color-graphite)">{{ fasting ? L(`since ${formatHM(new Date(data.fastStart!))}`) : L(`today · ${HOURS} h fast`) }}</text>
     </svg>
     <div class="grid grid-cols-2 gap-3 w-full mt-3">
       <button v-if="!fasting" class="btn btn-ink col-span-2" :disabled="!editable || done" @click="startFast">
-        {{ done ? L('Jeûne réussi ✓', 'Fast complete ✓') : L('Je commence à jeûner', 'Start fasting') }}
+        {{ done ? L('Fast complete ✓') : L('Start fasting') }}
       </button>
       <template v-else>
         <button class="btn" @click="breakFast">
-          {{ progress >= 1 ? L('Rompre le jeûne', 'Break the fast') : L('J\'arrête', 'Stop') }}
+          {{ progress >= 1 ? L('Break the fast') : L('Stop') }}
         </button>
         <div class="t-body text-sm text-center self-center tabular-nums">
-          {{ formatClock(Math.max(0, GOAL - elapsed)) }} {{ L('restant', 'left') }}
+          {{ formatClock(Math.max(0, GOAL - elapsed)) }} {{ L('left') }}
         </div>
       </template>
     </div>
     <button v-if="done && isToday" class="t-label underline underline-offset-4 mt-4" @click="lastMealNow">
-      {{ data.lastMeal ? L(`Dernier repas : ${formatHM(new Date(data.lastMeal))}`, `Last meal: ${formatHM(new Date(data.lastMeal))}`) : L('Noter mon dernier repas (démarre le jeûne de demain)', 'Log my last meal (starts tomorrow\'s fast)') }}
+      {{ data.lastMeal ? L(`Last meal: ${formatHM(new Date(data.lastMeal))}`) : L('Log my last meal (starts tomorrow\'s fast)') }}
     </button>
   </div>
 </template>

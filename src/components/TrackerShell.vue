@@ -62,7 +62,7 @@ function needsAction(i: number) {
   nudge.value = false
   requestAnimationFrame(() => (nudge.value = true))
   setTimeout(() => (nudge.value = false), 700)
-  toast.info(L('Faites le challenge ci-dessus pour cocher la journée', 'Do the challenge above to tick the day'))
+  toast.info(L('Do the challenge above to tick the day'))
 }
 
 function toggle(i: number, v: boolean) {
@@ -78,11 +78,11 @@ function stampDone() {
 
 function onCelebrated() {
   if (quest.complete(props.run))
-    toast.success(L('Joker gagné !', 'Joker earned!'), { message: L('Refaire un challenge rapporte un joker pour en passer un autre.', 'Doing a challenge again earns a joker to skip another one.') })
+    toast.success(L('Joker earned!'), { message: L('Doing a challenge again earns a joker to skip another one.') })
 }
 
 function dayLabel(i: number) {
-  return L(`JOUR ${i + 1}`, `DAY ${i + 1}`)
+  return L(`DAY ${i + 1}`)
 }
 
 function dayDate(i: number) {
@@ -103,7 +103,7 @@ function dayDate(i: number) {
 
     <!-- status banners -->
     <p v-if="status === 'upcoming'" class="t-body text-center text-graphite mb-6">
-      {{ $t('home.startsIn') }} — {{ L('le carnet vous attend.', 'your notebook awaits.') }}
+      {{ $t('home.startsIn') }} — {{ L('your notebook awaits.') }}
     </p>
     <p v-else-if="status === 'missed'" class="t-body text-center text-graphite mb-6">
       {{ $t('home.missed') }}
@@ -129,7 +129,7 @@ function dayDate(i: number) {
         </Transition>
         <p v-if="lockable && editable && selected === todayIdx" class="lock-line t-body">
           <QuestIcon name="lock" :size="14" :stroke="3" class="inline -mt-0.5" />
-          {{ L('Lancé, vous pouvez verrouiller le téléphone : le chrono reste sur l\'écran de verrouillage.', 'Once started, you can lock the phone: the timer stays on your lock screen.') }}
+          {{ L('Once started, you can lock the phone: the timer stays on your lock screen.') }}
         </p>
       </div>
     </section>

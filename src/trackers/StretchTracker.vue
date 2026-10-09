@@ -22,10 +22,10 @@ const STEP_MS = GOAL / 8
 const s = useSession(props, {
   targetMs: GOAL,
   keepAwake: true,
-  title: () => L('SOUPLESSE FÉLINE', 'FELINE FLEXIBILITY'),
+  title: () => L('FELINE FLEXIBILITY'),
   subtitle: () => STEPS.value[0]!,
   short: '⤢',
-  doneBody: () => L('15 minutes d\'étirements. Belle souplesse !', '15 minutes of stretching. Nicely done!'),
+  doneBody: () => L('15 minutes of stretching. Nicely done!'),
 })
 const { running, elapsed, progress, done, toggle } = s
 
@@ -66,14 +66,14 @@ watch(running, (r) => {
     </ol>
     <div class="flex items-center gap-3 mt-5">
       <button class="btn btn-ink w-44" :disabled="!editable || done" @click="toggle">
-        {{ done ? L('Étiré ✓', 'Stretched ✓') : running ? L('Pause', 'Pause') : elapsed ? L('Reprendre', 'Resume') : L('Commencer', 'Start') }}
+        {{ done ? L('Stretched ✓') : running ? L('Pause') : elapsed ? L('Resume') : L('Start') }}
       </button>
       <button class="btn px-4" :class="{ 'btn-ink': voice }" :aria-pressed="voice" @click="voice = !voice">
         🗣
       </button>
     </div>
     <p class="t-body text-xs text-pencil mt-3">
-      {{ formatClock(elapsed) }} / 15:00 · {{ L('guidage vocal', 'voice guidance') }}
+      {{ formatClock(elapsed) }} / 15:00 · {{ L('voice guidance') }}
     </p>
   </div>
 </template>

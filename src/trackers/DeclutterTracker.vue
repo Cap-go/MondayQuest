@@ -18,13 +18,13 @@ const { data, done, patch, markDone, unmark } = useDay(props, { items: [] as Pil
 const pile = ref<Pile>('give')
 const fresh = ref(-1)
 const piles = computed(() => [
-  { id: 'give' as Pile, label: L('Donner', 'Give') },
-  { id: 'sell' as Pile, label: L('Vendre', 'Sell') },
-  { id: 'recycle' as Pile, label: L('Recycler', 'Recycle') },
+  { id: 'give' as Pile, label: L('Give') },
+  { id: 'sell' as Pile, label: L('Sell') },
+  { id: 'recycle' as Pile, label: L('Recycle') },
 ])
 const count = computed(() => data.value.items.length)
 const tally = computed(() => piles.value.map(p => ({ ...p, n: data.value.items.filter(i => i === p.id).length })))
-const short = (p: Pile) => ({ give: L('DON', 'GIVE'), sell: L('VENTE', 'SELL'), recycle: L('RECYC', 'RECYC') })[p]
+const short = (p: Pile) => ({ give: L('GIVE'), sell: L('SELL'), recycle: L('RECYC') })[p]
 
 // items stack in rows of 5 at the bottom of the box
 function slot(i: number) {
@@ -110,19 +110,19 @@ function up(e: PointerEvent) {
       {{ count }}<span class="text-pencil">/{{ GOAL }}</span>
     </p>
     <p class="t-label text-graphite">
-      {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ GOAL > 1 ? L('objets', 'things') : L('objet', 'thing') }}
+      {{ L('Today') }} · {{ GOAL }} {{ GOAL > 1 ? L('things') : L('thing') }}
     </p>
     <div class="flex gap-4 mt-2">
       <span v-for="t in tally" :key="t.id" class="t-label text-graphite">{{ t.label }} {{ t.n }}</span>
     </div>
     <p v-if="done" class="t-body text-sm text-graphite mt-3">
-      {{ L(`Carton fermé. ${GOAL} de moins.`, `Box closed. ${GOAL} ${GOAL > 1 ? 'things' : 'thing'} lighter.`) }}
+      {{ L(`Box closed. ${GOAL} ${GOAL > 1 ? 'things' : 'thing'} lighter.`) }}
     </p>
     <p v-else-if="editable" class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('Glissez vers le haut ou touchez le carton pour y jeter un objet.', 'Swipe up or tap the box to throw a thing in.') }}
+      {{ L('Swipe up or tap the box to throw a thing in.') }}
     </p>
     <button v-if="editable && count" class="t-label text-pencil underline mt-2" @click="undo">
-      {{ L('Annuler le dernier', 'Undo last') }}
+      {{ L('Undo last') }}
     </button>
   </div>
 </template>

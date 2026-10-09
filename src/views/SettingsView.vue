@@ -13,6 +13,7 @@ import QuestPage from '~/components/QuestPage.vue'
 import ToggleRow from '~/components/ToggleRow.vue'
 import { useL } from '~/composables/useL'
 import { COMMUNITY_URL, openExternal } from '~/config'
+import { deviceTag, languageOf } from '~/i18n/translate'
 import { openSystemAlarms } from '~/services/alarm'
 import { buildEnv, isTestBuild } from '~/services/env'
 import { haptic } from '~/services/haptics'
@@ -34,14 +35,14 @@ onMounted(async () => {
 async function enableNotif() {
   notif.value = await requestNotifications()
   if (notif.value) {
-    toast.success(L('Rappels activés', 'Reminders on'))
+    toast.success(L('Reminders on'))
     void rescheduleAll()
   }
 }
 
 async function pickTime(key: 'reminder' | 'evening' | 'wakeAlarm', title: string) {
   haptic.tap()
-  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, date: quest.settings[key], title, locale: L.tag(), doneText: 'OK', cancelText: L('Annuler', 'Cancel') }).catch(() => null)
+  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, date: quest.settings[key], title, locale: L.tag(), doneText: 'OK', cancelText: L('Cancel') }).catch(() => null)
   if (res?.value)
     quest.settings[key] = res.value
 }
@@ -55,7 +56,7 @@ onMounted(async () => {
 /** Picking a time switches the Rising sun alarm from automatic (sunrise) to fixed. */
 async function pickWake() {
   haptic.tap()
-  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, date: quest.settings.wakeAuto ? autoWake.value : quest.settings.wakeAlarm, title: L('Réveil fixe', 'Fixed alarm'), locale: L.tag(), doneText: 'OK', cancelText: L('Annuler', 'Cancel') }).catch(() => null)
+  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, date: quest.settings.wakeAuto ? autoWake.value : quest.settings.wakeAlarm, title: L('Fixed alarm'), locale: L.tag(), doneText: 'OK', cancelText: L('Cancel') }).catch(() => null)
   if (res?.value) {
     quest.settings.wakeAlarm = res.value
     quest.settings.wakeAuto = false
@@ -73,12 +74,25 @@ function setLocale(l: Settings['locale']) {
   quest.settings.locale = l
 }
 
+/** Offered explicitly; "Automatic" covers every other phone language too. */
+const LANGUAGES = ['en', 'fr', 'es', 'de', 'it', 'pt', 'pt-BR', 'nl', 'pl', 'sv', 'da', 'nb', 'fi', 'et', 'cs', 'ro', 'hu', 'el', 'tr', 'ru', 'uk', 'ar', 'he', 'hi', 'id', 'vi', 'th', 'ja', 'ko', 'zh-Hans', 'zh-Hant']
+const deviceLanguage = languageOf(deviceTag())
+function nativeName(code: string): string {
+  try {
+    const n = new Intl.DisplayNames([code], { type: 'language' }).of(code) ?? code
+    return n.charAt(0).toLocaleUpperCase(code) + n.slice(1)
+  }
+  catch {
+    return code
+  }
+}
+
 function reset() {
   // eslint-disable-next-line no-alert
-  if (window.confirm(L('Effacer toute votre progression ?', 'Erase all your progress?'))) {
+  if (window.confirm(L('Erase all your progress?'))) {
     haptic.error()
     quest.resetAll()
-    toast.info(L('Carnet vierge', 'Blank notebook'))
+    toast.info(L('Blank notebook'))
   }
 }
 
@@ -93,11 +107,11 @@ function link(url: string) {
 }
 
 const LINKS = [
-  ...(COMMUNITY_URL ? [{ label: () => L('Le groupe Monday Quest', 'Monday Quest group'), hint: 'Telegram', url: COMMUNITY_URL }] : []),
-  { label: () => L('Créé par Martin Donadieu', 'Made by Martin Donadieu'), hint: '@martindonadieu', url: 'https://x.com/martindonadieu' },
-  { label: () => L('Mises à jour en direct par Capgo', 'Live updates by Capgo'), hint: 'capgo.app', url: 'https://capgo.app/?utm_source=mondayquest&utm_medium=app' },
-  { label: () => L('Site web', 'Website'), hint: 'mondayquest.com', url: 'https://mondayquest.com' },
-  { label: () => L('Confidentialité', 'Privacy'), hint: '', url: 'https://mondayquest.com/privacy' },
+  ...(COMMUNITY_URL ? [{ label: () => L('Monday Quest group'), hint: 'Telegram', url: COMMUNITY_URL }] : []),
+  { label: () => L('Made by Martin Donadieu'), hint: '@martindonadieu', url: 'https://x.com/martindonadieu' },
+  { label: () => L('Live updates by Capgo'), hint: 'capgo.app', url: 'https://capgo.app/?utm_source=mondayquest&utm_medium=app' },
+  { label: () => L('Website'), hint: 'mondayquest.com', url: 'https://mondayquest.com' },
+  { label: () => L('Privacy'), hint: '', url: 'https://mondayquest.com/privacy' },
 ]
 
 let taps = 0
@@ -135,11 +149,17 @@ function custom() {
       <p class="t-label">
         {{ $t('settings.language') }}
       </p>
-      <div class="seg mt-2">
-        <button v-for="l in (['auto', 'fr', 'en'] as const)" :key="l" :class="{ on: quest.settings.locale === l }" @click="setLocale(l)">
-          {{ l === 'auto' ? $t('settings.auto') : l === 'fr' ? 'Français' : 'English' }}
-        </button>
-      </div>
+      <select class="lang-select mt-2" :value="quest.settings.locale" @change="setLocale(($event.target as HTMLSelectElement).value)">
+        <option value="auto">
+          {{ $t('settings.auto') }} · {{ nativeName(deviceLanguage) }}
+        </option>
+        <option v-for="code in LANGUAGES" :key="code" :value="code">
+          {{ nativeName(code) }}
+        </option>
+      </select>
+      <p class="t-body text-xs text-pencil mt-2">
+        {{ L('Written in English, translated automatically into your language.') }}
+      </p>
     </section>
 
     <section class="mt-8">
@@ -157,20 +177,20 @@ function custom() {
       </button>
       <button class="row" @click="pickWake">
         <span class="t-body flex-1 text-left">{{ $t('settings.wakeAlarm') }}</span>
-        <span v-if="quest.settings.wakeAuto" class="t-label text-pencil mr-2">{{ L('lever du soleil', 'sunrise') }}</span>
+        <span v-if="quest.settings.wakeAuto" class="t-label text-pencil mr-2">{{ L('sunrise') }}</span>
         <span class="t-display tabular-nums">{{ quest.settings.wakeAuto ? autoWake : quest.settings.wakeAlarm }}</span>
       </button>
       <button v-if="!quest.settings.wakeAuto" class="t-label text-graphite underline mt-1" @click="followSunrise">
-        {{ L('Revenir au lever du soleil', 'Follow the sunrise again') }}
+        {{ L('Follow the sunrise again') }}
       </button>
       <button v-if="native" class="row" @click="openSystemAlarms">
-        <span class="t-body flex-1 text-left">{{ L('Ouvrir l\'app Horloge', 'Open the Clock app') }}</span><span>↗</span>
+        <span class="t-body flex-1 text-left">{{ L('Open the Clock app') }}</span><span>↗</span>
       </button>
     </section>
 
     <section class="mt-8">
       <p class="t-label">
-        {{ L('Expérience', 'Experience') }}
+        {{ L('Experience') }}
       </p>
       <ToggleRow v-model="quest.settings.sound" :label="$t('settings.sound')" />
       <ToggleRow v-model="quest.settings.haptics" :label="$t('settings.haptics')" />
@@ -206,14 +226,14 @@ function custom() {
 
     <section class="mt-8">
       <p class="t-label">
-        {{ L('À propos', 'About') }}
+        {{ L('About') }}
       </p>
       <button v-for="l in LINKS" :key="l.url" class="row" @click="link(l.url)">
         <span class="t-body flex-1 text-left">{{ l.label() }}</span>
         <span class="t-body text-sm text-pencil">{{ l.hint }}</span><span class="ml-2">↗</span>
       </button>
       <p class="version-line t-label" @click="versionTap">
-        {{ L('Version', 'Version') }} {{ nativeVersion || 'web' }}{{ bundleVersion && bundleVersion !== 'builtin' ? ` · ${bundleVersion}` : '' }}
+        {{ L('Version') }} {{ nativeVersion || 'web' }}{{ bundleVersion && bundleVersion !== 'builtin' ? ` · ${bundleVersion}` : '' }}
       </p>
     </section>
 
@@ -244,6 +264,22 @@ function custom() {
 </template>
 
 <style scoped>
+.lang-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2.5px solid var(--color-ink);
+  background: var(--color-sheet);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--color-ink) 50%), linear-gradient(135deg, var(--color-ink) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
+
 .version-line {
   margin-top: 14px;
   text-align: center;

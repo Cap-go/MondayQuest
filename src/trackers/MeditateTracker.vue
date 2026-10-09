@@ -21,9 +21,9 @@ const s = useSession(props, {
   targetMs: GOAL,
   keepAwake: true,
   title: () => 'ZEN CHEF',
-  subtitle: () => L(`Méditation · ${MIN} min`, `Meditation · ${MIN} min`),
+  subtitle: () => L(`Meditation · ${MIN} min`),
   short: '◯',
-  doneBody: () => L(`${MIN} minutes de calme. Revenez doucement.`, `${MIN} minutes of calm. Come back gently.`),
+  doneBody: () => L(`${MIN} minutes of calm. Come back gently.`),
   onComplete: () => void logMindful(),
 })
 const { running, elapsed, progress, done, start, pause } = s
@@ -78,19 +78,19 @@ onBeforeUnmount(() => void HomeIndicator.show().catch(() => {}))
             {{ formatClock(Math.max(0, GOAL - elapsed)) }}
           </p>
           <p class="t-label text-graphite">
-            {{ running ? (inhale ? L('Inspirez', 'Breathe in') : L('Expirez', 'Breathe out')) : L('Durée de méditation', 'Meditation time') }}
+            {{ running ? (inhale ? L('Breathe in') : L('Breathe out')) : L('Meditation time') }}
           </p>
         </div>
       </div>
     </div>
     <p class="t-label text-graphite mt-4">
-      {{ L('Aujourd\'hui', 'Today') }} · {{ MIN }} min
+      {{ L('Today') }} · {{ MIN }} min
     </p>
     <button class="btn btn-ink mt-3 w-48" :disabled="!editable || done" @click="running ? end() : begin()">
-      {{ done ? L('Méditation faite ✓', 'Meditated ✓') : running ? L('Pause', 'Pause') : elapsed ? L('Reprendre', 'Resume') : L('S\'asseoir', 'Sit down') }}
+      {{ done ? L('Meditated ✓') : running ? L('Pause') : elapsed ? L('Resume') : L('Sit down') }}
     </button>
     <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('Écran gardé allumé · séance enregistrée dans Santé', 'Screen kept awake · session saved to Health') }}
+      {{ L('Screen kept awake · session saved to Health') }}
     </p>
 
     <!-- full-screen zen mode -->
@@ -99,7 +99,7 @@ onBeforeUnmount(() => void HomeIndicator.show().catch(() => {}))
         <div v-if="zen && running" class="zen" @click="end">
           <div class="zen-circle" :style="{ transform: `scale(${scale})` }" />
           <p class="t-label text-paper/70 mt-10">
-            {{ inhale ? L('Inspirez', 'Breathe in') : L('Expirez', 'Breathe out') }}
+            {{ inhale ? L('Breathe in') : L('Breathe out') }}
           </p>
           <p class="t-body text-paper/40 text-sm mt-2 tabular-nums">
             {{ formatClock(Math.max(0, GOAL - elapsed)) }}

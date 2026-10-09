@@ -131,19 +131,19 @@ onBeforeUnmount(() => cancelAnimationFrame(raf))
       </g>
       <!-- finger stop -->
       <path :d="`M${C + Math.cos(STOP * Math.PI / 180) * 100} ${C + Math.sin(STOP * Math.PI / 180) * 100} L${C + Math.cos(STOP * Math.PI / 180) * 128} ${C + Math.sin(STOP * Math.PI / 180) * 128}`" stroke="var(--color-ink)" stroke-width="5" stroke-linecap="square" />
-      <text :x="C" :y="C - 6" text-anchor="middle" font-size="9" letter-spacing="1.5" fill="var(--color-pencil)">{{ done ? L('APPELÉ', 'CALLED') : L('COMPOSEZ', 'DIAL') }}</text>
+      <text :x="C" :y="C - 6" text-anchor="middle" font-size="9" letter-spacing="1.5" fill="var(--color-pencil)">{{ done ? L('CALLED') : L('DIAL') }}</text>
       <text :x="C" :y="C + 16" text-anchor="middle" font-size="15" font-weight="700" fill="var(--color-ink)" class="tabular-nums">{{ data.digits || '· · ·' }}</text>
     </svg>
 
     <p v-if="editable && !spun" class="t-body text-xs text-pencil mt-1 text-center">
-      {{ L('Glissez un trou jusqu\'à la butée pour composer.', 'Drag a hole round to the stop to dial.') }}
+      {{ L('Drag a hole round to the stop to dial.') }}
     </p>
     <div class="w-64 mt-4">
-      <label class="t-label text-graphite">{{ L('Qui avez-vous appelé ?', 'Who did you call?') }}</label>
-      <input v-model="who" class="ink-input mt-1" :disabled="!editable || done" :placeholder="L('Mamie, Paul, une vieille amie…', 'Grandma, Paul, an old friend…')" @change="patch({ who: who.trim() })">
+      <label class="t-label text-graphite">{{ L('Who did you call?') }}</label>
+      <input v-model="who" class="ink-input mt-1" :disabled="!editable || done" :placeholder="L('Grandma, Paul, an old friend…')" @change="patch({ who: who.trim() })">
     </div>
     <button class="btn mt-5 w-56" :class="{ 'btn-ink': !done }" :disabled="!editable || (!done && (!spun || !who.trim()))" @click="hangUp">
-      {{ done ? L('Appel passé ✓', 'Call made ✓') : L('Raccrocher', 'Hang up') }}
+      {{ done ? L('Call made ✓') : L('Hang up') }}
     </button>
   </div>
 </template>

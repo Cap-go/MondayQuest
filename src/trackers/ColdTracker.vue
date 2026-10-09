@@ -40,7 +40,7 @@ async function begin() {
   left.value = WARM
   sfx.play('chime')
   haptic.press()
-  say(L(`Eau chaude. Trente secondes, puis ${COLD.value} secondes de froid.`, `Warm water. Thirty seconds, then ${COLD.value} seconds of cold.`))
+  say(L(`Warm water. Thirty seconds, then ${COLD.value} seconds of cold.`))
   await KeepAwake.keepAwake().catch(() => {})
   vol = await VolumeButtons.addListener('volumeButtonPressed', () => stop()).catch(() => undefined)
   timer = setInterval(tick, 1000)
@@ -50,7 +50,7 @@ function tick() {
   left.value--
   if (phase.value === 'warm') {
     if (left.value === 10) {
-      say(L('Froid dans dix secondes', 'Cold in ten seconds'))
+      say(L('Cold in ten seconds'))
     }
     else if (left.value <= 3 && left.value > 0) {
       say(String(left.value))
@@ -64,7 +64,7 @@ function tick() {
   }
   if (phase.value === 'cold') {
     if (left.value > 5 && left.value % 10 === 0) {
-      say(L(`${left.value} secondes`, `${left.value} seconds`))
+      say(L(`${left.value} seconds`))
       haptic.shiver(4)
     }
     else if (left.value <= 5 && left.value > 0) {
@@ -85,7 +85,7 @@ function toCold() {
   sfx.play('wake')
   sfx.play('freeze')
   haptic.shiver(12)
-  say(L(`Froid ! Tenez ${COLD.value} secondes.`, `Cold! Hold ${COLD.value} seconds.`))
+  say(L(`Cold! Hold ${COLD.value} seconds.`))
 }
 
 function finish() {
@@ -94,7 +94,7 @@ function finish() {
   const held = COLD.value
   sfx.play('done')
   haptic.success()
-  say(L('Terminé. Bravo, agent secret.', 'Done. Well done, double-oh-seven.'))
+  say(L('Done. Well done, double-oh-seven.'))
   markDone({ best: Math.max(data.value.best ?? 0, held * 1000), tries: (data.value.tries ?? 0) + 1 })
   setTimeout(() => {
     if (phase.value === 'end')
@@ -132,7 +132,7 @@ const bestCold = computed(() => Math.floor((data.value.best ?? 0) / 1000))
 <template>
   <div class="text-center py-2">
     <p class="t-label text-graphite">
-      {{ L('Aujourd\'hui', 'Today') }} · 30 s {{ L('chaud', 'warm') }} → {{ COLD }} s {{ L('froid', 'cold') }}
+      {{ L('Today') }} · 30 s {{ L('warm') }} → {{ COLD }} s {{ L('cold') }}
     </p>
     <svg viewBox="0 0 200 110" class="w-full max-w-60 mx-auto mt-2">
       <path d="M60 10h40a8 8 0 0 1 8 8v8" fill="none" stroke="var(--color-ink)" stroke-width="3" />
@@ -143,19 +143,19 @@ const bestCold = computed(() => Math.floor((data.value.best ?? 0) / 1000))
       <path d="M40 104h120" stroke="var(--color-rule)" stroke-width="2" />
     </svg>
     <button class="btn btn-ink mt-4 w-60" :disabled="!editable" @click="begin">
-      {{ done ? L('Encore une', 'Once more') : L('J\'entre sous la douche', 'I\'m stepping in') }}
+      {{ done ? L('Once more') : L('I\'m stepping in') }}
     </button>
     <p class="t-body text-xs text-pencil mt-3 px-4">
-      {{ L('Posez le téléphone près de la douche, son fort. La voix vous dit quand passer au froid et quand c\'est fini. Bouton de volume pour arrêter.', 'Leave the phone near the shower, volume up. A voice tells you when to switch to cold and when you are done. Any volume button stops it.') }}
+      {{ L('Leave the phone near the shower, volume up. A voice tells you when to switch to cold and when you are done. Any volume button stops it.') }}
     </p>
     <p v-if="bestCold" class="t-label mt-3">
-      {{ L('Froid tenu', 'Cold held') }} : {{ bestCold }} s {{ done ? '✓' : '' }}
+      {{ L('Cold held') }} : {{ bestCold }} s {{ done ? '✓' : '' }}
     </p>
 
     <Teleport to="body">
       <div v-if="phase !== 'idle'" class="shower" :class="phase" @pointerdown="stop">
         <p class="t-label label">
-          {{ phase === 'warm' ? L('Eau chaude', 'Warm water') : phase === 'cold' ? L('Eau froide !', 'Cold water!') : L('Terminé', 'Done') }}
+          {{ phase === 'warm' ? L('Warm water') : phase === 'cold' ? L('Cold water!') : L('Done') }}
         </p>
         <div class="dial">
           <svg viewBox="0 0 260 260">
@@ -170,7 +170,7 @@ const bestCold = computed(() => Math.floor((data.value.best ?? 0) / 1000))
           </p>
         </div>
         <p class="t-label hint">
-          {{ phase === 'end' ? L('Bravo, agent secret', 'Well done, 007') : L('Touchez ou bouton volume pour arrêter', 'Tap or volume button to stop') }}
+          {{ phase === 'end' ? L('Well done, 007') : L('Tap or volume button to stop') }}
         </p>
       </div>
     </Teleport>

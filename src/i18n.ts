@@ -1,134 +1,7 @@
-import { createI18n } from 'vue-i18n'
+import type { App } from 'vue'
+import { tr } from './i18n/translate'
 
-const fr = {
-  tabs: { today: 'Aujourd\'hui', levels: 'Niveaux', journal: 'Carnet', settings: 'Réglages' },
-  common: {
-    day: 'Jour {n}',
-    done: 'Done',
-    start: 'Commencer',
-    cancel: 'Annuler',
-    save: 'Enregistrer',
-    close: 'Fermer',
-    back: 'Retour',
-    next: 'Suivant',
-    tips: 'Tips',
-    startDate: 'Date de début du challenge',
-    monday: 'lundi',
-    level: 'Niveau {n}',
-    minutes: '{n} min',
-    seconds: '{n} s',
-    of: 'sur',
-    abandon: 'Abandonner',
-    restart: 'Recommencer',
-    open: 'Ouvrir',
-    continue: 'Continuer',
-  },
-  home: {
-    hello: 'Bonjour',
-    mondayHello: 'Lundi matin.',
-    noQuest: 'Aucun challenge en cours.',
-    pickOne: 'Choisissez votre prochain challenge et commencez lundi matin.',
-    nextUp: 'Prochain challenge',
-    todayTask: 'Aujourd\'hui',
-    dayOf: 'Jour {n} sur 7',
-    startsIn: 'Commence lundi',
-    streak: 'jours d\'affilée | jour d\'affilée | jours d\'affilée',
-    checks: 'cases cochées',
-    completed: 'challenges terminés',
-    finishing: 'Les 7 jours sont cochés. Tamponnez DONE !',
-    missed: 'La semaine est passée.',
-  },
-  start: {
-    title: 'Quand commencer ?',
-    nextMonday: 'Lundi prochain',
-    now: 'Maintenant',
-    nowHint: 'Jour 1 = aujourd\'hui',
-    mondayHint: 'Le vrai esprit de Monday Quest',
-    hardcore: 'Mode hardcore : tout le niveau cette semaine',
-  },
-  detail: {
-    track: 'Suivi',
-    read: 'Lire',
-    swipe: 'Tournez la page',
-    completedOn: 'Terminé le {date}',
-    locked: 'Terminez le niveau précédent pour débloquer ce challenge.',
-  },
-  done: {
-    title: 'Challenge réussi',
-    subtitle: 'Vous êtes une version plus résiliente de vous-même.',
-    share: 'Partager',
-    levelUp: 'Niveau {n} terminé !',
-  },
-  journal: {
-    title: 'Carnet',
-    empty: 'Votre carnet se remplira au fil des semaines.',
-    week: 'Semaine du {date}',
-    stats: 'Statistiques',
-  },
-  settings: {
-    title: 'Réglages',
-    language: 'Langue',
-    auto: 'Automatique',
-    sound: 'Sons',
-    haptics: 'Vibrations',
-    reminder: 'Rappel du jour',
-    evening: 'Rappel du soir',
-    wakeAlarm: 'Réveil « Soleil levant »',
-    hardcore: 'Mode hardcore',
-    hardcoreHint: 'Lancez les 5 challenges d\'un niveau la même semaine.',
-    notifications: 'Notifications',
-    enableNotifications: 'Activer les notifications',
-    widget: 'Widget & Live Activity',
-    widgetHint: 'Appui long sur l\'écran d\'accueil, touchez +, cherchez Monday Quest. Il se met à jour tout seul, et vous pouvez cocher la journée depuis le widget.',
-    custom: 'Mes challenges',
-    createCustom: 'Créer un challenge',
-    about: 'À propos',
-    aboutText: '52 challenges, un nouveau chaque lundi matin. Une année entière.',
-    version: 'Version',
-    update: 'Mise à jour',
-    reset: 'Tout effacer',
-    resetConfirm: 'Effacer toute votre progression ?',
-    review: 'Noter l\'app',
-    health: 'Avertissement santé',
-    healthText: 'Certains challenges vous invitent à modifier vos habitudes de vie de manière importante. Soyez sûr que votre santé physique et mentale vous autorise à vous lancer dans une telle aventure. En cas de doute, consultez votre médecin.',
-  },
-  custom: {
-    title: 'Nouveau challenge',
-    name: 'Nom du challenge',
-    short: 'Description du challenge',
-    long: 'Description longue',
-    tip: 'Tips',
-    icon: 'Pictogramme',
-    category: 'Catégorie',
-    create: 'Créer',
-    bonus: 'Niveau bonus',
-  },
-  onboarding: {
-    preface: 'Préface',
-    p1: 'Monday Quest est un outil de développement personnel composé de 52 challenges d\'une semaine chacun : un par semaine pendant un an.',
-    p2: 'L\'objectif de cette aventure est de vous aider à sortir de votre zone de confort, à découvrir des habitudes différentes et à devenir « une meilleure version de vous-même ».',
-    how: 'Comment ça marche ?',
-    h1: 'Chaque challenge commence un lundi matin et dure 7 jours.',
-    h2: 'Cochez chaque jour. Le septième, tamponnez DONE.',
-    h3: '11 niveaux, 52 semaines. Terminez un niveau pour débloquer le suivant.',
-    begin: 'Commencer l\'aventure',
-    allow: 'Autoriser les rappels',
-  },
-  notif: {
-    mondayTitle: 'Lundi matin',
-    mondayBody: 'Un nouveau challenge commence aujourd\'hui : {title}.',
-    dailyTitle: '{title} — jour {n}',
-    dailyBody: 'Avez-vous coché votre case aujourd\'hui ?',
-    eveningTitle: 'Avant de dormir',
-    eveningBody: 'Prenez une minute pour remplir votre carnet.',
-    actionDone: 'C\'est fait ✓',
-    actionLater: 'Plus tard',
-  },
-}
-
-type Messages = typeof fr
-
-const en: Messages = {
+const en = {
   tabs: { today: 'Today', levels: 'Levels', journal: 'Notebook', settings: 'Settings' },
   common: {
     day: 'Day {n}',
@@ -254,9 +127,53 @@ const en: Messages = {
   },
 }
 
-export const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  fallbackLocale: 'en',
-  messages: { fr, en },
-})
+type Messages = typeof en
+
+function lookup(path: string): string | undefined {
+  let cur: any = en
+  for (const part of path.split('.'))
+    cur = cur?.[part]
+  return typeof cur === 'string' ? cur : undefined
+}
+
+/** Every English message string, for prefetching translations. */
+export function allMessages(obj: any = en, out: string[] = []): string[] {
+  for (const v of Object.values(obj)) {
+    if (typeof v === 'string')
+      out.push(...v.split(' | '))
+    else if (v && typeof v === 'object')
+      allMessages(v, out)
+  }
+  return out
+}
+
+/** Translate a message key; {placeholders} are filled after translation so they stay cacheable. */
+export function t(key: string, params?: Record<string, unknown> | number): string {
+  let source = lookup(key)
+  if (source === undefined)
+    return key
+  // Plural messages "zero | one | many": pick the English form, translate that form only.
+  if (typeof params === 'number') {
+    const forms = source.split(' | ')
+    source = forms.length === 3 ? forms[params === 0 ? 0 : params === 1 ? 1 : 2]! : forms.length === 2 ? forms[params === 1 ? 0 : 1]! : source
+    params = { n: params, count: params }
+  }
+  const text = tr(source)
+  const p = params
+  return p ? text.replace(/\{(\w+)\}/g, (m, k) => (k in p ? String(p[k]) : m)) : text
+}
+
+export const i18n = {
+  install(app: App) {
+    app.config.globalProperties.$t = t
+  },
+  global: { t },
+}
+
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $t: typeof t
+  }
+}
+
+export type { Messages }

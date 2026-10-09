@@ -3,6 +3,7 @@ import type { Run } from '~/lib/progress'
 import { Capacitor } from '@capacitor/core'
 import { RichNotifications } from '@capgo/capacitor-rich-notifications'
 import { i18n } from '~/i18n'
+import { tr } from '~/i18n/translate'
 import { dateOfDay, dayIndex, WEEK } from '~/lib/progress'
 import { useQuest } from '~/stores/quest'
 
@@ -140,7 +141,7 @@ export async function rescheduleAll() {
 
 function scheduleRun(run: Run, c: Challenge, now: number): Promise<unknown>[] {
   const quest = useQuest()
-  const title = c.text[quest.locale].title
+  const title = tr(c.text.title)
   const jobs: Promise<unknown>[] = []
   const startIdx = Math.max(0, dayIndex(run, quest.today))
 

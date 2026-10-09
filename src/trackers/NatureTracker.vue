@@ -19,10 +19,10 @@ const LEAVES = MIN
 
 const s = useSession(props, {
   targetMs: GOAL,
-  title: () => L('AU VERT', 'INTO THE GREEN'),
-  subtitle: () => L(`${MIN} minutes dehors`, `${MIN} minutes outside`),
+  title: () => L('INTO THE GREEN'),
+  subtitle: () => L(`${MIN} minutes outside`),
   short: '🌿',
-  doneBody: () => L(`${MIN} minutes au grand air. La case est cochée.`, `${MIN} minutes of fresh air. The box is ticked.`),
+  doneBody: () => L(`${MIN} minutes of fresh air. The box is ticked.`),
 })
 
 const lux = ref<number | null>(null)
@@ -48,12 +48,12 @@ const light = computed(() => {
   if (!v)
     return null
   if (v > 10_000)
-    return L('plein soleil', 'full sun')
+    return L('full sun')
   if (v > 1_000)
-    return L('lumière du jour', 'daylight')
+    return L('daylight')
   if (v > 200)
-    return L('ciel couvert', 'overcast')
-  return L('à l\'ombre', 'in the shade')
+    return L('overcast')
+  return L('in the shade')
 })
 
 async function startLight() {
@@ -102,16 +102,16 @@ onBeforeUnmount(() => {
       {{ s.done.value ? formatClock(GOAL) : formatClock(s.running.value || s.elapsed.value ? s.remaining.value : GOAL) }}
     </p>
     <p class="t-label text-graphite mt-1">
-      {{ L('Aujourd\'hui', 'Today') }} · {{ MIN }} min · {{ shown }}/{{ LEAVES }} {{ L('feuilles', 'leaves') }}
+      {{ L('Today') }} · {{ MIN }} min · {{ shown }}/{{ LEAVES }} {{ L('leaves') }}
       <template v-if="light">
-        · {{ L('lumière', 'sunlight') }} : {{ light }}
+        · {{ L('sunlight') }} : {{ light }}
       </template>
     </p>
     <button class="btn btn-ink mt-5 w-52" :disabled="!editable || s.done.value" @click="s.toggle">
-      {{ s.done.value ? L('Bol d\'air pris ✓', 'Fresh air taken ✓') : s.running.value ? L('Pause', 'Pause') : s.elapsed.value ? L('Reprendre', 'Resume') : L('Je suis dehors', 'I\'m outside') }}
+      {{ s.done.value ? L('Fresh air taken ✓') : s.running.value ? L('Pause') : s.elapsed.value ? L('Resume') : L('I\'m outside') }}
     </button>
     <p v-if="editable && !s.done.value" class="t-body text-xs text-pencil mt-2 text-center max-w-64">
-      {{ L('Une feuille par minute. Rangez le téléphone, l\'arbre pousse sans vous.', 'One leaf a minute. Pocket the phone, the tree grows on its own.') }}
+      {{ L('One leaf a minute. Pocket the phone, the tree grows on its own.') }}
     </p>
   </div>
 </template>

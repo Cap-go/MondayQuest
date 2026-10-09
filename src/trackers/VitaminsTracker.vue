@@ -10,11 +10,11 @@ const props = defineProps<TrackerProps>()
 const L = useL()
 const { data, done, patch, markDone, unmark } = useDay(props, { fruits: ['', ''] as string[], veggies: ['', ''] as string[] })
 
-const FRUITS = { fr: ['Pomme', 'Banane', 'Orange', 'Kiwi', 'Poire', 'Fraises', 'Raisin', 'Clémentine', 'Myrtilles', 'Mangue', 'Ananas', 'Prune'], en: ['Apple', 'Banana', 'Orange', 'Kiwi', 'Pear', 'Strawberries', 'Grapes', 'Clementine', 'Blueberries', 'Mango', 'Pineapple', 'Plum'] }
-const VEGGIES = { fr: ['Carotte', 'Tomate', 'Courgette', 'Brocoli', 'Épinards', 'Salade', 'Poivron', 'Haricots verts', 'Concombre', 'Chou-fleur', 'Poireau', 'Betterave'], en: ['Carrot', 'Tomato', 'Courgette', 'Broccoli', 'Spinach', 'Lettuce', 'Pepper', 'Green beans', 'Cucumber', 'Cauliflower', 'Leek', 'Beetroot'] }
+const FRUITS = ['Apple', 'Banana', 'Orange', 'Kiwi', 'Pear', 'Strawberries', 'Grapes', 'Clementine', 'Blueberries', 'Mango', 'Pineapple', 'Plum']
+const VEGGIES = ['Carrot', 'Tomato', 'Courgette', 'Broccoli', 'Spinach', 'Lettuce', 'Pepper', 'Green beans', 'Cucumber', 'Cauliflower', 'Leek', 'Beetroot']
 
 const focus = ref<{ kind: 'fruits' | 'veggies', i: number }>({ kind: 'fruits', i: 0 })
-const suggestions = computed(() => (focus.value.kind === 'fruits' ? FRUITS : VEGGIES)[L.locale()])
+const suggestions = computed(() => (focus.value.kind === 'fruits' ? FRUITS : VEGGIES).map(x => L(x)))
 
 const filled = computed(() => [...data.value.fruits, ...data.value.veggies].map(s => !!s.trim()))
 const valid = computed(() => {
@@ -75,20 +75,20 @@ const slices = [
       <div class="flex-1 grid grid-cols-2 gap-x-3 text-sm">
         <div>
           <p class="t-label mb-1">
-            {{ L('Fruits', 'Fruits') }}
+            {{ L('Fruits') }}
           </p>
           <label v-for="i in 2" :key="i" class="flex items-baseline gap-1">
             <span class="text-xs">{{ i }}.</span>
-            <input class="ink-input text-sm" :value="data.fruits[i - 1]" :disabled="!editable" :placeholder="FRUITS[L.locale()][i * 3]" @focus="focus = { kind: 'fruits', i: i - 1 }" @change="set('fruits', i - 1, ($event.target as HTMLInputElement).value)">
+            <input class="ink-input text-sm" :value="data.fruits[i - 1]" :disabled="!editable" :placeholder="L(FRUITS[i * 3]!)" @focus="focus = { kind: 'fruits', i: i - 1 }" @change="set('fruits', i - 1, ($event.target as HTMLInputElement).value)">
           </label>
         </div>
         <div>
           <p class="t-label mb-1">
-            {{ L('Légumes', 'Veggies') }}
+            {{ L('Veggies') }}
           </p>
           <label v-for="i in 2" :key="i" class="flex items-baseline gap-1">
             <span class="text-xs">{{ i }}.</span>
-            <input class="ink-input text-sm" :value="data.veggies[i - 1]" :disabled="!editable" :placeholder="VEGGIES[L.locale()][i * 4]" @focus="focus = { kind: 'veggies', i: i - 1 }" @change="set('veggies', i - 1, ($event.target as HTMLInputElement).value)">
+            <input class="ink-input text-sm" :value="data.veggies[i - 1]" :disabled="!editable" :placeholder="L(VEGGIES[i * 4]!)" @focus="focus = { kind: 'veggies', i: i - 1 }" @change="set('veggies', i - 1, ($event.target as HTMLInputElement).value)">
           </label>
         </div>
       </div>
@@ -99,7 +99,7 @@ const slices = [
       </button>
     </div>
     <p class="t-body text-xs text-pencil mt-3">
-      {{ L('Deux fruits et deux légumes différents. La case se coche toute seule.', 'Two different fruits and two different veggies. The box ticks itself.') }}
+      {{ L('Two different fruits and two different veggies. The box ticks itself.') }}
     </p>
   </div>
 </template>

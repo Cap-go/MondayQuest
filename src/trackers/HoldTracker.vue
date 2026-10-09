@@ -64,10 +64,10 @@ const C = 2 * Math.PI * 70
       </svg>
     </button>
     <p class="t-display text-lg mt-3">
-      {{ done ? L('Tenu.', 'Held.') : L('Maintenez', 'Hold') }}
+      {{ done ? L('Held.') : L('Hold') }}
     </p>
     <p class="t-body text-sm text-graphite text-center mt-1 max-w-64">
-      {{ done ? L('Une journée de maîtrise de plus.', 'One more day of self-control.') : L('Gardez le doigt appuyé pour valider la journée, comme on garde le cap.', 'Keep your finger down to validate the day, like keeping your course.') }}
+      {{ done ? L('One more day of self-control.') : L('Keep your finger down to validate the day, like keeping your course.') }}
     </p>
   </div>
 </template>

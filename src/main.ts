@@ -9,6 +9,7 @@ import { createPinia } from 'pinia'
 import { createApp, watch } from 'vue'
 import App from './App.vue'
 import { i18n } from './i18n'
+import { applyLanguage } from './i18n/content'
 import { router } from './router'
 import { detectBuildEnv } from './services/env'
 import { setHapticsEnabled } from './services/haptics'
@@ -34,7 +35,8 @@ async function boot() {
 
   const quest = useQuest()
   await quest.load()
-  i18n.global.locale.value = quest.locale
+  // Phone language by default; cached translations load before the first paint.
+  await applyLanguage(quest.settings.locale)
   setSoundEnabled(quest.settings.sound)
   setHapticsEnabled(quest.settings.haptics)
 
@@ -113,8 +115,9 @@ async function boot() {
 
   watch(() => quest.settings.sound, setSoundEnabled)
   watch(() => quest.settings.haptics, setHapticsEnabled)
-  watch(() => quest.locale, (l) => {
-    i18n.global.locale.value = l
+  watch(() => quest.settings.locale, l => void applyLanguage(l))
+  // Native tab titles are pushed once: redraw when the language or its translations change.
+  watch(() => ['today', 'levels', 'journal', 'settings'].map(id => i18n.global.t(`tabs.${id}`)).join('|'), () => {
     void renderTabbar(!!router.currentRoute.value.meta.hideTabs)
   })
 }

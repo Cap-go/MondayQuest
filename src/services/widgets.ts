@@ -2,6 +2,7 @@ import type { SvgTemplateDefinition } from '@capgo/capacitor-widget-kit'
 import { Capacitor } from '@capacitor/core'
 import { CapgoWidgetKit } from '@capgo/capacitor-widget-kit'
 import { CATEGORY_LABEL } from '~/data/challenges'
+import { tr } from '~/i18n/translate'
 import { checkedCount, runStatus } from '~/lib/progress'
 import { useQuest } from '~/stores/quest'
 
@@ -72,9 +73,9 @@ export async function syncTodayWidget() {
   const fr = quest.locale === 'fr'
   const state = run && c
     ? {
-        title: c.text[quest.locale].title.toUpperCase(),
-        short: c.text[quest.locale].short,
-        category: CATEGORY_LABEL[c.category][quest.locale],
+        title: tr(c.text.title).toUpperCase(),
+        short: tr(c.text.short),
+        category: tr(CATEGORY_LABEL[c.category]),
         icon: c.icon,
         number: c.n,
         day: Math.min(7, Math.max(1, idx + 1)),

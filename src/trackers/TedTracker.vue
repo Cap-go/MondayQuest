@@ -55,15 +55,15 @@ onBeforeUnmount(() => handles.forEach(h => void h.remove()))
   <div>
     <button class="ted-card w-full" :disabled="!editable" @click="open">
       <span class="t-display text-3xl">TED</span>
-      <span class="t-body text-sm text-left">{{ L('Ouvrir ted.com et choisir le sujet du jour', 'Open ted.com and pick today\'s topic') }}</span>
+      <span class="t-body text-sm text-left">{{ L('Open ted.com and pick today\'s topic') }}</span>
       <span class="text-2xl">↗</span>
     </button>
     <label class="block mt-5">
-      <span class="t-label">{{ L('Sujet de la conférence', 'Talk topic') }} :</span>
-      <input v-model="draft" class="ink-input mt-1" :disabled="!editable" :placeholder="L('ex. La puissance de la vulnérabilité', 'e.g. The power of vulnerability')" @keyup.enter="save">
+      <span class="t-label">{{ L('Talk topic') }} :</span>
+      <input v-model="draft" class="ink-input mt-1" :disabled="!editable" :placeholder="L('e.g. The power of vulnerability')" @keyup.enter="save">
     </label>
     <button class="btn btn-ink w-full mt-4" :disabled="!editable || !draft.trim() || (done && draft === data.topic)" @click="save">
-      {{ done && draft === data.topic ? L('Conférence vue ✓', 'Talk watched ✓') : L('J\'ai regardé', 'I watched it') }}
+      {{ done && draft === data.topic ? L('Talk watched ✓') : L('I watched it') }}
     </button>
   </div>
 </template>

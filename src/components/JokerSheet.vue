@@ -6,6 +6,7 @@ import { toast } from '@capgo/capacitor-pretty-toast'
 import { computed, ref } from 'vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import { useL } from '~/composables/useL'
+import { ct } from '~/i18n/content'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 import { MAX_SHARE_JOKERS, useQuest } from '~/stores/quest'
@@ -20,7 +21,7 @@ const sheet = ref<any>(null)
 const sharing = ref(false)
 
 const canUse = computed(() => !!props.challenge && quest.canUseJoker(props.challenge))
-const title = computed(() => props.challenge?.text[quest.locale].title ?? '')
+const title = computed(() => (props.challenge ? ct(props.challenge).title : '') ?? '')
 
 function present() {
   haptic.tap()
@@ -33,7 +34,7 @@ function use() {
   sfx.play('stamp')
   haptic.success()
   sheet.value?.dismiss?.()
-  toast.success(L('Joker posé', 'Joker played'), { message: L(`« ${title.value} » est passé.`, `"${title.value}" is skipped.`) })
+  toast.success(L('Joker played'), { message: L(`"${title.value}" is skipped.`) })
   emit('used')
 }
 
@@ -50,8 +51,8 @@ function card(): string {
   ctx.fillText('MONDAY', 90, 520)
   ctx.fillText('QUEST', 90, 670)
   ctx.font = '400 54px "Didact Gothic"'
-  ctx.fillText(L('52 challenges, un par semaine.', '52 challenges, one a week.'), 96, 790)
-  ctx.fillText(L('On commence lundi ?', 'Start with me on Monday?'), 96, 870)
+  ctx.fillText(L('52 challenges, one a week.'), 96, 790)
+  ctx.fillText(L('Start with me on Monday?'), 96, 870)
   ctx.lineWidth = 12
   for (let i = 0; i < 7; i++) {
     ctx.strokeRect(96 + i * 128, 980, 92, 92)
@@ -73,7 +74,7 @@ async function share() {
     return
   sharing.value = true
   haptic.press()
-  const text = L('Fais Monday Quest avec moi : 52 challenges, un chaque lundi. https://mondayquest.com', 'Do Monday Quest with me: 52 challenges, one every Monday. https://mondayquest.com')
+  const text = L('Do Monday Quest with me: 52 challenges, one every Monday. https://mondayquest.com')
   let shared = false
   try {
     if (Capacitor.isNativePlatform()) {
@@ -86,7 +87,7 @@ async function share() {
     }
     else {
       await navigator.clipboard.writeText(text)
-      toast.info(L('Lien copié', 'Link copied'))
+      toast.info(L('Link copied'))
       shared = true
     }
   }
@@ -95,7 +96,7 @@ async function share() {
   if (shared && quest.earnShareJoker()) {
     sfx.play('chime')
     haptic.success()
-    toast.success(L('Joker gagné !', 'Joker earned!'), { message: L('Merci de faire tourner Monday Quest.', 'Thanks for spreading Monday Quest.') })
+    toast.success(L('Joker earned!'), { message: L('Thanks for spreading Monday Quest.') })
   }
 }
 
@@ -115,30 +116,30 @@ defineExpose({ present })
             </h3>
             <div class="flex gap-1">
               <QuestIcon v-for="i in Math.max(quest.jokerBalance, 0)" :key="i" name="joker" :size="30" :stroke="3" />
-              <span v-if="!quest.jokerBalance" class="t-label text-pencil">{{ L('aucun', 'none left') }}</span>
+              <span v-if="!quest.jokerBalance" class="t-label text-pencil">{{ L('none left') }}</span>
             </div>
           </div>
           <p class="t-body text-sm text-graphite mt-1">
-            {{ L('Un joker passe un challenge qui ne vous parle pas. Il compte pour débloquer le niveau suivant.', 'A joker skips a challenge that isn\'t for you. It still counts to unlock the next level.') }}
+            {{ L('A joker skips a challenge that isn\'t for you. It still counts to unlock the next level.') }}
           </p>
 
           <button v-if="canUse" class="choice inverted" @click="use">
-            <span class="t-display text-lg">{{ L('Passer avec un joker', 'Skip with a joker') }}</span>
-            <span class="t-body text-sm">« {{ title }} » · {{ L(`il en restera ${quest.jokerBalance - 1}`, `${quest.jokerBalance - 1} left after`) }}</span>
+            <span class="t-display text-lg">{{ L('Skip with a joker') }}</span>
+            <span class="t-body text-sm">« {{ title }} » · {{ L(`${quest.jokerBalance - 1} left after`) }}</span>
           </button>
           <p v-else-if="challenge && !quest.jokerBalance" class="t-body text-sm mt-3">
-            {{ L('Plus de joker. Gagnez-en un :', 'No joker left. Earn one:') }}
+            {{ L('No joker left. Earn one:') }}
           </p>
 
           <button class="choice" :disabled="sharing || quest.shareJokersLeft <= 0" @click="share">
-            <span class="t-display text-lg">{{ L('Partager à un ami', 'Share with a friend') }} · +1</span>
+            <span class="t-display text-lg">{{ L('Share with a friend') }} · +1</span>
             <span class="t-body text-sm text-graphite">
-              {{ quest.shareJokersLeft > 0 ? L(`Encore ${quest.shareJokersLeft} joker(s) à gagner ainsi (max ${MAX_SHARE_JOKERS}).`, `${quest.shareJokersLeft} more joker(s) to earn this way (max ${MAX_SHARE_JOKERS}).`) : L('Maximum atteint, merci !', 'Maximum reached, thank you!') }}
+              {{ quest.shareJokersLeft > 0 ? L(`${quest.shareJokersLeft} more joker(s) to earn this way (max ${MAX_SHARE_JOKERS}).`) : L('Maximum reached, thank you!') }}
             </span>
           </button>
           <div class="choice static">
-            <span class="t-display text-lg">{{ L('Refaire un challenge', 'Repeat a challenge') }} · +1</span>
-            <span class="t-body text-sm text-graphite">{{ L('Terminez une deuxième fois un challenge déjà réussi.', 'Finish a challenge you already completed once more.') }}</span>
+            <span class="t-display text-lg">{{ L('Repeat a challenge') }} · +1</span>
+            <span class="t-body text-sm text-graphite">{{ L('Finish a challenge you already completed once more.') }}</span>
           </div>
         </cap-sheet-content>
       </cap-sheet-view>

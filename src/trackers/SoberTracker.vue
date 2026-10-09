@@ -71,7 +71,7 @@ function holdEnd() {
 <template>
   <div>
     <p class="t-label text-center text-graphite">
-      {{ L('Libre depuis', 'Free for') }}
+      {{ L('Free for') }}
     </p>
     <div class="flex justify-center gap-3 mt-1 tabular-nums">
       <div v-for="(v, k) in { d: clean.d, h: clean.h, m: clean.m, s: clean.s }" :key="k" class="text-center">
@@ -79,7 +79,7 @@ function holdEnd() {
           {{ String(v).padStart(2, '0') }}
         </p>
         <p class="t-label text-[0.6rem] text-pencil">
-          {{ { d: L('jours', 'days'), h: 'h', m: 'min', s: 's' }[k] }}
+          {{ { d: L('days'), h: 'h', m: 'min', s: 's' }[k] }}
         </p>
       </div>
     </div>
@@ -97,19 +97,19 @@ function holdEnd() {
       </button>
       <div class="flex-1">
         <p class="t-display text-lg leading-tight">
-          {{ L('Une envie ?', 'A craving?') }}
+          {{ L('A craving?') }}
         </p>
         <p class="t-body text-sm text-graphite">
-          {{ L('Maintenez le verre appuyé : buvez un grand verre d\'eau à la place.', 'Hold the glass: drink a big glass of water instead.') }}
+          {{ L('Hold the glass: drink a big glass of water instead.') }}
         </p>
         <p v-if="data.cravings" class="t-label mt-2">
-          {{ data.cravings }} {{ L('envie(s) vaincue(s)', 'craving(s) beaten') }}
+          {{ data.cravings }} {{ L('craving(s) beaten') }}
         </p>
       </div>
     </div>
 
     <button class="btn btn-ink w-full mt-6" :disabled="!editable || done" @click="markDone()">
-      {{ done ? L('Journée propre ✓', 'Clean day ✓') : L('Aujourd\'hui : rien consommé', 'Today: nothing taken') }}
+      {{ done ? L('Clean day ✓') : L('Today: nothing taken') }}
     </button>
   </div>
 </template>

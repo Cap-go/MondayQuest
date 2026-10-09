@@ -101,26 +101,26 @@ const steps = computed(() => Array.from({ length: GOAL }, (_, i) => i < data.val
           {{ data.floors }}<span class="text-pencil text-2xl">/{{ GOAL }}</span>
         </p>
         <p class="t-label text-graphite">
-          {{ L('étages gravis', 'floors climbed') }}
+          {{ L('floors climbed') }}
         </p>
         <p class="t-label text-pencil mt-1">
-          {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ L('étages', 'floors') }}
+          {{ L('Today') }} · {{ GOAL }} {{ L('floors') }}
         </p>
         <p v-if="tracking" class="t-body text-xs mt-1 tabular-nums">
-          {{ L('Altitude', 'Altitude') }} {{ altitude >= 0 ? '+' : '' }}{{ altitude.toFixed(1) }} m
+          {{ L('Altitude') }} {{ altitude >= 0 ? '+' : '' }}{{ altitude.toFixed(1) }} m
         </p>
       </div>
     </div>
     <div class="flex gap-2 mt-5">
       <button class="btn btn-ink flex-1" :disabled="!editable" @click="toggle">
-        {{ tracking ? L('Arrêter le baromètre', 'Stop barometer') : L('Je monte', 'I\'m climbing') }}
+        {{ tracking ? L('Stop barometer') : L('I\'m climbing') }}
       </button>
       <button class="btn px-4" :disabled="!editable" @click="addFloors(1)">
         +1
       </button>
     </div>
     <p class="t-body text-xs text-pencil mt-3">
-      {{ L('Le baromètre détecte chaque étage (≈ 3 m) pendant que vous montez.', 'The barometer detects each floor (≈ 3 m) as you climb.') }}
+      {{ L('The barometer detects each floor (≈ 3 m) as you climb.') }}
     </p>
   </div>
 </template>

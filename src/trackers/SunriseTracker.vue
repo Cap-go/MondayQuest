@@ -75,14 +75,14 @@ function awake() {
 }
 
 async function pick() {
-  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, locale: L.tag(), title: L('Heure du réveil', 'Wake-up time'), doneText: 'OK', cancelText: L('Annuler', 'Cancel'), date: data.value.wake || alarmHM.value }).catch(() => null)
+  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, locale: L.tag(), title: L('Wake-up time'), doneText: 'OK', cancelText: L('Cancel'), date: data.value.wake || alarmHM.value }).catch(() => null)
   if (res?.value)
     record(res.value)
 }
 
 function alarm() {
   haptic.press()
-  void setSystemAlarm(alarmHM.value, L(`Soleil levant à ${sunrise.value} — debout !`, `Sunrise at ${sunrise.value} — up you get!`))
+  void setSystemAlarm(alarmHM.value, L(`Sunrise at ${sunrise.value} — up you get!`))
 }
 </script>
 
@@ -105,19 +105,19 @@ function alarm() {
 
     <div class="text-center mt-2">
       <p class="t-label text-graphite">
-        {{ L('Lever du soleil', 'Sunrise') }} {{ sunrise }}{{ coords?.approx ? ' ~' : '' }} · {{ L('Heure du réveil', 'Wake-up time') }}
+        {{ L('Sunrise') }} {{ sunrise }}{{ coords?.approx ? ' ~' : '' }} · {{ L('Wake-up time') }}
       </p>
       <button class="t-display text-5xl tabular-nums mt-1 underline decoration-dashed decoration-2 underline-offset-8" :disabled="!editable" @click="pick">
         {{ data.wake || '--:--' }}
       </button>
       <p v-if="data.wake" class="t-body text-sm mt-3" :class="beforeSix ? '' : 'text-graphite'">
-        {{ beforeSix ? L('Avant le soleil. Bravo.', 'Before the sun. Well done.') : L(`Après le lever (${sunrise})… demain sera le bon.`, `After sunrise (${sunrise})… tomorrow is the day.`) }}
+        {{ beforeSix ? L('Before the sun. Well done.') : L(`After sunrise (${sunrise})… tomorrow is the day.`) }}
       </p>
     </div>
 
     <div class="grid grid-cols-2 gap-3 mt-5">
       <button class="btn btn-ink" :disabled="!editable || !isToday || done" @click="awake">
-        {{ L('Je suis debout', 'I\'m up') }}
+        {{ L('I\'m up') }}
       </button>
       <button class="btn" @click="alarm">
         ⏰ {{ alarmHM }}
@@ -125,8 +125,8 @@ function alarm() {
     </div>
     <p class="t-body text-xs text-pencil mt-3 text-center">
       {{ quest.settings.wakeAuto
-        ? L('Réveil 15 min avant le lever du soleil de demain, calculé ici même selon votre position (jamais envoyée). Un vrai réveil système, même en silencieux.', 'Alarm 15 min before tomorrow\'s sunrise, computed right here from your location (never sent anywhere). A real system alarm, even in silent mode.')
-        : L('Heure fixe choisie dans Réglages. Un vrai réveil système, même en silencieux.', 'Fixed time set in Settings. A real system alarm, even in silent mode.') }}
+        ? L('Alarm 15 min before tomorrow\'s sunrise, computed right here from your location (never sent anywhere). A real system alarm, even in silent mode.')
+        : L('Fixed time set in Settings. A real system alarm, even in silent mode.') }}
     </p>
   </div>
 </template>

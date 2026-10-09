@@ -70,14 +70,14 @@ function undo() {
         {{ data.glasses }}<span class="text-pencil text-2xl">/{{ GOAL }}</span>
       </p>
       <p class="t-label text-graphite">
-        {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ L('verres d\'eau', 'glasses of water') }}
+        {{ L('Today') }} · {{ GOAL }} {{ L('glasses of water') }}
       </p>
       <div class="grid grid-cols-4 gap-1.5 mt-3">
         <span v-for="i in GOAL" :key="i" class="h-3 border-[1.5px] border-ink" :class="i <= data.glasses ? 'bg-ink' : ''" />
       </div>
       <div class="flex gap-2 mt-4">
         <button class="btn btn-ink flex-1" :disabled="!editable || data.glasses >= GOAL" @click="drink">
-          + {{ L('Un verre', 'A glass') }}
+          + {{ L('A glass') }}
         </button>
         <button class="btn px-4" :disabled="!editable || !data.glasses" @click="undo">
           −

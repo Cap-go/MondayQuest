@@ -37,19 +37,19 @@ async function dictate(i: number) {
   if (!props.editable)
     return
   if (!Capacitor.isNativePlatform()) {
-    toast.info(L('Dictée disponible dans l\'app', 'Dictation works in the app'))
+    toast.info(L('Dictation works in the app'))
     return
   }
   if (listening.value != null)
     return stopDictation()
   const { available } = await SpeechRecognition.available().catch(() => ({ available: false }))
   if (!available) {
-    toast.error(L('Dictée indisponible sur cet appareil', 'Dictation is not available on this device'))
+    toast.error(L('Dictation is not available on this device'))
     return
   }
   const perm = await SpeechRecognition.requestPermissions().catch(() => null)
   if (perm?.speechRecognition !== 'granted') {
-    toast.error(L('Autorisez le micro et la dictée dans Réglages > Monday Quest', 'Allow Microphone and Speech Recognition in Settings > Monday Quest'))
+    toast.error(L('Allow Microphone and Speech Recognition in Settings > Monday Quest'))
     return
   }
   listening.value = i
@@ -66,7 +66,7 @@ async function dictate(i: number) {
       void stopDictation()
   }))
   handles.push(await SpeechRecognition.addListener('error', (e) => {
-    toast.error(L('Dictée interrompue', 'Dictation stopped'), { message: e.message })
+    toast.error(L('Dictation stopped'), { message: e.message })
     void stopDictation()
   }))
   try {
@@ -76,7 +76,7 @@ async function dictate(i: number) {
       set(i, base + final)
   }
   catch (e) {
-    toast.error(L('Impossible de lancer la dictée', 'Could not start dictation'), { message: String((e as Error)?.message ?? e) })
+    toast.error(L('Could not start dictation'), { message: String((e as Error)?.message ?? e) })
     await stopDictation()
   }
 }
@@ -99,8 +99,8 @@ onBeforeUnmount(() => {
     <ol class="space-y-4">
       <li v-for="i in 3" :key="i" class="flex items-end gap-3 item" :class="{ filled: data.items[i - 1]?.trim() }">
         <span class="t-display text-xl w-5">{{ i }}.</span>
-        <input class="ink-input" :value="data.items[i - 1]" :disabled="!editable" :placeholder="[L('Le soleil sur la terrasse', 'Sun on the terrace'), L('Un fou rire avec Léa', 'A laughing fit with Lea'), L('Un bon café', 'A good coffee')][i - 1]" @change="set(i - 1, ($event.target as HTMLInputElement).value)">
-        <button class="mic" :class="{ on: listening === i - 1 }" :disabled="!editable" :aria-label="L('Dicter', 'Dictate')" @click="dictate(i - 1)">
+        <input class="ink-input" :value="data.items[i - 1]" :disabled="!editable" :placeholder="[L('Sun on the terrace'), L('A laughing fit with Lea'), L('A good coffee')][i - 1]" @change="set(i - 1, ($event.target as HTMLInputElement).value)">
+        <button class="mic" :class="{ on: listening === i - 1 }" :disabled="!editable" :aria-label="L('Dictate')" @click="dictate(i - 1)">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>
         </button>
       </li>

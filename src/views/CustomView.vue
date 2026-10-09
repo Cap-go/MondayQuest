@@ -9,6 +9,7 @@ import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import { useL } from '~/composables/useL'
 import { CATEGORY_LABEL } from '~/data/challenges'
+import { tr } from '~/i18n/translate'
 import { haptic } from '~/services/haptics'
 import { useQuest } from '~/stores/quest'
 
@@ -29,9 +30,9 @@ function create() {
   if (!valid.value)
     return
   const t = { title: title.value.trim(), short: short.value.trim(), body: long.value.trim() ? long.value.trim().split(/\n+/) : [], tip: tip.value.trim() }
-  const c = quest.addCustom({ icon: icon.value, tracker: 'custom', category: category.value, text: { fr: t, en: t } })
+  const c = quest.addCustom({ icon: icon.value, tracker: 'custom', category: category.value, text: t })
   haptic.success()
-  toast.success(L('Challenge créé', 'Challenge created'), { message: t.title })
+  toast.success(L('Challenge created'), { message: t.title })
   setDirection('forward')
   void router.replace(`/challenge/${c.id}/read`)
 }
@@ -51,7 +52,7 @@ function create() {
         <input v-model="title" class="ink-input t-display text-center text-xl mt-3" :placeholder="$t('custom.name')">
         <input v-model="short" class="ink-input text-center mt-3" :placeholder="$t('custom.short')">
         <p class="t-body italic text-center text-sm mt-3">
-          - {{ CATEGORY_LABEL[category][quest.locale] }} #MondayQuestBonus
+          - {{ tr(CATEGORY_LABEL[category]) }} #MondayQuestBonus
         </p>
         <textarea v-model="long" rows="4" class="ink-input mt-4 resize-none dashed-lines" :placeholder="$t('custom.long')" />
         <input v-model="tip" class="ink-input italic mt-3" :placeholder="`${$t('custom.tip')} : …`">
@@ -72,7 +73,7 @@ function create() {
     </p>
     <div class="flex gap-2 mt-2">
       <button v-for="k in (['health', 'growth', 'wellbeing'] as const)" :key="k" class="chip" :class="{ on: category === k }" @click="category = k; haptic.select()">
-        {{ CATEGORY_LABEL[k][quest.locale] }}
+        {{ tr(CATEGORY_LABEL[k]) }}
       </button>
     </div>
 

@@ -17,10 +17,10 @@ const GOAL = MIN * 60_000
 
 const s = useSession(props, {
   targetMs: GOAL,
-  title: () => L('LE FLÂNEUR', 'THE STROLLER'),
-  subtitle: () => L(`${MIN} minutes de marche`, `${MIN}-minute walk`),
+  title: () => L('THE STROLLER'),
+  subtitle: () => L(`${MIN}-minute walk`),
   short: '👣',
-  doneBody: () => L(`${MIN} minutes ! Vous pouvez rentrer, la case est cochée.`, `${MIN} minutes! Head home, the box is ticked.`),
+  doneBody: () => L(`${MIN} minutes! Head home, the box is ticked.`),
 })
 
 const steps = ref<number>((s.data.value as any).steps ?? 0)
@@ -86,7 +86,7 @@ const prints = computed(() => {
           {{ formatClock(s.running.value || s.elapsed.value ? s.remaining.value : GOAL) }}
         </p>
         <p class="t-label mt-1 text-graphite">
-          {{ steps }} {{ L('pas', 'steps') }}
+          {{ steps }} {{ L('steps') }}
         </p>
       </TimerRing>
       <svg class="absolute inset-0 pointer-events-none" width="240" height="240">
@@ -97,16 +97,16 @@ const prints = computed(() => {
       </svg>
     </div>
     <p class="t-label text-graphite mt-4">
-      {{ L('Aujourd\'hui', 'Today') }} · {{ MIN }} min
+      {{ L('Today') }} · {{ MIN }} min
     </p>
     <button class="btn btn-ink mt-3 w-48" :disabled="!editable || s.done.value" @click="s.toggle">
-      {{ s.done.value ? L('Marche faite ✓', 'Walk done ✓') : s.running.value ? L('Pause', 'Pause') : s.elapsed.value ? L('Reprendre', 'Resume') : L('Je pars marcher', 'Start walking') }}
+      {{ s.done.value ? L('Walk done ✓') : s.running.value ? L('Pause') : s.elapsed.value ? L('Resume') : L('Start walking') }}
     </button>
     <p v-if="todaySteps != null" class="t-body text-sm text-graphite mt-3">
-      {{ todaySteps.toLocaleString() }} {{ L('pas aujourd\'hui', 'steps today') }}
+      {{ todaySteps.toLocaleString() }} {{ L('steps today') }}
     </p>
     <p class="t-body text-xs text-pencil mt-2 text-center max-w-64">
-      {{ L('Le chrono continue téléphone verrouillé. Suivez-le sur l\'écran de verrouillage.', 'The timer keeps running when locked. Follow it on your lock screen.') }}
+      {{ L('The timer keeps running when locked. Follow it on your lock screen.') }}
     </p>
   </div>
 </template>

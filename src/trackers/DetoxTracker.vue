@@ -79,38 +79,38 @@ const streak = computed(() => {
       </button>
     </div>
     <p class="t-label text-graphite text-center mt-3">
-      {{ done ? L('Journée sans réseaux', 'A feed-free day') : allLocked ? L('Tout est cadenassé', 'Everything is padlocked') : L(`Cadenassez vos applis · ${data.locked.length}/${APPS.length}`, `Padlock your apps · ${data.locked.length}/${APPS.length}`) }}
+      {{ done ? L('A feed-free day') : allLocked ? L('Everything is padlocked') : L(`Padlock your apps · ${data.locked.length}/${APPS.length}`) }}
     </p>
 
     <Transition name="rise">
       <div v-if="allLocked && !done" class="checkin">
         <p class="t-display text-lg">
-          {{ L('Le soir venu', 'Come evening') }}
+          {{ L('Come evening') }}
         </p>
         <label class="t-label text-graphite block mt-2">
-          {{ L('Tentations ressenties', 'Urges felt') }} · <span class="tabular-nums text-ink">{{ data.urges }}{{ data.urges >= 10 ? '+' : '' }}</span>
+          {{ L('Urges felt') }} · <span class="tabular-nums text-ink">{{ data.urges }}{{ data.urges >= 10 ? '+' : '' }}</span>
         </label>
         <input type="range" min="0" max="10" class="w-full ink-range" :value="data.urges" :disabled="!editable" @input="setUrges(+($event.target as HTMLInputElement).value)">
         <div class="flex gap-2 mt-3">
           <button class="btn btn-ink flex-1" :disabled="!editable || data.slipped" @click="clean">
-            {{ L('Je ne les ai pas ouvertes', 'I didn\'t open them') }}
+            {{ L('I didn\'t open them') }}
           </button>
           <button class="btn px-3" :disabled="!editable" @click="slip">
-            {{ L('Craqué', 'Slipped') }}
+            {{ L('Slipped') }}
           </button>
         </div>
         <p v-if="data.slipped" class="t-body text-xs text-graphite mt-2">
-          {{ L('Pas grave. Refermez-les et repartez demain.', 'No big deal. Shut them again and go again tomorrow.') }}
+          {{ L('No big deal. Shut them again and go again tomorrow.') }}
         </p>
       </div>
     </Transition>
 
     <div class="flex items-center justify-center gap-1.5 mt-4">
       <span v-for="(d, i) in run.days" :key="i" class="pip" :class="{ on: d.done, today: i === idx }" />
-      <span class="t-label text-graphite ml-2 tabular-nums">{{ L(`${streak} j propres`, `${streak} clean days`) }}</span>
+      <span class="t-label text-graphite ml-2 tabular-nums">{{ L(`${streak} clean days`) }}</span>
     </div>
     <p v-if="done && data.urges" class="t-body text-xs text-pencil text-center mt-2">
-      {{ L(`${data.urges} tentations repoussées`, `${data.urges} urges resisted`) }}
+      {{ L(`${data.urges} urges resisted`) }}
     </p>
   </div>
 </template>

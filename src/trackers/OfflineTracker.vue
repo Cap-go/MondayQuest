@@ -19,10 +19,10 @@ const label = MIN % 60 ? `${MIN} min` : `${MIN / 60} h`
 
 const s = useSession(props, {
   targetMs: GOAL,
-  title: () => L('HORS LIGNE', 'OFFLINE'),
-  subtitle: () => L(`${label} pour vous`, `${label} for yourself`),
+  title: () => L('OFFLINE'),
+  subtitle: () => L(`${label} for yourself`),
   short: '✈',
-  doneBody: () => L(`${label} hors ligne. Bon retour parmi nous.`, `${label} offline. Welcome back.`),
+  doneBody: () => L(`${label} offline. Welcome back.`),
 })
 const { running, elapsed, progress, remaining, done, start, pause, patch, data } = s
 
@@ -83,20 +83,20 @@ watch(online, (on) => {
         {{ formatClock(running || elapsed ? remaining : GOAL) }}
       </p>
       <p class="t-label mt-1" :class="online ? 'text-graphite' : ''">
-        {{ online ? (via === 'wifi' ? L('● Wi-Fi actif', '● Wi-Fi on') : via === 'cellular' ? L('● Données mobiles', '● Mobile data on') : L('● En ligne', '● Online')) : L('○ Déconnecté', '○ Disconnected') }}
+        {{ online ? (via === 'wifi' ? L('● Wi-Fi on') : via === 'cellular' ? L('● Mobile data on') : L('● Online')) : L('○ Disconnected') }}
       </p>
     </TimerRing>
     <p class="t-label text-graphite mt-4">
-      {{ L('Aujourd\'hui', 'Today') }} · {{ label }}
+      {{ L('Today') }} · {{ label }}
     </p>
     <button class="btn btn-ink mt-3 w-52" :disabled="!editable || done || (!running && online)" @click="running ? pause() : start()">
-      {{ done ? L('Temps libre ✓', 'Free time ✓') : running ? L('Pause', 'Pause') : online ? L('Coupez le réseau', 'Go offline first') : L('Démarrer le chrono', 'Start the timer') }}
+      {{ done ? L('Free time ✓') : running ? L('Pause') : online ? L('Go offline first') : L('Start the timer') }}
     </button>
     <button v-if="!running && !done && online && editable" class="t-label text-graphite underline mt-3" @click="startAnyway">
-      {{ L('Démarrer quand même, sur l\'honneur', 'Start anyway, on my honour') }}
+      {{ L('Start anyway, on my honour') }}
     </button>
     <p class="t-body text-xs text-pencil mt-3 text-center max-w-64">
-      {{ L('Mode avion ET Wi-Fi coupé (le mode avion laisse souvent le Wi-Fi allumé). Si la connexion revient, le chrono se met en pause.', 'Airplane mode AND Wi-Fi off (airplane mode often keeps Wi-Fi on). If the connection comes back, the timer pauses.') }}
+      {{ L('Airplane mode AND Wi-Fi off (airplane mode often keeps Wi-Fi on). If the connection comes back, the timer pauses.') }}
     </p>
   </div>
 </template>

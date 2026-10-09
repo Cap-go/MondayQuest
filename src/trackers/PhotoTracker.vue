@@ -17,21 +17,21 @@ const cam = ref<InstanceType<typeof CameraCapture> | null>(null)
     <div class="polaroid mx-auto" :class="{ has: data.photo }">
       <div class="shot">
         <img v-if="data.photo" :src="data.photo" alt="">
-        <span v-else class="t-label text-pencil">{{ L('Pas de selfie !', 'No selfies!') }}</span>
+        <span v-else class="t-label text-pencil">{{ L('No selfies!') }}</span>
       </div>
       <p class="t-body text-center text-sm mt-2">
-        {{ L(`Jour ${idx + 1}`, `Day ${idx + 1}`) }}
+        {{ L(`Day ${idx + 1}`) }}
       </p>
     </div>
     <div class="grid grid-cols-2 gap-3 mt-5">
       <button class="btn btn-ink" :disabled="!editable" @click="cam?.open()">
-        {{ L('Tendre le téléphone', 'Hand over phone') }}
+        {{ L('Hand over phone') }}
       </button>
       <button class="btn" :disabled="!editable" @click="cam?.pick()">
-        {{ L('Galerie', 'Gallery') }}
+        {{ L('Gallery') }}
       </button>
     </div>
-    <CameraCapture ref="cam" position="rear" :hint="L('Demandez à quelqu\'un de vous photographier', 'Ask someone to take your picture')" @shot="photo => markDone({ photo })" />
+    <CameraCapture ref="cam" position="rear" :hint="L('Ask someone to take your picture')" @shot="photo => markDone({ photo })" />
   </div>
 </template>
 

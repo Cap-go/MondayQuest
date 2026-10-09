@@ -93,23 +93,23 @@ function tear() {
       <div v-if="!done" class="page" :class="{ tearing }" :style="{ transform: tearing ? undefined : `translateY(${pull * 0.35}px) rotate(${pull * 0.04}deg)` }" @pointerdown="pageDown" @pointermove="pageMove" @pointerup="pageUp" @pointercancel="pageUp">
         <div class="perf" />
         <div class="flex items-center justify-between px-3 pt-3">
-          <button class="nudge" :disabled="!editable" :aria-label="L('Année précédente', 'Previous year')" @pointerdown.stop @click="step(-1)">
+          <button class="nudge" :disabled="!editable" :aria-label="L('Previous year')" @pointerdown.stop @click="step(-1)">
             ‹
           </button>
           <p class="t-display text-5xl tabular-nums select-none touch-none cursor-ew-resize" @pointerdown.stop="yearDown" @pointermove="yearMove" @pointerup="yearUp" @pointercancel="yearUp">
             {{ year }}
           </p>
-          <button class="nudge" :disabled="!editable || year >= NOW" :aria-label="L('Année suivante', 'Next year')" @pointerdown.stop @click="step(1)">
+          <button class="nudge" :disabled="!editable || year >= NOW" :aria-label="L('Next year')" @pointerdown.stop @click="step(1)">
             ›
           </button>
         </div>
         <p class="t-label text-pencil text-center">
-          {{ NOW - year ? L(`il y a ${NOW - year} ans`, `${NOW - year} years ago`) : L('cette année', 'this year') }}
+          {{ NOW - year ? L(`${NOW - year} years ago`) : L('this year') }}
         </p>
-        <textarea class="memo t-body" rows="4" :value="data.text" :disabled="!editable" :placeholder="L('Ce jour-là, sur la plage avec papa…', 'That day at the beach with dad…')" @pointerdown.stop @input="patch({ text: ($event.target as HTMLTextAreaElement).value })" />
+        <textarea class="memo t-body" rows="4" :value="data.text" :disabled="!editable" :placeholder="L('That day at the beach with dad…')" @pointerdown.stop @input="patch({ text: ($event.target as HTMLTextAreaElement).value })" />
         <div class="pull" :class="{ on: ready }">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 4v15M6 13l6 6 6-6" /></svg>
-          <span class="t-label">{{ ready ? L('Tirez pour arracher', 'Pull down to tear') : L('Écrivez un souvenir', 'Write a memory') }}</span>
+          <span class="t-label">{{ ready ? L('Pull down to tear') : L('Write a memory') }}</span>
         </div>
       </div>
       <!-- the stub left on the pad once torn -->
@@ -123,7 +123,7 @@ function tear() {
       </div>
     </div>
     <p v-if="!editable && !done" class="t-body text-xs text-pencil mt-3">
-      {{ L('Aucun souvenir ce jour-là.', 'No memory that day.') }}
+      {{ L('No memory that day.') }}
     </p>
   </div>
 </template>

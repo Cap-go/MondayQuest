@@ -17,7 +17,7 @@ const street = ref(data.value.street)
 const handles: Array<{ remove: () => Promise<void> } | PluginListenerHandle> = []
 let lastAligned = false
 
-const DIRS = computed(() => L.locale() === 'fr' ? ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'] : ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
+const DIRS = computed(() => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'].map(d => L(d)))
 const target = computed(() => data.value.target)
 const delta = computed(() => {
   if (target.value < 0)
@@ -79,17 +79,17 @@ function save() {
       </div>
     </div>
     <p class="t-label text-center mt-2">
-      {{ Math.round(heading) }}° {{ target >= 0 ? (aligned ? L('· Allez-y tout droit', '· Go straight ahead') : L(`· tournez ${delta > 0 ? 'à droite' : 'à gauche'}`, `· turn ${delta > 0 ? 'right' : 'left'}`)) : '' }}
+      {{ Math.round(heading) }}° {{ target >= 0 ? (aligned ? L('· Go straight ahead') : L(`· turn ${delta > 0 ? 'right' : 'left'}`)) : '' }}
     </p>
     <button class="btn w-full mt-4" :disabled="!editable" @click="draw">
-      {{ L('Tirer une direction (ou secouez)', 'Draw a direction (or shake)') }}
+      {{ L('Draw a direction (or shake)') }}
     </button>
     <label class="block mt-4">
-      <span class="t-label">{{ L('Rue ou chemin découvert', 'Street or path discovered') }}</span>
-      <input v-model="street" class="ink-input mt-1" :disabled="!editable" :placeholder="L('Passage des Panoramas', 'Rose Alley')">
+      <span class="t-label">{{ L('Street or path discovered') }}</span>
+      <input v-model="street" class="ink-input mt-1" :disabled="!editable" :placeholder="L('Rose Alley')">
     </label>
     <button class="btn btn-ink w-full mt-4" :disabled="!editable || !street.trim() || (done && street === data.street)" @click="save">
-      {{ done && street === data.street ? L('Exploré ✓', 'Explored ✓') : L('Nouveau chemin pris', 'New path taken') }}
+      {{ done && street === data.street ? L('Explored ✓') : L('New path taken') }}
     </button>
   </div>
 </template>

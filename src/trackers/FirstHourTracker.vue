@@ -18,10 +18,10 @@ const HOUR = 60 * 60_000
 const extra = useDay(props, { wakeAt: 0, peeks: 0 })
 const s = useSession(props, {
   targetMs: HOUR,
-  title: () => L('L\'HEURE BLANCHE', 'THE BLANK HOUR'),
-  subtitle: () => L('Posez le téléphone', 'Put the phone down'),
+  title: () => L('THE BLANK HOUR'),
+  subtitle: () => L('Put the phone down'),
   short: '☼',
-  doneBody: () => L('Une heure rien qu\'à vous. Bonjour !', 'One hour all yours. Good morning!'),
+  doneBody: () => L('One hour all yours. Good morning!'),
 })
 const { running, elapsed, progress, remaining, done, start, pause } = s
 
@@ -86,7 +86,7 @@ const rays = computed(() => Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 
       <Transition name="mark">
         <div v-if="peeked" class="absolute inset-0 grid place-items-center">
           <p class="early t-display text-2xl">
-            {{ L('Trop tôt !', 'Too early!') }}
+            {{ L('Too early!') }}
           </p>
         </div>
       </Transition>
@@ -96,16 +96,16 @@ const rays = computed(() => Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 
       {{ done ? '60:00' : formatClock(running || elapsed ? remaining : HOUR) }}
     </p>
     <p class="t-label text-graphite">
-      {{ done ? L('Heure blanche tenue', 'Blank hour kept') : running ? L('Posez le téléphone', 'Put the phone down') : L('Sans écran après le réveil', 'Screen-free after waking') }}
+      {{ done ? L('Blank hour kept') : running ? L('Put the phone down') : L('Screen-free after waking') }}
     </p>
 
     <button v-if="!done" class="btn mt-4 w-52" :class="running ? '' : 'btn-ink'" :disabled="!editable" @click="running ? stop() : wake()">
-      {{ running ? L('Pause', 'Pause') : elapsed ? L('Reprendre', 'Resume') : L('Je suis levé', 'I\'m up') }}
+      {{ running ? L('Pause') : elapsed ? L('Resume') : L('I\'m up') }}
     </button>
 
     <div class="flex gap-6 mt-4 t-label text-graphite">
-      <span>{{ L('Réveil', 'Woke') }} {{ wakeLabel }}</span>
-      <span>{{ L('Coups d\'œil', 'Peeks') }} {{ extra.data.value.peeks }}</span>
+      <span>{{ L('Woke') }} {{ wakeLabel }}</span>
+      <span>{{ L('Peeks') }} {{ extra.data.value.peeks }}</span>
     </div>
   </div>
 </template>

@@ -96,10 +96,10 @@ const waves = [136, 150, 164, 178, 192]
       <path d="M40 60 q8 -6 16 0 q8 -6 16 0 M214 44 q6 -5 12 0 q6 -5 12 0" fill="none" stroke="var(--color-ink)" stroke-width="2" />
     </svg>
     <p class="t-display text-3xl mt-3">
-      {{ done ? data.setAt || '—' : L('Couchez le soleil', 'Set the sun') }}
+      {{ done ? data.setAt || '—' : L('Set the sun') }}
     </p>
     <p class="t-label text-graphite mt-1 text-center">
-      {{ done ? L('Soleil couché, vu de vos yeux', 'Sun set, seen with your own eyes') : editable ? L('Glissez-le sous l\'horizon quand il disparaît', 'Drag it below the horizon as it disappears') : L('Pas de coucher ce jour-là', 'No sunset that day') }}
+      {{ done ? L('Sun set, seen with your own eyes') : editable ? L('Drag it below the horizon as it disappears') : L('No sunset that day') }}
     </p>
   </div>
 </template>

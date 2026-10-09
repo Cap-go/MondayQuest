@@ -109,17 +109,17 @@ const C = 2 * Math.PI * 120
       </svg>
       <div class="flex-1 min-w-0">
         <p class="t-label text-graphite">
-          {{ L('Aujourd\'hui', 'Today') }} · {{ L(`au moins ${SECONDS} s`, `at least ${SECONDS} s`) }}
+          {{ L('Today') }} · {{ L(`at least ${SECONDS} s`) }}
         </p>
         <p class="t-body text-xs text-pencil mt-1">
-          {{ L('Pas « t\'es top ». Un geste précis, ce qu\'il dit de la personne, ce qu\'il a changé pour vous.', 'Not "you\'re great". A precise thing they did, what it says about them, what it changed for you.') }}
+          {{ L('Not "you\'re great". A precise thing they did, what it says about them, what it changed for you.') }}
         </p>
       </div>
     </div>
 
     <div v-if="done || !editable" class="mt-4 space-y-2">
       <p class="t-label">
-        {{ L('Pour', 'To') }} {{ data.to || '—' }}
+        {{ L('To') }} {{ data.to || '—' }}
       </p>
       <p class="t-body text-sm">
         <span class="t-label text-pencil">1.</span> {{ data.did }}
@@ -132,29 +132,29 @@ const C = 2 * Math.PI * 120
       </p>
     </div>
     <div v-else class="mt-4 space-y-3">
-      <input v-model="to" class="ink-input w-full" :placeholder="L('Pour qui ? (Léa, mon père, la voisine…)', 'For whom? (Lea, my dad, the neighbour…)')" @change="save">
+      <input v-model="to" class="ink-input w-full" :placeholder="L('For whom? (Lea, my dad, the neighbour…)')" @change="save">
       <label class="block">
-        <span class="t-label">1 · {{ L('Ce qu\'elle a fait, précisément', 'What they did, precisely') }}</span>
-        <textarea v-model="did" rows="2" class="ink-input w-full resize-none mt-1" :placeholder="L('Tu as repris le dossier quand j\'étais malade, sans rien demander.', 'You took over the project when I was sick, without being asked.')" @change="save" />
+        <span class="t-label">1 · {{ L('What they did, precisely') }}</span>
+        <textarea v-model="did" rows="2" class="ink-input w-full resize-none mt-1" :placeholder="L('You took over the project when I was sick, without being asked.')" @change="save" />
       </label>
       <label class="block">
-        <span class="t-label">2 · {{ L('Ce que ça dit d\'elle', 'What it says about them') }}</span>
-        <textarea v-model="shows" rows="2" class="ink-input w-full resize-none mt-1" :placeholder="L('Tu es fiable, on peut compter sur toi quand ça compte.', 'You are reliable: people can count on you when it matters.')" @change="save" />
+        <span class="t-label">2 · {{ L('What it says about them') }}</span>
+        <textarea v-model="shows" rows="2" class="ink-input w-full resize-none mt-1" :placeholder="L('You are reliable: people can count on you when it matters.')" @change="save" />
       </label>
       <label class="block">
-        <span class="t-label">3 · {{ L('Ce que ça a changé pour vous', 'What it changed for you') }}</span>
-        <textarea v-model="changed" rows="2" class="ink-input w-full resize-none mt-1" :placeholder="L('J\'ai pu me reposer sans stress. Ça m\'a vraiment touché.', 'I could rest without stress. It really touched me.')" @change="save" />
+        <span class="t-label">3 · {{ L('What it changed for you') }}</span>
+        <textarea v-model="changed" rows="2" class="ink-input w-full resize-none mt-1" :placeholder="L('I could rest without stress. It really touched me.')" @change="save" />
       </label>
       <p class="t-body text-xs text-graphite">
-        {{ L('Puis demandez son attention : « Je peux te dire un truc ? » Regardez la personne, et prenez votre temps.', 'Then ask for their attention: "Can I tell you something?" Look at them, and take your time.') }}
+        {{ L('Then ask for their attention: "Can I tell you something?" Look at them, and take your time.') }}
       </p>
     </div>
 
     <button v-if="!done" class="btn btn-ink w-full mt-4" :disabled="!editable || !ready" @click="speak">
-      {{ ready ? L('Je lui dis maintenant', 'I\'m telling them now') : L('Remplissez les 3 points', 'Fill in the 3 points') }}
+      {{ ready ? L('I\'m telling them now') : L('Fill in the 3 points') }}
     </button>
     <p v-if="!done && data.spoke" class="t-body text-xs text-pencil text-center mt-2">
-      {{ L(`Dernier essai : ${data.spoke} s. Visez ${SECONDS} s.`, `Last try: ${data.spoke} s. Aim for ${SECONDS} s.`) }}
+      {{ L(`Last try: ${data.spoke} s. Aim for ${SECONDS} s.`) }}
     </p>
 
     <div class="flex justify-between mt-5 border-t-2 border-rule pt-3">
@@ -169,7 +169,7 @@ const C = 2 * Math.PI * 120
     <Teleport to="body">
       <div v-if="speaking" class="speak">
         <p class="t-label opacity-70">
-          {{ L('Pour', 'To') }} {{ to }}
+          {{ L('To') }} {{ to }}
         </p>
         <div class="dial">
           <svg viewBox="0 0 260 260">
@@ -186,7 +186,7 @@ const C = 2 * Math.PI * 120
           <li><span class="t-label">3</span>{{ changed }}</li>
         </ol>
         <button class="btn finish" @click="finish">
-          {{ left > 0 ? L('J\'ai fini (trop court)', 'Done (too short)') : L('Dit. Épingler la cocarde', 'Said it. Pin the ribbon') }}
+          {{ left > 0 ? L('Done (too short)') : L('Said it. Pin the ribbon') }}
         </button>
       </div>
     </Teleport>

@@ -4,6 +4,7 @@ import type { Run } from '~/lib/progress'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { CHALLENGES, LEVELS } from '~/data/challenges'
+import { lang } from '~/i18n/translate'
 import { today as todayISO } from '~/lib/date'
 import { allChecked, completeRun, dayIndex, isLive, newRun, patchDayData, runStatus, setDay, streak } from '~/lib/progress'
 import { loadJSON, saveJSON } from '~/lib/storage'
@@ -25,6 +26,8 @@ export interface Settings {
   wakeAuto: boolean
   hardcore: boolean
   onboarded: boolean
+  /** Set once the language moved to automatic + translated (see load). */
+  i18nV2?: boolean
   /** Debug menu unlocked (TestFlight, or 7 taps on the version box). */
   debug: boolean
   /** Debug: every level open. */
@@ -54,7 +57,7 @@ interface Persisted {
 const KEY = 'mq.state.v1'
 
 export const DEFAULT_SETTINGS: Settings = {
-  locale: 'en',
+  locale: 'auto',
   sound: true,
   haptics: true,
   reminder: '09:00',
@@ -79,11 +82,8 @@ export const useQuest = defineStore('quest', () => {
 
   const allChallenges = computed(() => [...CHALLENGES, ...custom.value])
 
-  const locale = computed<Locale>(() => {
-    if (settings.value.locale !== 'auto')
-      return settings.value.locale
-    return navigator.language.toLowerCase().startsWith('fr') ? 'fr' : 'en'
-  })
+  /** Active UI language (phone language unless chosen in Settings). */
+  const locale = computed<Locale>(() => lang.value)
 
   const liveRuns = computed(() => runs.value.filter(r => isLive(r, today.value)))
 
@@ -219,6 +219,11 @@ export const useQuest = defineStore('quest', () => {
     // Custom challenges used to sit on level 7, which is now a real level.
     custom.value = data.custom.map(c => ({ ...c, level: CUSTOM_LEVEL }))
     settings.value = { ...DEFAULT_SETTINGS, ...data.settings }
+    // v2: the language follows the phone by default (was a fr/en switch).
+    if (!data.settings?.i18nV2) {
+      settings.value.locale = 'auto'
+      settings.value.i18nV2 = true
+    }
     jokers.value = { earned: [], used: [], ...data.jokers }
     ready.value = true
     setInterval(tick, 60_000)

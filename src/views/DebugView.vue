@@ -11,6 +11,7 @@ import QuestPage from '~/components/QuestPage.vue'
 import ToggleRow from '~/components/ToggleRow.vue'
 import { useL } from '~/composables/useL'
 import { CHALLENGES, LEVELS } from '~/data/challenges'
+import { tr } from '~/i18n/translate'
 import { addDays } from '~/lib/date'
 import { setSystemAlarm } from '~/services/alarm'
 import { buildEnv } from '~/services/env'
@@ -180,7 +181,7 @@ function hideDebug() {
       </div>
       <template v-for="g in groups" :key="g.level.n">
         <h3 class="level-head">
-          <span>{{ L('Niveau', 'Level') }} {{ g.level.roman }} · {{ g.level.text[quest.locale] }}</span>
+          <span>{{ L('Level') }} {{ g.level.roman }} · {{ tr(g.level.text) }}</span>
           <span class="count">{{ quest.levelDone(g.level.n) }}/{{ g.items.length }}</span>
         </h3>
         <ul>
@@ -188,7 +189,7 @@ function hideDebug() {
             <QuestIcon :name="c.icon" :size="26" :stroke="3" class="shrink-0" />
             <button class="flex-1 min-w-0 text-left" @click="go(`/challenge/${c.id}/read`)">
               <p class="t-display text-[0.85rem] truncate">
-                {{ c.n }}. {{ c.text[quest.locale].title }}
+                {{ c.n }}. {{ tr(c.text.title) }}
               </p>
               <p class="t-label text-[0.55rem] text-pencil">
                 {{ c.tracker }} · L{{ c.level }}

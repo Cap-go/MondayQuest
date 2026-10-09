@@ -19,10 +19,10 @@ const extra = useDay(props, { task: '', switches: 0 })
 const s = useSession(props, {
   targetMs: GOAL,
   keepAwake: true,
-  title: () => L('MONOTÂCHE', 'SINGLE-TASKER'),
-  subtitle: () => extra.data.value.task || L('25 min, une seule chose', '25 min, one thing'),
+  title: () => L('SINGLE-TASKER'),
+  subtitle: () => extra.data.value.task || L('25 min, one thing'),
   short: '◉',
-  doneBody: () => L('25 minutes de concentration. Respirez.', '25 focused minutes. Breathe.'),
+  doneBody: () => L('25 focused minutes. Breathe.'),
   onComplete: () => haptic.success(),
 })
 const { running, elapsed, progress, done } = s
@@ -91,24 +91,24 @@ const ripe = computed(() => `color-mix(in oklab, var(--color-sun) ${Math.round(p
     </div>
     <input
       v-if="!done && editable && !running && !elapsed" v-model="task" class="ink-input mt-3 text-center"
-      :placeholder="L('La seule tâche du bloc', 'The one task of this block')"
+      :placeholder="L('The one task of this block')"
     >
     <p v-else class="t-label mt-3 text-center">
-      {{ extra.data.value.task || L('Aucune tâche', 'No task') }}
+      {{ extra.data.value.task || L('No task') }}
     </p>
     <div class="flex items-center gap-3 mt-3 h-7">
-      <span class="t-label text-pencil text-[10px]">{{ L('Écarts', 'Switches') }}</span>
+      <span class="t-label text-pencil text-[10px]">{{ L('Switches') }}</span>
       <svg v-for="(c, g) in tallies" :key="g" viewBox="0 0 34 26" class="w-8 h-6">
         <line v-for="i in Math.min(4, c)" :key="i" :x1="2 + i * 6" :x2="2 + i * 6" y1="3" y2="23" stroke="var(--color-ink)" stroke-width="2.5" />
         <line v-if="c === 5" x1="3" y1="20" x2="31" y2="6" stroke="var(--color-ink)" stroke-width="2.5" />
       </svg>
-      <span v-if="!tallies.length" class="t-body text-xs text-graphite">{{ L('aucun', 'none') }}</span>
+      <span v-if="!tallies.length" class="t-body text-xs text-graphite">{{ L('none') }}</span>
     </div>
     <button v-if="!done" class="btn btn-ink mt-4 w-52" :disabled="!editable || (!running && !task.trim())" @click="go">
-      {{ running ? L('Pause', 'Pause') : elapsed ? L('Reprendre', 'Resume') : L('Lancer 25 min', 'Start 25 min') }}
+      {{ running ? L('Pause') : elapsed ? L('Resume') : L('Start 25 min') }}
     </button>
     <p class="t-body text-xs text-pencil mt-3 text-center px-4">
-      {{ done ? L('Tomate mûre. Bloc terminé.', 'Ripe tomato. Block done.') : L('Quitter l\'app ou toucher au volume compte comme un écart.', 'Leaving the app or touching the volume counts as a switch.') }}
+      {{ done ? L('Ripe tomato. Block done.') : L('Leaving the app or touching the volume counts as a switch.') }}
     </p>
   </div>
 </template>

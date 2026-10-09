@@ -20,18 +20,18 @@ const cards = computed<Card[]>(() => Array.from({ length: Math.max(GOAL, data.va
 
 // Carry yesterday's language over so the user only picks it once.
 const lang = computed(() => data.value.lang || [...props.run.days.slice(0, props.idx)].reverse().find(d => d.data?.lang)?.data.lang || 'es-ES')
-const LANGS: [string, string, string][] = [
-  ['es-ES', 'Espagnol', 'Spanish'],
-  ['it-IT', 'Italien', 'Italian'],
-  ['de-DE', 'Allemand', 'German'],
-  ['pt-PT', 'Portugais', 'Portuguese'],
-  ['nl-NL', 'Néerlandais', 'Dutch'],
-  ['ja-JP', 'Japonais', 'Japanese'],
-  ['zh-CN', 'Chinois', 'Chinese'],
-  ['ar-SA', 'Arabe', 'Arabic'],
-  ['ru-RU', 'Russe', 'Russian'],
-  ['en-GB', 'Anglais', 'English'],
-  ['fr-FR', 'Français', 'French'],
+const LANGS: [string, string][] = [
+  ['es-ES', 'Spanish'],
+  ['it-IT', 'Italian'],
+  ['de-DE', 'German'],
+  ['pt-PT', 'Portuguese'],
+  ['nl-NL', 'Dutch'],
+  ['ja-JP', 'Japanese'],
+  ['zh-CN', 'Chinese'],
+  ['ar-SA', 'Arabic'],
+  ['ru-RU', 'Russian'],
+  ['en-GB', 'English'],
+  ['fr-FR', 'French'],
 ]
 
 const flipped = ref<number[]>([])
@@ -84,8 +84,8 @@ function setLang(v: string) {
   <div>
     <div class="flex items-center justify-between">
       <select class="ink-input t-label w-auto" :value="lang" :disabled="!editable" @change="setLang(($event.target as HTMLSelectElement).value)">
-        <option v-for="[code, fr, en] in LANGS" :key="code" :value="code">
-          {{ L(fr, en) }}
+        <option v-for="[code, en] in LANGS" :key="code" :value="code">
+          {{ L(en) }}
         </option>
       </select>
       <p class="t-display text-2xl tabular-nums">
@@ -93,14 +93,14 @@ function setLang(v: string) {
       </p>
     </div>
     <p class="t-label text-graphite mt-2">
-      {{ L('Aujourd\'hui', 'Today') }} · {{ GOAL }} {{ L('mots', 'words') }}
+      {{ L('Today') }} · {{ GOAL }} {{ L('words') }}
     </p>
 
     <div class="grid grid-cols-2 gap-2.5 mt-3">
       <div v-for="(c, i) in cards" :key="i" class="scene" :class="{ wide: (cards.length % 2 === 1 && i === cards.length - 1) || editing === i, open: editing === i }">
         <div v-if="editing === i" class="face front edit">
-          <input v-model="w" class="ink-input text-center" :placeholder="L('Mot', 'Word')" autofocus>
-          <input v-model="t" class="ink-input text-center text-sm" :placeholder="L('Traduction', 'Translation')" @keyup.enter="save">
+          <input v-model="w" class="ink-input text-center" :placeholder="L('Word')" autofocus>
+          <input v-model="t" class="ink-input text-center text-sm" :placeholder="L('Translation')" @keyup.enter="save">
           <div class="flex gap-2 mt-1">
             <button class="btn btn-ink px-3 py-1 text-xs" :disabled="!w.trim() || !t.trim()" @click="save">
               OK
@@ -114,7 +114,7 @@ function setLang(v: string) {
           <span class="face front">
             <template v-if="c.w">
               <span class="t-display text-lg leading-tight break-words">{{ c.w }}</span>
-              <span class="speak" role="button" :aria-label="L('Prononcer', 'Pronounce')" @click.stop="say(c.w)">
+              <span class="speak" role="button" :aria-label="L('Pronounce')" @click.stop="say(c.w)">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" /></svg>
               </span>
             </template>
@@ -127,7 +127,7 @@ function setLang(v: string) {
       </div>
     </div>
     <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ done ? L(`${GOAL} mots de plus dans la poche.`, `${GOAL} more words in your pocket.`) : L('Touchez une carte pour la retourner', 'Tap a card to flip it') }}
+      {{ done ? L(`${GOAL} more words in your pocket.`) : L('Tap a card to flip it') }}
     </p>
   </div>
 </template>

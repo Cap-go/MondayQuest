@@ -50,7 +50,7 @@ function toBed() {
 
 function reminder() {
   haptic.press()
-  void setSystemAlarm('22:15', L('Couvre-feu dans 15 minutes. Écrans off.', 'Curfew in 15 minutes. Screens off.'))
+  void setSystemAlarm('22:15', L('Curfew in 15 minutes. Screens off.'))
 }
 
 // moon phase grows through the week
@@ -64,27 +64,27 @@ const moonX = computed(() => 30 - (props.idx / 6) * 26)
       <circle :cx="moonX + 14" cy="26" r="20" fill="var(--color-sheet)" class="shadow" />
     </svg>
     <p class="t-label text-graphite mt-2">
-      {{ L('Heure du coucher', 'Bedtime') }}
+      {{ L('Bedtime') }}
     </p>
     <p class="t-display text-5xl tabular-nums">
       {{ data.bed || '--:--' }}
     </p>
     <p v-if="data.bed" class="t-body text-sm mt-1">
-      {{ onTime ? L('Avant 22h30. Bonne nuit.', 'Before 10:30 p.m. Good night.') : L('Trop tard ce soir.', 'Too late tonight.') }}
+      {{ onTime ? L('Before 10:30 p.m. Good night.') : L('Too late tonight.') }}
     </p>
     <p v-if="lux != null" class="t-label text-xs mt-2" :class="dark ? '' : 'text-pencil'">
-      {{ dark ? L('☾ Chambre dans le noir', '☾ Room is dark') : L(`Lumière : ${Math.round(lux)} lux — éteignez`, `Light: ${Math.round(lux)} lux — switch off`) }}
+      {{ dark ? L('☾ Room is dark') : L(`Light: ${Math.round(lux)} lux — switch off`) }}
     </p>
     <div class="grid grid-cols-2 gap-3 mt-5">
       <button class="btn btn-ink" :disabled="!editable || !isToday || done" @click="toBed">
-        {{ done ? L('Couché ✓', 'In bed ✓') : L('Je me couche', 'Going to bed') }}
+        {{ done ? L('In bed ✓') : L('Going to bed') }}
       </button>
       <button class="btn" @click="reminder">
         ⏰ 22:15
       </button>
     </div>
     <p class="t-body text-xs text-pencil mt-3">
-      {{ L('Posez ensuite le téléphone hors de la chambre.', 'Then leave the phone outside the bedroom.') }}
+      {{ L('Then leave the phone outside the bedroom.') }}
     </p>
   </div>
 </template>

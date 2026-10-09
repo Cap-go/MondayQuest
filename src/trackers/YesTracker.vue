@@ -29,15 +29,15 @@ function oui() {
 <template>
   <div class="relative">
     <label class="block">
-      <span class="t-label">{{ L('Exemple de requête inhabituelle acceptée', 'An unusual request you accepted') }} :</span>
-      <textarea v-model="draft" rows="3" class="ink-input mt-2 resize-none" :disabled="!editable" :placeholder="L('« Tu viens au karaoké ce soir ? »', '“Coming to karaoke tonight?”')" />
+      <span class="t-label">{{ L('An unusual request you accepted') }} :</span>
+      <textarea v-model="draft" rows="3" class="ink-input mt-2 resize-none" :disabled="!editable" :placeholder="L('“Coming to karaoke tonight?”')" />
     </label>
     <div class="flex items-center justify-between mt-4">
       <button class="btn btn-ink" :disabled="!editable || !draft.trim()" @click="oui">
-        {{ L('J\'ai dit OUI', 'I said YES') }}
+        {{ L('I said YES') }}
       </button>
       <div class="stamp" :class="{ show: done || stamping, hit: stamping }">
-        {{ L('OUI', 'YES') }}
+        {{ L('YES') }}
       </div>
     </div>
   </div>

@@ -4,10 +4,10 @@ import { KeepAwake } from '@capgo/capacitor-keep-awake'
 import { toast } from '@capgo/capacitor-pretty-toast'
 import { computed, onBeforeUnmount, watch } from 'vue'
 import { useTimer } from '~/composables/useTimer'
+import { tr } from '~/i18n/translate'
 import { cancelTimerEnd, scheduleTimerEnd } from '~/services/notifications'
 import { sfx } from '~/services/sound'
 import { endSessionActivity, startSessionActivity } from '~/services/widgets'
-import { useQuest } from '~/stores/quest'
 import { useDay } from './useDay'
 
 interface SessionOpts {
@@ -58,8 +58,7 @@ export function useSession(props: TrackerProps, opts: SessionOpts) {
     }).then((live) => {
       if (live && opts.lockHint !== false && !hinted) {
         hinted = true
-        const fr = useQuest().locale === 'fr'
-        toast.info(fr ? 'Verrouillez le téléphone' : 'Lock your phone', { message: fr ? 'Le chrono reste sur l\'écran de verrouillage.' : 'The timer stays on your lock screen.', icon: 'lock.fill', duration: 4000 })
+        toast.info(tr('Lock your phone'), { message: tr('The timer stays on your lock screen.'), icon: 'lock.fill', duration: 4000 })
       }
     })
     if (remaining > 0)

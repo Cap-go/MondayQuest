@@ -35,8 +35,8 @@ const shrink = computed(() => data.value.before - (data.value.after || data.valu
 <template>
   <div>
     <label class="block">
-      <span class="t-label">{{ L('Ce qui me fait peur aujourd\'hui', 'What scares me today') }}</span>
-      <input v-model="what" class="ink-input mt-1" :disabled="!editable || stage === 'after'" :placeholder="L('Prendre la parole en réunion', 'Speak up in the meeting')">
+      <span class="t-label">{{ L('What scares me today') }}</span>
+      <input v-model="what" class="ink-input mt-1" :disabled="!editable || stage === 'after'" :placeholder="L('Speak up in the meeting')">
     </label>
 
     <div class="flex items-end justify-center gap-10 mt-6">
@@ -46,19 +46,19 @@ const shrink = computed(() => data.value.before - (data.value.after || data.valu
         </svg>
         <input type="range" min="0" max="10" step="1" class="slider mt-2" :value="data[k]" :disabled="!editable || (k === 'after' && stage === 'before') || (k === 'before' && stage === 'after')" @input="setLevel(k, Number(($event.target as HTMLInputElement).value))">
         <p class="t-label text-xs mt-1">
-          {{ k === 'before' ? L('Avant', 'Before') : L('Après', 'After') }} · {{ data[k] }}/10
+          {{ k === 'before' ? L('Before') : L('After') }} · {{ data[k] }}/10
         </p>
       </div>
     </div>
 
     <button v-if="stage === 'before'" class="btn btn-ink w-full mt-6" :disabled="!editable || !what.trim()" @click="leap">
-      {{ L('J\'y vais', 'Here I go') }}
+      {{ L('Here I go') }}
     </button>
     <button v-else class="btn btn-ink w-full mt-6" :disabled="!editable || done" @click="landed">
-      {{ done ? L('Saut réussi ✓', 'Leap made ✓') : L('Je l\'ai fait', 'I did it') }}
+      {{ done ? L('Leap made ✓') : L('I did it') }}
     </button>
     <p v-if="done && shrink > 0" class="t-body text-sm text-center mt-3">
-      {{ L(`Votre peur a fondu de ${shrink} points.`, `Your fear shrank by ${shrink} points.`) }}
+      {{ L(`Your fear shrank by ${shrink} points.`) }}
     </p>
   </div>
 </template>

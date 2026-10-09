@@ -8,6 +8,7 @@ import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import { useL } from '~/composables/useL'
 import { challengesOfLevel, LEVELS } from '~/data/challenges'
+import { tr } from '~/i18n/translate'
 import { haptic } from '~/services/haptics'
 import { useQuest } from '~/stores/quest'
 
@@ -53,17 +54,17 @@ function newCustom() {
     </button>
     <JokerSheet ref="jokerSheet" />
     <p class="t-body text-graphite mt-1">
-      {{ L('52 challenges, un par semaine pendant un an. Terminez un niveau pour débloquer le suivant.', '52 challenges, one a week for a year. Finish a level to unlock the next.') }}
+      {{ L('52 challenges, one a week for a year. Finish a level to unlock the next.') }}
     </p>
 
     <section v-for="lvl in levels" :key="lvl.n" class="sheet level mt-8 px-5 pt-6 pb-3" :class="{ 'current': lvl.n === quest.currentLevel, 'level-locked': lvl.n > quest.currentLevel }">
       <div class="flex items-end justify-between">
         <div>
           <p class="t-label">
-            {{ L('Niveau', 'Level') }} {{ lvl.roman }}
+            {{ L('Level') }} {{ lvl.roman }}
           </p>
           <h2 class="t-display text-[1.65rem] leading-none mt-1">
-            {{ lvl.text[quest.locale] }}
+            {{ tr(lvl.text) }}
           </h2>
         </div>
         <QuestIcon v-if="lvl.n > quest.currentLevel" name="lock" :size="26" :stroke="3" class="mb-0.5" />
@@ -77,10 +78,10 @@ function newCustom() {
           <QuestIcon :name="c.icon" :size="30" :stroke="3" class="shrink-0 mt-0.5" />
           <div class="flex-1 min-w-0">
             <p class="t-display text-[0.95rem]">
-              {{ c.text[quest.locale].title }}
+              {{ tr(c.text.title) }}
             </p>
             <p class="t-body text-[0.82rem] text-graphite leading-snug">
-              {{ c.text[quest.locale].short }}
+              {{ tr(c.text.short) }}
             </p>
           </div>
           <QuestIcon v-if="state(c) === 'joker'" name="joker" :size="26" :stroke="3" class="shrink-0 mr-0.5" />
@@ -96,7 +97,7 @@ function newCustom() {
     <!-- bonus level: blank pages at the end of the booklet -->
     <section class="sheet level mt-8 px-5 pt-6 pb-5">
       <p class="t-label">
-        {{ L('Niveaux bonus', 'Bonus levels') }}
+        {{ L('Bonus levels') }}
       </p>
       <h2 class="t-display text-[1.65rem] leading-none mt-1">
         {{ $t('settings.custom') }}
@@ -106,10 +107,10 @@ function newCustom() {
           <QuestIcon :name="c.icon" :size="30" :stroke="3" class="shrink-0" />
           <div class="flex-1">
             <p class="t-display text-[0.95rem]">
-              {{ c.text[quest.locale].title }}
+              {{ tr(c.text.title) }}
             </p>
             <p class="t-body text-[0.82rem] text-graphite">
-              {{ c.text[quest.locale].short }}
+              {{ tr(c.text.short) }}
             </p>
           </div>
           <span class="box" :class="state(c)" />

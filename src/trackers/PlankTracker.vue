@@ -73,16 +73,16 @@ function coach() {
     say(text)
   }
   if (left === Math.ceil(target.value / 2) && target.value >= 40)
-    cue('half', L('À mi-chemin', 'Halfway'))
+    cue('half', L('Halfway'))
   if (left === 10 && target.value > 15)
-    cue('10', L('Dix secondes', 'Ten seconds'))
+    cue('10', L('Ten seconds'))
   if (left <= 5 && left >= 1) {
     if (!spoken.has(`n${left}`))
       haptic.press()
     cue(`n${left}`, String(left))
   }
   if (left <= 0)
-    cue('done', L('Tenu ! Continuez si vous pouvez.', 'Done! Keep going if you can.'))
+    cue('done', L('Done! Keep going if you can.'))
 }
 
 function getReady() {
@@ -92,7 +92,7 @@ function getReady() {
   ready.value = 5
   haptic.press()
   void KeepAwake.keepAwake().catch(() => {})
-  say(L('En position', 'Get in position'))
+  say(L('Get in position'))
   readyTimer = setInterval(() => {
     ready.value--
     if (ready.value > 0) {
@@ -103,7 +103,7 @@ function getReady() {
       return
     }
     clearInterval(readyTimer)
-    say(L('Partez', 'Go'))
+    say(L('Go'))
     start()
   }, 1000)
 }
@@ -174,7 +174,7 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
 <template>
   <div class="flex flex-col items-center">
     <p class="t-label text-graphite">
-      {{ L('Objectif du jour', 'Today\'s target') }} · {{ fmt(target) }}
+      {{ L('Today\'s target') }} · {{ fmt(target) }}
     </p>
     <p class="t-display text-6xl tabular-nums mt-1" :class="{ 'text-ice': holding && progress >= 1 }">
       {{ fmt(holding ? secs : data.best) }}
@@ -194,17 +194,17 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
       class="btn mt-4 w-52 select-none" :class="holding ? '' : 'btn-ink'" :disabled="!editable"
       @click="holding ? drop() : getReady()"
     >
-      {{ holding ? L('Je lâche', 'Drop') : done ? L('Encore une', 'Once more') : L('En position', 'Get in position') }}
+      {{ holding ? L('Drop') : done ? L('Once more') : L('Get in position') }}
     </button>
     <div class="flex gap-6 mt-4 t-label text-graphite">
-      <span>{{ L('Aujourd\'hui', 'Today') }} {{ fmt(data.best) }}</span>
-      <span>{{ L('Record', 'Best') }} {{ fmt(record) }}</span>
+      <span>{{ L('Today') }} {{ fmt(data.best) }}</span>
+      <span>{{ L('Best') }} {{ fmt(record) }}</span>
     </div>
     <p v-if="!holding && !done" class="t-body text-xs text-pencil mt-2 text-center px-4">
-      {{ L('5 secondes pour vous mettre en place, puis une voix vous guide. Touchez l\'écran pour lâcher.', '5 seconds to get in place, then a voice guides you. Tap the screen to drop.') }}
+      {{ L('5 seconds to get in place, then a voice guides you. Tap the screen to drop.') }}
     </p>
     <p v-if="done && !holding" class="t-body text-xs text-pencil mt-2">
-      {{ L('Tenu. Demain, 10 secondes de plus.', 'Held. Tomorrow, 10 more seconds.') }}
+      {{ L('Held. Tomorrow, 10 more seconds.') }}
     </p>
 
     <!-- Full-screen coach, readable from the floor. Tap anywhere to drop. -->
@@ -212,7 +212,7 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
       <div v-if="ready || holding" class="coach" @pointerdown="drop">
         <template v-if="ready">
           <p class="t-label text-paper/70">
-            {{ L('En position', 'Get in position') }}
+            {{ L('Get in position') }}
           </p>
           <p :key="ready" class="t-display tabular-nums text-paper count-in">
             {{ ready }}
@@ -231,11 +231,11 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
               {{ left > 0 ? fmt(Math.ceil(left)) : `+${fmt(-left)}` }}
             </p>
             <p class="t-label text-paper/70 mt-2">
-              {{ left > 0 ? L('à tenir', 'to hold') : L('bonus', 'bonus') }} · {{ fmt(target) }}
+              {{ left > 0 ? L('to hold') : L('bonus') }} · {{ fmt(target) }}
             </p>
           </div>
           <p class="t-label text-paper/60 hint">
-            {{ L('Touchez pour lâcher', 'Tap to drop') }}
+            {{ L('Tap to drop') }}
           </p>
         </template>
       </div>

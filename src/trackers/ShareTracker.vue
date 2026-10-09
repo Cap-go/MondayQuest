@@ -5,14 +5,13 @@ import { computed, ref } from 'vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import { useL } from '~/composables/useL'
 import { CHALLENGES } from '~/data/challenges'
+import { ct } from '~/i18n/content'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
-import { useQuest } from '~/stores/quest'
 import { useDay } from './useDay'
 
 const props = defineProps<TrackerProps>()
 const L = useL()
-const quest = useQuest()
 const { data, done, patch, markDone } = useDay(props, { pick: (props.idx * 7) % CHALLENGES.length, to: '' })
 
 const i = ref(data.value.pick % CHALLENGES.length)
@@ -20,7 +19,7 @@ const dir = ref<'l' | 'r'>('l')
 const to = ref(data.value.to)
 const busy = ref(false)
 const c = computed(() => CHALLENGES[i.value]!)
-const t = computed(() => c.value.text[quest.locale])
+const t = computed(() => ct(c.value))
 const sentThisWeek = computed(() => props.run.days.filter(d => d.done).map(d => d.data?.to).filter(Boolean) as string[])
 
 function step(d: 1 | -1) {
@@ -56,7 +55,7 @@ function render(): string {
   ctx.strokeRect(80, 80, 920, 1190)
   ctx.textAlign = 'center'
   ctx.font = '600 38px Archivo'
-  ctx.fillText(L('UNE INVITATION', 'AN INVITATION').split('').join(' '), 540, 220)
+  ctx.fillText(L('AN INVITATION').split('').join(' '), 540, 220)
   ctx.font = '800 220px Archivo'
   ctx.fillText(`N°${c.value.n}`, 540, 470)
   ctx.font = '800 88px Archivo'
@@ -96,7 +95,7 @@ async function send() {
     base64Data: render(),
     contentType: 'image/png',
     title: t.value.title,
-    text: L(`Je te lance un défi : « ${t.value.title} ». ${t.value.short} On le fait ensemble ? https://mondayquest.com`, `I challenge you: "${t.value.title}". ${t.value.short} Shall we do it together? https://mondayquest.com`),
+    text: L(`I challenge you: "${t.value.title}". ${t.value.short} Shall we do it together? https://mondayquest.com`),
   }).catch(() => {})
   busy.value = false
   markDone({ pick: i.value, to: to.value.trim() })
@@ -106,7 +105,7 @@ async function send() {
 <template>
   <div>
     <div class="flex items-center gap-2">
-      <button class="arrow" :disabled="!editable || done" :aria-label="L('Précédent', 'Previous')" @click="step(-1)">
+      <button class="arrow" :disabled="!editable || done" :aria-label="L('Previous')" @click="step(-1)">
         ←
       </button>
       <div class="flex-1 overflow-hidden touch-pan-y" @pointerdown="swipeStart" @pointerup="swipeEnd">
@@ -125,27 +124,27 @@ async function send() {
             <div class="flex gap-1 mt-3">
               <span v-for="k in 7" :key="k" class="w-4 h-4 border-[1.5px] border-ink" />
             </div>
-            <span v-if="done" class="stamp">{{ L('ENVOYÉ', 'SENT') }}</span>
+            <span v-if="done" class="stamp">{{ L('SENT') }}</span>
           </div>
         </Transition>
       </div>
-      <button class="arrow" :disabled="!editable || done" :aria-label="L('Suivant', 'Next')" @click="step(1)">
+      <button class="arrow" :disabled="!editable || done" :aria-label="L('Next')" @click="step(1)">
         →
       </button>
     </div>
     <template v-if="done || !editable">
       <p class="t-label text-graphite mt-4 text-center">
-        {{ data.to ? `${L('Envoyé à', 'Sent to')} ${data.to}` : L('Rien envoyé ce jour-là', 'Nothing sent that day') }}
+        {{ data.to ? `${L('Sent to')} ${data.to}` : L('Nothing sent that day') }}
       </p>
     </template>
     <div v-else class="flex items-end gap-2 mt-4">
-      <input v-model="to" class="ink-input flex-1" :placeholder="L('À qui ? (Marc, maman…)', 'To whom? (Marc, mum…)')" @change="patch({ to })">
+      <input v-model="to" class="ink-input flex-1" :placeholder="L('To whom? (Marc, mum…)')" @change="patch({ to })">
       <button class="btn btn-ink" :disabled="!to.trim() || busy" @click="send">
-        {{ L('Inviter', 'Invite') }}
+        {{ L('Invite') }}
       </button>
     </div>
     <p v-if="sentThisWeek.length" class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('Cette semaine', 'This week') }} : {{ sentThisWeek.join(' · ') }}
+      {{ L('This week') }} : {{ sentThisWeek.join(' · ') }}
     </p>
   </div>
 </template>

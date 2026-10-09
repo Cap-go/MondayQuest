@@ -10,6 +10,7 @@ import QuestIcon from '~/components/QuestIcon.vue'
 import QuestPage from '~/components/QuestPage.vue'
 import { useL } from '~/composables/useL'
 import { CATEGORY_LABEL, CHALLENGES } from '~/data/challenges'
+import { tr } from '~/i18n/translate'
 import { formatDate, fromISO, isMonday } from '~/lib/date'
 import { runStatus } from '~/lib/progress'
 import { haptic } from '~/services/haptics'
@@ -91,7 +92,7 @@ function daysUntil(run: Run) {
             <div class="flex-1 min-w-0">
               <p class="t-label text-graphite">
                 <template v-if="status === 'upcoming'">
-                  {{ daysUntil(run) === 1 ? L('Demain, lundi', 'Tomorrow, Monday') : L(`Lundi · dans ${daysUntil(run)} j`, `Monday · in ${daysUntil(run)} d`) }}
+                  {{ daysUntil(run) === 1 ? L('Tomorrow, Monday') : L(`Monday · in ${daysUntil(run)} d`) }}
                 </template>
                 <template v-else-if="status === 'finishing'">
                   {{ $t('home.finishing') }}
@@ -101,10 +102,10 @@ function daysUntil(run: Run) {
                 </template>
               </p>
               <h2 class="t-display text-2xl mt-0.5">
-                {{ c.text[quest.locale].title }}
+                {{ tr(c.text.title) }}
               </h2>
               <p class="t-body text-sm text-graphite mt-1 line-clamp-2">
-                {{ c.text[quest.locale].short }}
+                {{ tr(c.text.short) }}
               </p>
             </div>
           </div>
@@ -123,13 +124,13 @@ function daysUntil(run: Run) {
           </p>
           <QuestIcon :name="next.icon" :size="84" draw class="mx-auto my-4" />
           <h2 class="t-display text-3xl">
-            {{ next.text[quest.locale].title }}
+            {{ tr(next.text.title) }}
           </h2>
           <p class="t-body text-graphite mt-2">
-            {{ next.text[quest.locale].short }}
+            {{ tr(next.text.short) }}
           </p>
           <p class="t-body italic text-sm mt-3">
-            - {{ CATEGORY_LABEL[next.category][quest.locale] }}
+            - {{ tr(CATEGORY_LABEL[next.category]) }}
           </p>
           <button class="btn btn-ink mt-6 w-full" @click.stop="open(next, 'read')">
             {{ $t('common.start') }}

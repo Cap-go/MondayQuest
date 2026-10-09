@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import { useL } from '~/composables/useL'
 import { challengesOfLevel, LEVELS } from '~/data/challenges'
+import { tr } from '~/i18n/translate'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 import { useQuest } from '~/stores/quest'
@@ -24,7 +25,7 @@ const level = computed(() => LEVELS.find(l => l.n === levels.value[page.value])!
 const rows = computed(() => challengesOfLevel(level.value.n).map((c) => {
   const runs = quest.runs.filter(r => r.challengeId === c.id)
   const best = Math.max(0, ...runs.map(r => r.days.filter(d => d.done).length))
-  return { c, title: c.text[quest.locale].title, completed: quest.completedIds.has(c.id), best, tried: runs.length > 0 }
+  return { c, title: tr(c.text.title), completed: quest.completedIds.has(c.id), best, tried: runs.length > 0 }
 }))
 const score = computed(() => rows.value.filter(r => r.completed).length)
 
@@ -54,14 +55,14 @@ function save() {
         <div :key="level.n" class="leaf">
           <div class="flex items-baseline justify-between">
             <p class="t-label text-graphite">
-              {{ L('Niveau', 'Level') }} {{ level.roman }}
+              {{ L('Level') }} {{ level.roman }}
             </p>
             <p class="t-label text-pencil text-[10px]">
               {{ score }}/{{ rows.length }}
             </p>
           </div>
           <h3 class="t-display text-2xl leading-none mt-1">
-            {{ level.text[quest.locale] }}
+            {{ tr(level.text) }}
           </h3>
           <ul class="mt-3 divide-y-[1.5px] divide-rule">
             <li v-for="r in rows" :key="r.c.id" class="flex items-center gap-2 py-1.5">
@@ -77,25 +78,25 @@ function save() {
         </div>
       </Transition>
       <div v-if="levels.length > 1" class="flex justify-between mt-2">
-        <button class="btn px-3 py-1" :disabled="page === 0" :aria-label="L('Page précédente', 'Previous page')" @click="flip(-1)">
+        <button class="btn px-3 py-1" :disabled="page === 0" :aria-label="L('Previous page')" @click="flip(-1)">
           ←
         </button>
         <span class="t-label text-pencil self-center text-[10px]">{{ page + 1 }} / {{ levels.length }}</span>
-        <button class="btn px-3 py-1" :disabled="page === levels.length - 1" :aria-label="L('Page suivante', 'Next page')" @click="flip(1)">
+        <button class="btn px-3 py-1" :disabled="page === levels.length - 1" :aria-label="L('Next page')" @click="flip(1)">
           →
         </button>
       </div>
     </div>
     <p class="t-label text-graphite mt-4">
-      {{ L('Ce qui a changé', 'What changed') }}
+      {{ L('What changed') }}
     </p>
     <p v-if="done || !editable" class="t-body text-sm mt-1 italic">
       {{ data.note || '—' }}
     </p>
     <div v-else class="flex items-end gap-2 mt-1">
-      <input v-model="note" class="ink-input flex-1" :placeholder="L('Je marche encore tous les matins', 'I still walk every morning')" @keyup.enter="save">
+      <input v-model="note" class="ink-input flex-1" :placeholder="L('I still walk every morning')" @keyup.enter="save">
       <button class="btn btn-ink" :disabled="!note.trim()" @click="save">
-        {{ L('Noter', 'Save') }}
+        {{ L('Save') }}
       </button>
     </div>
   </div>

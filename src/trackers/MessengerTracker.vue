@@ -38,15 +38,15 @@ function send() {
       </svg>
     </div>
     <label class="block mt-4">
-      <span class="t-label">{{ L('À qui ?', 'To whom?') }}</span>
-      <input v-model="who" class="ink-input mt-1" :disabled="!editable" :placeholder="L('Maman, Julien, Mme Leroy…', 'Mum, Julian, Mrs Leroy…')">
+      <span class="t-label">{{ L('To whom?') }}</span>
+      <input v-model="who" class="ink-input mt-1" :disabled="!editable" :placeholder="L('Mum, Julian, Mrs Leroy…')">
     </label>
     <label class="block mt-3">
-      <span class="t-label">{{ L('Ce que vous lui avez dit', 'What you told them') }}</span>
-      <textarea v-model="words" rows="2" class="ink-input mt-1 resize-none" :disabled="!editable" :placeholder="L('Merci pour ce week-end à la mer en 2009…', 'Thanks for that weekend by the sea in 2009…')" />
+      <span class="t-label">{{ L('What you told them') }}</span>
+      <textarea v-model="words" rows="2" class="ink-input mt-1 resize-none" :disabled="!editable" :placeholder="L('Thanks for that weekend by the sea in 2009…')" />
     </label>
     <button class="btn btn-ink w-full mt-4" :disabled="!editable || !who.trim()" @click="send">
-      {{ done ? L('Message envoyé ✓', 'Message sent ✓') : L('C\'est dit', 'Said and done') }}
+      {{ done ? L('Message sent ✓') : L('Said and done') }}
     </button>
   </div>
 </template>
