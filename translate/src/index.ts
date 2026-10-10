@@ -67,13 +67,15 @@ function restore(translated: string, kept: string[]): string | null {
 }
 
 /** Reject obviously broken output (empty, absurd length) so English is kept instead. */
-function plausible(src: string, out: string) {
+function plausible(src: string, out: string, lang: string) {
   if (!out.trim())
     return false
   if (src.length < 12)
     return out.length < 80
   const r = out.length / src.length
-  return r > 0.25 && r < 3.5
+  // Chinese, Japanese and Korean are far denser than English.
+  const min = /^(?:zh|ja|ko)/.test(lang) ? 0.08 : 0.25
+  return r > min && r < 3.5
 }
 
 function system(lang: string, context?: string) {
@@ -115,7 +117,7 @@ async function translateBatch(env: Env, lang: string, items: string[], context?:
         if (typeof t !== 'string')
           return null
         const back = restore(t.trim(), prepared[i]!.kept)
-        return back && plausible(items[i]!, back) ? back : null
+        return back && plausible(items[i]!, back, lang) ? back : null
       })
     }
     catch {}
