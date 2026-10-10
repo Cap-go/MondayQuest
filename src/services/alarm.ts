@@ -90,7 +90,3 @@ export async function cancelHourlyAlarms(ids: string[], kind: 'alarm' | 'notific
       await RichNotifications.cancel({ id }).catch(() => {})
   }
 }
-
-export async function openSystemAlarms() {
-  await CapgoAlarm.openAlarms().catch(() => {})
-}

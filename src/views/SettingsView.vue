@@ -14,7 +14,6 @@ import ToggleRow from '~/components/ToggleRow.vue'
 import { useL } from '~/composables/useL'
 import { COMMUNITY_URL, openExternal } from '~/config'
 import { deviceTag, languageOf } from '~/i18n/translate'
-import { openSystemAlarms } from '~/services/alarm'
 import { buildEnv, isTestBuild } from '~/services/env'
 import { haptic } from '~/services/haptics'
 import { notificationsAllowed, requestNotifications, rescheduleAll } from '~/services/notifications'
@@ -182,9 +181,6 @@ function custom() {
       </button>
       <button v-if="!quest.settings.wakeAuto" class="t-label text-graphite underline mt-1" @click="followSunrise">
         {{ L('Follow the sunrise again') }}
-      </button>
-      <button v-if="native" class="row" @click="openSystemAlarms">
-        <span class="t-body flex-1 text-left">{{ L('Open the Clock app') }}</span><span>↗</span>
       </button>
     </section>
 
