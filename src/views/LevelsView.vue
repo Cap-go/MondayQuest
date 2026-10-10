@@ -73,7 +73,22 @@ function newCustom() {
         </p>
       </div>
 
-      <ul class="mt-4">
+      <!-- locked level: the quests stay a surprise until the level opens -->
+      <ul v-if="lvl.n > quest.currentLevel" class="mt-4">
+        <li v-for="(c, i) in lvl.items" :key="c.id" class="row hidden-row">
+          <span class="mystery shrink-0">?</span>
+          <div class="flex-1 min-w-0">
+            <p class="t-display text-[0.95rem]">
+              {{ L('Challenge') }} {{ c.n }}
+            </p>
+            <span class="bar" :style="{ width: `${55 + ((i * 37) % 35)}%` }" />
+          </div>
+        </li>
+        <p class="t-label text-pencil text-center pt-3 pb-1">
+          {{ L('Finish the previous level to reveal these quests.') }}
+        </p>
+      </ul>
+      <ul v-else class="mt-4">
         <li v-for="c in lvl.items" :key="c.id" class="row" :class="{ 'is-locked': state(c) === 'locked' }" @click="open(c)">
           <QuestIcon :name="c.icon" :size="30" :stroke="3" class="shrink-0 mt-0.5" />
           <div class="flex-1 min-w-0">
@@ -139,6 +154,28 @@ function newCustom() {
 .level.level-locked {
   background: transparent;
   box-shadow: inset 0 0 0 2px var(--color-rule);
+}
+
+.hidden-row p {
+  opacity: 0.55;
+}
+
+.mystery {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--color-pencil);
+  color: var(--color-pencil);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.bar {
+  display: block;
+  height: 9px;
+  margin-top: 7px;
+  background: var(--color-rule);
 }
 
 .is-locked p {
