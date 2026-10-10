@@ -22,6 +22,8 @@ onMounted(() => {
 
 <template>
   <div class="app-root" :class="{ 'has-web-tabs': showWebTabs }">
+    <!-- Paper strip behind the iOS status bar so scrolled content never sits under the clock. -->
+    <div class="status-scrim" aria-hidden="true" />
     <cap-router-outlet ref="outlet" class="outlet">
       <router-view />
     </cap-router-outlet>
@@ -61,5 +63,13 @@ cap-page {
 .tabbar-enter-from,
 .tabbar-leave-to {
   transform: translateY(110%);
+}
+.status-scrim {
+  position: fixed;
+  inset: 0 0 auto;
+  height: var(--safe-top);
+  z-index: 50;
+  pointer-events: none;
+  background: linear-gradient(var(--color-paper) 75%, rgb(246 244 239 / 0));
 }
 </style>

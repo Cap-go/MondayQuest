@@ -68,9 +68,9 @@ function newCustom() {
           </h2>
         </div>
         <QuestIcon v-if="lvl.n > quest.currentLevel" name="lock" :size="26" :stroke="3" class="mb-0.5" />
-        <div v-else class="flex gap-1 pb-1">
-          <span v-for="i in lvl.items.length" :key="i" class="pip" :class="{ on: i <= lvl.done }" />
-        </div>
+        <p v-else-if="lvl.done" class="t-label text-graphite pb-1 tabular-nums">
+          {{ lvl.done }}/{{ lvl.items.length }}
+        </p>
       </div>
 
       <ul class="mt-4">
@@ -230,15 +230,5 @@ function newCustom() {
   50% {
     transform: scale(0.5);
   }
-}
-
-.pip {
-  width: 10px;
-  height: 10px;
-  border: 2px solid var(--color-ink);
-}
-
-.pip.on {
-  background: var(--color-ink);
 }
 </style>
