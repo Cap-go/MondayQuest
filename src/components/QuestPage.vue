@@ -32,6 +32,9 @@ onUnmounted(() => cleanup?.())
 <style>
 .page-body {
   min-height: 100%;
+  /* Wide screens (iPhone Duo inner display, iPad): keep a booklet-width column. */
+  max-width: 640px;
+  margin-inline: auto;
   padding: calc(max(var(--safe-top), var(--cap-native-navigation-top, 0px)) + 18px) 20px calc(var(--safe-bottom) + var(--tabbar-h) + 36px);
 }
 

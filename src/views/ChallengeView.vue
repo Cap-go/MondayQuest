@@ -126,7 +126,7 @@ function capitalize(s: string) {
 
       <div ref="pager" class="pager no-scrollbar" @scroll.passive="onScroll">
         <!-- PAGE 1 — the booklet's challenge page -->
-        <section class="leaf" :style="{ transform: `perspective(1200px) rotateY(${-scrollP * 18}deg)`, opacity: 1 - scrollP * 0.5 }">
+        <section class="leaf" :style="{ transform: `perspective(1200px) rotateY(${-scrollP * 18}deg)`, opacity: 1 - scrollP * 0.5, visibility: scrollP > 0.99 ? 'hidden' : 'visible' }">
           <div class="sheet page">
             <div class="text-center stagger">
               <QuestIcon :name="c.icon" :size="104" :stroke="2.4" draw class="mx-auto" />
@@ -175,7 +175,7 @@ function capitalize(s: string) {
         </section>
 
         <!-- PAGE 2 — the tracking page -->
-        <section class="leaf" :style="{ transform: `perspective(1200px) rotateY(${(1 - scrollP) * 18}deg)`, opacity: 0.5 + scrollP * 0.5 }">
+        <section class="leaf" :style="{ transform: `perspective(1200px) rotateY(${(1 - scrollP) * 18}deg)`, opacity: 0.5 + scrollP * 0.5, visibility: scrollP < 0.01 ? 'hidden' : 'visible' }">
           <div class="sheet page">
             <TrackerShell v-if="shown" :key="shown.id" :run="shown" :challenge="c" />
             <div v-else class="text-center py-10">
@@ -243,6 +243,9 @@ function capitalize(s: string) {
 }
 
 .topbar {
+  width: 100%;
+  max-width: 628px;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -319,6 +322,9 @@ function capitalize(s: string) {
 
 .page {
   min-height: 100%;
+  /* Wide screens (iPhone Duo inner display, iPad): a centered booklet page, not a stretched sheet. */
+  max-width: 600px;
+  margin-inline: auto;
   padding: 30px 22px 26px;
   box-shadow: 0 1px 0 var(--color-rule), 0 20px 40px -28px rgb(0 0 0 / 0.4);
 }
