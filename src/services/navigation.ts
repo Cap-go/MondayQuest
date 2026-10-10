@@ -20,7 +20,8 @@ export const TAB_ICONS: Record<TabId, { svg: string, sf: string, sfOn: string }>
   today: { svg: stroke('<rect x="4" y="4" width="16" height="16"/><path d="M8 12.5l3 3 6-7"/>'), sf: 'checkmark.square', sfOn: 'checkmark.square.fill' },
   levels: { svg: stroke('<path d="M3 20h5v-5h5v-5h5V5h3"/>'), sf: 'stairs', sfOn: 'stairs' },
   journal: { svg: stroke('<path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h3"/>'), sf: 'book.closed', sfOn: 'book.closed.fill' },
-  settings: { svg: stroke('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>'), sf: 'gearshape', sfOn: 'gearshape.fill' },
+  // A real gear (8 teeth), not rays: the old circle + lines read as a sun.
+  settings: { svg: stroke('<path d="M10.3 2.5h3.4l.5 2.6 1.7.7 2.2-1.5 2.4 2.4-1.5 2.2.7 1.7 2.6.5v3.4l-2.6.5-.7 1.7 1.5 2.2-2.4 2.4-2.2-1.5-1.7.7-.5 2.6h-3.4l-.5-2.6-1.7-.7-2.2 1.5-2.4-2.4 1.5-2.2-.7-1.7-2.6-.5v-3.4l2.6-.5.7-1.7-1.5-2.2 2.4-2.4 2.2 1.5 1.7-.7z"/><circle cx="12" cy="12" r="3.2"/>'), sf: 'gearshape', sfOn: 'gearshape.fill' },
 }
 
 function tabTitle(id: TabId) {
