@@ -63,6 +63,6 @@ export const TRACKERS: Record<TrackerKind, { component: Component, summary?: Sum
   sunset: { component: lazy(() => import('./SunsetTracker.vue')) },
   focus: { component: lazy(() => import('./FocusTracker.vue')) },
   review: { component: lazy(() => import('./ReviewTracker.vue')) },
-  share: { component: lazy(() => import('./ShareTracker.vue')) },
+  letter: { component: lazy(() => import('./LetterTracker.vue')), summary: d => d.data.text ? `${String(d.data.text).trim().split(/\s+/).length} ${tr('words')}` : '' },
   custom: { component: lazy(() => import('./HoldTracker.vue')) },
 }

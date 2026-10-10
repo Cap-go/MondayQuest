@@ -77,8 +77,7 @@ function stampDone() {
 }
 
 function onCelebrated() {
-  if (quest.complete(props.run))
-    toast.success(L('Joker earned!'), { message: L('Doing a challenge again earns a joker to skip another one.') })
+  quest.complete(props.run)
 }
 
 function dayLabel(i: number) {

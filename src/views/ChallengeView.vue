@@ -165,7 +165,7 @@ function capitalize(s: string) {
                 <QuestIcon name="joker" :size="16" :stroke="3" /> {{ L('Skipped with a joker') }}
               </p>
               <button v-else-if="!run && !completed && !locked && c.source !== 'custom'" class="t-label text-graphite underline w-full text-center mt-4" @click="jokerSheet?.present()">
-                {{ L('Not for me: use a joker') }} ({{ quest.jokerBalance }})
+                {{ quest.jokerBalance ? `${L('Not for me: use a joker')} (${quest.jokerBalance})` : L('Not for me? Earn a joker to skip it') }}
               </button>
               <p v-if="locked" class="t-body text-xs text-pencil text-center mt-3">
                 {{ $t('detail.locked') }}

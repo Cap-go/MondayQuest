@@ -62,7 +62,7 @@ export type TrackerKind
     | 'sunset'
     | 'focus'
     | 'review'
-    | 'share'
+    | 'letter'
     | 'custom' // user-made challenge
 
 export type IconName

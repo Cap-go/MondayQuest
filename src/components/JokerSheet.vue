@@ -9,7 +9,7 @@ import { useL } from '~/composables/useL'
 import { ct } from '~/i18n/content'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
-import { MAX_SHARE_JOKERS, useQuest } from '~/stores/quest'
+import { useQuest } from '~/stores/quest'
 
 // Jokers keep people going when a challenge isn't for them: skip it (it still unlocks
 // the next level), and earn more by sharing the app or redoing a finished challenge.
@@ -20,6 +20,10 @@ const L = useL()
 const sheet = ref<any>(null)
 const sharing = ref(false)
 
+const nextMonth = computed(() => {
+  const d = new Date()
+  return new Date(d.getFullYear(), d.getMonth() + 1, 1).toLocaleDateString(L.tag(), { month: 'long' })
+})
 const canUse = computed(() => !!props.challenge && quest.canUseJoker(props.challenge))
 const title = computed(() => (props.challenge ? ct(props.challenge).title : '') ?? '')
 
@@ -116,7 +120,7 @@ defineExpose({ present })
             </h3>
             <div class="flex gap-1">
               <QuestIcon v-for="i in Math.max(quest.jokerBalance, 0)" :key="i" name="joker" :size="30" :stroke="3" />
-              <span v-if="!quest.jokerBalance" class="t-label text-pencil">{{ L('none left') }}</span>
+              <span v-if="!quest.jokerBalance" class="t-label text-pencil">{{ L('none yet') }}</span>
             </div>
           </div>
           <p class="t-body text-sm text-graphite mt-1">
@@ -128,19 +132,15 @@ defineExpose({ present })
             <span class="t-body text-sm">« {{ title }} » · {{ L(`${quest.jokerBalance - 1} left after`) }}</span>
           </button>
           <p v-else-if="challenge && !quest.jokerBalance" class="t-body text-sm mt-3">
-            {{ L('No joker left. Earn one:') }}
+            {{ L('No joker yet. You earn one by sharing Monday Quest with someone:') }}
           </p>
 
-          <button class="choice" :disabled="sharing || quest.shareJokersLeft <= 0" @click="share">
-            <span class="t-display text-lg">{{ L('Share with a friend') }} · +1</span>
+          <button class="choice" :disabled="sharing" @click="share">
+            <span class="t-display text-lg">{{ L('Share with a friend') }}{{ quest.canEarnShareJoker ? ' · +1' : '' }}</span>
             <span class="t-body text-sm text-graphite">
-              {{ quest.shareJokersLeft > 0 ? L(`${quest.shareJokersLeft} more joker(s) to earn this way (max ${MAX_SHARE_JOKERS}).`) : L('Maximum reached, thank you!') }}
+              {{ quest.canEarnShareJoker ? L('One joker per month, the first time you share Monday Quest with someone.') : L(`This month's joker is earned. Next one in ${nextMonth}.`) }}
             </span>
           </button>
-          <div class="choice static">
-            <span class="t-display text-lg">{{ L('Repeat a challenge') }} · +1</span>
-            <span class="t-body text-sm text-graphite">{{ L('Finish a challenge you already completed once more.') }}</span>
-          </div>
         </cap-sheet-content>
       </cap-sheet-view>
     </cap-sheet-portal>

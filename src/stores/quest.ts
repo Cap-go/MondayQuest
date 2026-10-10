@@ -35,16 +35,16 @@ export interface Settings {
 }
 
 export interface Jokers {
-  /** +1 each: shared the app with a friend (capped), finished a challenge for the second time. */
+  /** Earned by sharing the app with a friend, at most once per calendar month. ('repeat' entries are legacy and no longer count.) */
   earned: { kind: 'share' | 'repeat', at: number, ref?: string }[]
   /** A joker clears a challenge you don't want to do: it counts for unlocking the next level. */
   used: { challengeId: string, at: number }[]
 }
 
-/** Every notebook starts with two jokers. */
-export const STARTING_JOKERS = 2
-/** Sharing can't be farmed: at most this many jokers come from shares. */
-export const MAX_SHARE_JOKERS = 3
+/** Jokers are earned, never given: one per month for sharing Monday Quest with someone. */
+export const STARTING_JOKERS = 0
+
+const monthOf = (t: number) => new Date(t).toISOString().slice(0, 7)
 
 interface Persisted {
   version: 1
@@ -92,9 +92,11 @@ export const useQuest = defineStore('quest', () => {
   const completedIds = computed(() => new Set(runs.value.filter(r => r.completedAt).map(r => r.challengeId)))
 
   const jokers = ref<Jokers>({ earned: [], used: [] })
-  const jokerBalance = computed(() => STARTING_JOKERS + jokers.value.earned.length - jokers.value.used.length)
+  const shareEarns = computed(() => jokers.value.earned.filter(e => e.kind === 'share'))
+  const jokerBalance = computed(() => Math.max(0, STARTING_JOKERS + shareEarns.value.length - jokers.value.used.length))
   const skippedIds = computed(() => new Set(jokers.value.used.map(u => u.challengeId)))
-  const shareJokersLeft = computed(() => MAX_SHARE_JOKERS - jokers.value.earned.filter(e => e.kind === 'share').length)
+  /** Can sharing earn a joker right now (none earned yet this month)? */
+  const canEarnShareJoker = computed(() => !shareEarns.value.some(e => monthOf(e.at) === monthOf(clock.value)))
   /** Done or skipped with a joker: what level unlocking looks at. */
   const clearedIds = computed(() => new Set([...completedIds.value, ...skippedIds.value]))
 
@@ -163,12 +165,7 @@ export const useQuest = defineStore('quest', () => {
   function complete(run: Run) {
     if (!allChecked(run))
       return
-    // Doing a challenge again earns a joker to skip one you don't like.
-    const repeat = completedIds.value.has(run.challengeId) && !jokers.value.earned.some(e => e.ref === run.id)
     replace(completeRun(run))
-    if (repeat)
-      jokers.value.earned.push({ kind: 'repeat', at: Date.now(), ref: run.id })
-    return repeat
   }
 
   function canUseJoker(c: Challenge): boolean {
@@ -182,9 +179,9 @@ export const useQuest = defineStore('quest', () => {
     return true
   }
 
-  /** Returns false once the share cap is reached. */
+  /** Returns false when a joker was already earned by sharing this month. */
   function earnShareJoker(): boolean {
-    if (shareJokersLeft.value <= 0)
+    if (!canEarnShareJoker.value)
       return false
     jokers.value.earned.push({ kind: 'share', at: Date.now() })
     return true
@@ -258,7 +255,7 @@ export const useQuest = defineStore('quest', () => {
     skippedIds,
     jokers,
     jokerBalance,
-    shareJokersLeft,
+    canEarnShareJoker,
     canUseJoker,
     useJoker,
     earnShareJoker,

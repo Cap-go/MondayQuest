@@ -21,17 +21,17 @@ export const LEVEL_11: Def[] = [
   {
     n: 52,
     level: 11,
-    icon: 'share',
-    tracker: 'share',
+    icon: 'envelope',
+    tracker: 'letter',
     category: 'growth',
     text: {
-      title: 'Pass the baton',
-      short: 'Invite one person to take on a challenge every day for a week.',
+      title: 'Dear future me',
+      short: 'Write one paragraph a day of a letter to yourself. On day seven, seal it: it comes back in exactly one year.',
       body: [
-        'You now know what seven days can change. The best way to close the year is to hand that road to someone else.',
-        'A challenge is easier to keep with two. Inviting a friend gives them a nudge, and commits you all over again.',
+        'You have just spent a year of Mondays changing small things. Write down who you are today: what changed, what you are proud of, what still scares you, what you hope for.',
+        'One paragraph a day, then the letter is sealed. The app keeps it closed and gives it back to you in a year, when you will be able to see how far you went.',
       ],
-      tip: 'Pick the challenge that fits the person: the walk for the desk-bound colleague, the call for the faraway friend. Offer to do it with them.',
+      tip: 'Be specific and honest: names, places, the small details you will have forgotten. Ask your future self a question or two.',
     },
   },
 ]
