@@ -1,5 +1,5 @@
 /** Community group (Telegram invite link). Empty hides every community entry point. */
-export const COMMUNITY_URL = ''
+export const COMMUNITY_URL = 'https://t.me/mondayquest'
 
 /** Open an external link outside the app (universal links like t.me hand over to their app). */
 export function openExternal(url: string) {
