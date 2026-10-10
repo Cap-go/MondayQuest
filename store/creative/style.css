@@ -1,0 +1,11 @@
+@font-face{font-family:A;font-weight:900;src:url(a900.woff2)}
+@font-face{font-family:D;src:url(d400.woff2)}
+*{box-sizing:border-box;margin:0}
+body{background:#f6f4ef;color:#141414;font-family:D,system-ui;overflow:hidden;position:relative}
+h1{font-family:A;font-weight:900;text-transform:uppercase;line-height:.88;letter-spacing:-.01em}
+.phone{position:absolute;border:7px solid #141414;border-radius:44px;overflow:hidden;background:#f6f4ef;box-shadow:0 40px 70px -40px rgba(0,0,0,.55)}
+.phone img{display:block;width:100%}
+.corner{position:absolute;top:0;right:0;width:0;height:0;border-top:90px solid #fff;border-left:90px solid transparent}
+.boxes{display:flex;gap:14px}
+.boxes span{width:46px;height:46px;border:5px solid #141414;position:relative}
+.boxes span.on::after{content:'';position:absolute;left:7px;top:-6px;width:18px;height:34px;border:solid #141414;border-width:0 7px 7px 0;transform:rotate(40deg)}
