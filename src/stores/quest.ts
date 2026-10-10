@@ -8,6 +8,7 @@ import { lang } from '~/i18n/translate'
 import { today as todayISO } from '~/lib/date'
 import { allChecked, completeRun, dayIndex, isLive, newRun, patchDayData, runStatus, setDay, streak } from '~/lib/progress'
 import { loadJSON, saveJSON } from '~/lib/storage'
+import { onCloudChange, readCloud, reattachLocal, writeCloud } from '~/services/cloud'
 
 /** Bonus level for user-made challenges, never locked. */
 export const CUSTOM_LEVEL = 99
@@ -52,6 +53,8 @@ interface Persisted {
   custom: Challenge[]
   settings: Settings
   jokers?: Jokers
+  /** Last local change, used to pick the newest copy between this phone and iCloud. */
+  savedAt?: number
 }
 
 const KEY = 'mq.state.v1'
@@ -210,8 +213,13 @@ export const useQuest = defineStore('quest', () => {
     settings.value = { ...DEFAULT_SETTINGS, onboarded: true }
   }
 
-  async function load() {
-    const data = await loadJSON<Persisted>(KEY, { version: 1, runs: [], custom: [], settings: { ...DEFAULT_SETTINGS } })
+  /** Last change written by this device (or adopted from the cloud). */
+  let savedAt = 0
+  /** What was last saved or adopted: opening the app or applying another device's copy is not a change. */
+  let lastContent = ''
+  const content = () => JSON.stringify([runs.value, custom.value, settings.value, jokers.value])
+
+  function apply(data: Persisted) {
     runs.value = data.runs
     // Custom challenges used to sit on level 7, which is now a real level.
     custom.value = data.custom.map(c => ({ ...c, level: CUSTOM_LEVEL }))
@@ -222,8 +230,43 @@ export const useQuest = defineStore('quest', () => {
       settings.value.i18nV2 = true
     }
     jokers.value = { earned: [], used: [], ...data.jokers }
+    savedAt = data.savedAt ?? 0
+    lastContent = content()
+  }
+
+  function snapshot(): Persisted {
+    return { version: 1, runs: runs.value, custom: custom.value, settings: settings.value, jokers: jokers.value, savedAt }
+  }
+
+  /** Take the iCloud copy when another device saved after this one (new phone, reinstall, iPad). */
+  async function pullCloud(local: Persisted): Promise<Persisted> {
+    const cloud = await readCloud<Persisted>()
+    if (!cloud?.runs || (cloud.savedAt ?? 0) <= (local.savedAt ?? 0))
+      return local
+    return reattachLocal(cloud, local)
+  }
+
+  async function load() {
+    const local = await loadJSON<Persisted>(KEY, { version: 1, runs: [], custom: [], settings: { ...DEFAULT_SETTINGS } })
+    const data = await pullCloud(local)
+    apply(data)
+    if (data !== local) {
+      void saveJSON(KEY, snapshot())
+    }
+    else if (runs.value.length || settings.value.onboarded) {
+      // This phone is the newest copy (or progress from before iCloud sync): back it up now.
+      savedAt ||= 1
+      void writeCloud(snapshot())
+    }
     ready.value = true
     setInterval(tick, 60_000)
+    onCloudChange(async () => {
+      const next = await pullCloud(snapshot())
+      if (next.savedAt !== savedAt) {
+        apply(next)
+        void saveJSON(KEY, snapshot())
+      }
+    })
   }
 
   let saveTimer: ReturnType<typeof setTimeout> | undefined
@@ -232,7 +275,14 @@ export const useQuest = defineStore('quest', () => {
       return
     clearTimeout(saveTimer)
     saveTimer = setTimeout(() => {
-      void saveJSON(KEY, { version: 1, runs: runs.value, custom: custom.value, settings: settings.value, jokers: jokers.value } satisfies Persisted)
+      const c = content()
+      if (c === lastContent)
+        return
+      lastContent = c
+      savedAt = Date.now()
+      const state = snapshot()
+      void saveJSON(KEY, state satisfies Persisted)
+      void writeCloud(state)
     }, 250)
   }, { deep: true })
 

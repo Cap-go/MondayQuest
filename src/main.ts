@@ -11,6 +11,7 @@ import App from './App.vue'
 import { i18n } from './i18n'
 import { applyLanguage } from './i18n/content'
 import { router } from './router'
+import { flushCloud } from './services/cloud'
 import { detectBuildEnv } from './services/env'
 import { setHapticsEnabled } from './services/haptics'
 import { renderTabbar, setupNativeNavigation } from './services/navigation'
@@ -85,6 +86,8 @@ async function boot() {
   CapApp.addListener('appStateChange', ({ isActive }) => {
     if (isActive)
       void refresh()
+    else
+      flushCloud()
   })
 
   // mondayquest://challenge/mq03 or mondayquest://today from widgets and Live Activities
