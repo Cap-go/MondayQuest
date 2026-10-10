@@ -64,6 +64,9 @@ button {
   text-transform: uppercase;
   letter-spacing: -0.01em;
   line-height: 1.02;
+  /* Translated titles can be one long word (L'AFFRANCHISSEMENT): hyphenate rather than clip. */
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 .t-label {

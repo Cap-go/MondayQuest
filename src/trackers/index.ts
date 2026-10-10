@@ -27,7 +27,7 @@ export const TRACKERS: Record<TrackerKind, { component: Component, summary?: Sum
   yes: { component: lazy(() => import('./YesTracker.vue')), summary: d => d.data.note ?? '' },
   photo: { component: lazy(() => import('./PhotoTracker.vue')), summary: d => d.data.photo ? tr('Photo ✓') : '' },
   gratitude: { component: lazy(() => import('./GratitudeTracker.vue')), summary: d => (d.data.items ?? []).some(Boolean) ? `${(d.data.items ?? []).filter(Boolean).length}/3` : '' },
-  water: { component: lazy(() => import('./WaterTracker.vue')), summary: d => d.data.glasses ? `${d.data.glasses} ${tr('glasses')}` : '' },
+  water: { component: lazy(() => import('./WaterTracker.vue')), summary: d => d.data.glasses ? `${d.data.glasses} ${tr('glasses of water')}` : '' },
   read: { component: lazy(() => import('./ReadTracker.vue')), summary: d => d.data.pages ? `${d.data.pages} ${tr('pages')}` : '' },
   sketch: { component: lazy(() => import('./SketchTracker.vue')), summary: d => d.data.subject ?? '' },
   offline: { component: lazy(() => import('./OfflineTracker.vue')), summary: d => mins(d.data.elapsed) },
