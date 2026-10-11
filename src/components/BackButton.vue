@@ -2,6 +2,7 @@
 import { setDirection } from '@capgo/capacitor-transitions/vue'
 import { useRouter } from 'vue-router'
 import { haptic } from '~/services/haptics'
+import { nativeTabs } from '~/services/navigation'
 
 // The one back arrow used across pushed pages. Falls back to `fallback` when there is no history.
 const props = withDefaults(defineProps<{ fallback?: string }>(), { fallback: '/today' })
@@ -20,7 +21,7 @@ function back() {
 </script>
 
 <template>
-  <button class="icon-btn" :aria-label="$t('common.back')" @click="back">
+  <button v-if="!nativeTabs" class="icon-btn" :aria-label="$t('common.back')" @click="back">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"><path d="M15 5l-7 7 7 7" /></svg>
   </button>
 </template>

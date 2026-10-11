@@ -8,10 +8,10 @@ export const router = createRouter({
     { path: '/levels', component: () => import('~/views/LevelsView.vue'), meta: { tab: 'levels' } },
     { path: '/journal', component: () => import('~/views/JournalView.vue'), meta: { tab: 'journal' } },
     { path: '/settings', component: () => import('~/views/SettingsView.vue'), meta: { tab: 'settings' } },
-    { path: '/challenge/:id/:page(read|track)?', component: () => import('~/views/ChallengeView.vue'), meta: { hideTabs: true } },
+    { path: '/challenge/:id/:page(read|track)?', component: () => import('~/views/ChallengeView.vue'), meta: { hideTabs: true, navbar: true } },
     { path: '/onboarding', component: () => import('~/views/OnboardingView.vue'), meta: { hideTabs: true } },
-    { path: '/debug', component: () => import('~/views/DebugView.vue'), meta: { hideTabs: true } },
-    { path: '/custom/new', component: () => import('~/views/CustomView.vue'), meta: { hideTabs: true } },
+    { path: '/debug', component: () => import('~/views/DebugView.vue'), meta: { hideTabs: true, navbar: true } },
+    { path: '/custom/new', component: () => import('~/views/CustomView.vue'), meta: { hideTabs: true, navbar: true } },
     { path: '/:pathMatch(.*)*', redirect: '/today' },
   ],
 })

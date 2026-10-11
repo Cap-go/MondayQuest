@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { setDirection } from '@capgo/capacitor-transitions/vue'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import JokerSheet from '~/components/JokerSheet.vue'
 import QuestIcon from '~/components/QuestIcon.vue'
@@ -12,6 +12,7 @@ import { ct } from '~/i18n/content'
 import { tr } from '~/i18n/translate'
 import { formatDate, isMonday, nextMonday } from '~/lib/date'
 import { haptic } from '~/services/haptics'
+import { nativeTabs, navTitle } from '~/services/navigation'
 import { ensureReminders } from '~/services/notifications'
 import { sfx } from '~/services/sound'
 import { useQuest } from '~/stores/quest'
@@ -36,6 +37,12 @@ const scrollP = ref(page.value)
 const sheet = ref<any>(null)
 const jokerSheet = ref<InstanceType<typeof JokerSheet> | null>(null)
 const skipped = computed(() => quest.skippedIds.has(id.value))
+
+// Native navbar title (the back button is native on device).
+watch([() => route.path, () => text.value?.title], () => {
+  if (route.path.startsWith('/challenge/') && text.value)
+    navTitle.value = text.value.title
+}, { immediate: true })
 
 onMounted(async () => {
   await nextTick()
@@ -108,8 +115,8 @@ function capitalize(s: string) {
   <QuestPage flush>
     <div v-if="c && text" class="cv">
       <!-- top bar -->
-      <div class="topbar">
-        <button class="icon-btn" :aria-label="$t('common.back')" @click="back">
+      <div class="topbar" :class="{ native: nativeTabs }">
+        <button v-if="!nativeTabs" class="icon-btn" :aria-label="$t('common.back')" @click="back">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"><path d="M15 5l-7 7 7 7" /></svg>
         </button>
         <div class="tabs">
@@ -121,7 +128,7 @@ function capitalize(s: string) {
           </button>
           <span class="ink" :style="{ transform: `translateX(${scrollP * 100}%)` }" />
         </div>
-        <span class="w-10" />
+        <span v-if="!nativeTabs" class="w-10" />
       </div>
 
       <div ref="pager" class="pager no-scrollbar" @scroll.passive="onScroll">
@@ -250,6 +257,12 @@ function capitalize(s: string) {
   align-items: center;
   justify-content: space-between;
   padding: calc(var(--safe-top) + 8px) 14px 8px;
+}
+
+/* On device the native navbar holds back + title: the READ / TRACK switch sits centered under it. */
+.topbar.native {
+  justify-content: center;
+  padding-top: calc(var(--cap-native-navigation-top, var(--safe-top)) + 6px);
 }
 
 .icon-btn {
