@@ -68,9 +68,11 @@ cap-page {
 .status-scrim {
   position: fixed;
   inset: 0 0 auto;
-  height: var(--safe-top);
+  /* Grows with the native navbar (iOS 26 draws it fully clear): content fades out under the title. */
+  height: calc(max(var(--safe-top), var(--cap-native-navigation-top, 0px)) + 14px);
   z-index: 50;
   pointer-events: none;
-  background: linear-gradient(var(--color-paper) 75%, rgb(246 244 239 / 0));
+  background: linear-gradient(var(--color-paper) calc(100% - 22px), rgb(246 244 239 / 0));
+  transition: height 220ms var(--ease-out-quint);
 }
 </style>

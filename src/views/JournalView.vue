@@ -57,7 +57,7 @@ function open(id: string) {
 </script>
 
 <template>
-  <QuestPage>
+  <QuestPage :title="$t('tabs.journal')">
     <div class="flex items-end justify-between gap-3">
       <h1 class="t-display text-[2.6rem]">
         {{ $t('journal.title') }}

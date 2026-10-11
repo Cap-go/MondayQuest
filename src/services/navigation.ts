@@ -113,6 +113,12 @@ export async function renderTabbar(hidden = false, animated = false) {
   }).catch(() => {})
 }
 
+/** Clear native bar; the paper fade behind it is the web status scrim (App.vue). */
+const BAR_SURFACE = {
+  transparent: true,
+  colors: { tint: '#141414', foreground: '#141414', background: '#f6f4ef' },
+}
+
 /** Native navbar (back + title, Liquid Glass) on pushed pages; tab pages keep their booklet titles. */
 export async function renderNavbar(visible: boolean, reset = true) {
   if (!nativeTabs)
@@ -126,10 +132,25 @@ export async function renderNavbar(visible: boolean, reset = true) {
     hidden: false,
     animated: true,
     title: navTitle.value,
-    transparent: true,
+    ...BAR_SURFACE,
     // The plugin's backButton is a text button: use an icon item for a real chevron.
     leftItems: [{ id: 'back', icon: { svg: stroke('<path d="M15 5l-7 7 7 7"/>'), template: true, ios: { sfSymbol: 'chevron.backward' } } }],
-    colors: { tint: '#141414', foreground: '#141414', background: '#f6f4ef' },
     resetScrollCollapsed: reset,
+  }).catch(() => {})
+}
+
+/** Tab pages: show the page title in the native navbar once the booklet heading has scrolled away. */
+export function setScrolledTitle(title: string | null) {
+  if (!nativeTabs || navbarRoute)
+    return
+  if (!title) {
+    void NativeNavigation.setNavbar({ hidden: true, animated: true }).catch(() => {})
+    return
+  }
+  void NativeNavigation.setNavbar({
+    hidden: false,
+    animated: true,
+    title,
+    ...BAR_SURFACE,
   }).catch(() => {})
 }

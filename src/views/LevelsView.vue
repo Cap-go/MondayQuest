@@ -45,7 +45,7 @@ function newCustom() {
 </script>
 
 <template>
-  <QuestPage>
+  <QuestPage :title="$t('tabs.levels')">
     <h1 class="t-display text-[2.6rem]">
       {{ $t('tabs.levels') }}
     </h1>

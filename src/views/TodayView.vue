@@ -42,7 +42,7 @@ function daysUntil(run: Run) {
 </script>
 
 <template>
-  <QuestPage>
+  <QuestPage :title="$t('tabs.today')">
     <header class="flex items-start justify-between stagger">
       <div>
         <p class="t-label text-graphite capitalize">

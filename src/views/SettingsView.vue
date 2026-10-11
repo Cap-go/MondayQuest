@@ -141,7 +141,7 @@ function custom() {
 </script>
 
 <template>
-  <QuestPage>
+  <QuestPage :title="$t('tabs.settings')">
     <h1 class="t-display text-[2.6rem]">
       {{ $t('settings.title') }}
     </h1>
