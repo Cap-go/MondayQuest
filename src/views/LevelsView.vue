@@ -17,7 +17,7 @@ const router = useRouter()
 const L = useL()
 const jokerSheet = ref<InstanceType<typeof JokerSheet> | null>(null)
 
-const levels = computed(() => LEVELS.map(l => ({ ...l, items: challengesOfLevel(l.n), done: quest.levelDone(l.n) })))
+const levels = computed(() => LEVELS.map(l => ({ ...l, items: challengesOfLevel(l.n), done: quest.levelDone(l.n), locked: l.n > quest.currentLevel && !quest.settings.unlockAll })))
 
 function open(c: Challenge) {
   haptic.tap()
@@ -57,7 +57,7 @@ function newCustom() {
       {{ L('52 challenges, one a week for a year. Finish a level to unlock the next.') }}
     </p>
 
-    <section v-for="lvl in levels" :key="lvl.n" class="sheet level mt-8 px-5 pt-6 pb-3" :class="{ 'current': lvl.n === quest.currentLevel, 'level-locked': lvl.n > quest.currentLevel }">
+    <section v-for="lvl in levels" :key="lvl.n" class="sheet level mt-8 px-5 pt-6 pb-3" :class="{ 'current': lvl.n === quest.currentLevel, 'level-locked': lvl.locked }">
       <div class="flex items-end justify-between">
         <div>
           <p class="t-label">
@@ -67,14 +67,14 @@ function newCustom() {
             {{ tr(lvl.text) }}
           </h2>
         </div>
-        <QuestIcon v-if="lvl.n > quest.currentLevel" name="lock" :size="26" :stroke="3" class="mb-0.5" />
+        <QuestIcon v-if="lvl.locked" name="lock" :size="26" :stroke="3" class="mb-0.5" />
         <p v-else-if="lvl.done" class="t-label text-graphite pb-1 tabular-nums">
           {{ lvl.done }}/{{ lvl.items.length }}
         </p>
       </div>
 
       <!-- locked level: the quests stay a surprise until the level opens -->
-      <ul v-if="lvl.n > quest.currentLevel" class="mt-4">
+      <ul v-if="lvl.locked" class="mt-4">
         <li v-for="(c, i) in lvl.items" :key="c.id" class="row hidden-row">
           <span class="mystery shrink-0">?</span>
           <div class="flex-1 min-w-0">
