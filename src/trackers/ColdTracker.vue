@@ -182,6 +182,7 @@ const bestCold = computed(() => Math.floor((data.value.best ?? 0) / 1000))
   position: fixed;
   inset: 0;
   z-index: 200;
+  padding-inline: var(--safe-left) var(--safe-right);
   display: flex;
   flex-direction: column;
   align-items: center;

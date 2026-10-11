@@ -104,7 +104,7 @@ defineExpose({ open, pick })
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: calc(var(--safe-top) + 20px) 24px calc(var(--safe-bottom) + 28px);
+  padding: calc(var(--safe-top) + 20px) calc(var(--safe-right) + 24px) calc(var(--safe-bottom) + 28px) calc(var(--safe-left) + 24px);
   background:
     linear-gradient(to bottom, rgb(0 0 0 / 0.45), transparent 18%),
     linear-gradient(to top, rgb(0 0 0 / 0.55), transparent 26%);

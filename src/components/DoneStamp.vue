@@ -131,7 +131,7 @@ function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, ma
   z-index: 100;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 24px calc(var(--safe-right) + 24px) 24px calc(var(--safe-left) + 24px);
   background: color-mix(in oklab, var(--color-paper) 70%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);

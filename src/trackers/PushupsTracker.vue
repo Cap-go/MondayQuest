@@ -93,7 +93,7 @@ onBeforeUnmount(() => void KeepAwake.allowSleep().catch(() => {}))
         <p class="t-label text-paper/60 mt-4">
           {{ L('nose here') }} ↓
         </p>
-        <button class="t-label text-paper/70 absolute top-[calc(var(--safe-top)+18px)] right-5 p-3" @pointerdown.stop @click="exitFloor">
+        <button class="t-label text-paper/70 absolute top-[calc(var(--safe-top)+18px)] right-[calc(var(--safe-right)+20px)] p-3" @pointerdown.stop @click="exitFloor">
           {{ L('Finish') }}
         </button>
       </div>
@@ -106,6 +106,7 @@ onBeforeUnmount(() => void KeepAwake.allowSleep().catch(() => {}))
   position: fixed;
   inset: 0;
   z-index: 200;
+  padding-inline: var(--safe-left) var(--safe-right);
   background: var(--color-ink);
   display: flex;
   flex-direction: column;

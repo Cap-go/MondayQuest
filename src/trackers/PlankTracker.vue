@@ -262,6 +262,7 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
   position: fixed;
   inset: 0;
   z-index: 200;
+  padding-inline: var(--safe-left) var(--safe-right);
   background: var(--color-ink);
   display: flex;
   flex-direction: column;

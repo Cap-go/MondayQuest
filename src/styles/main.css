@@ -25,6 +25,9 @@
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* iPhone Duo outer display: the status pill and the tab bar sit in a column on the right. */
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
   --tabbar-h: 0px;
   color-scheme: light;
 }

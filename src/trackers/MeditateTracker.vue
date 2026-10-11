@@ -125,6 +125,7 @@ onBeforeUnmount(() => void HomeIndicator.show().catch(() => {}))
   position: fixed;
   inset: 0;
   z-index: 200;
+  padding-inline: var(--safe-left) var(--safe-right);
   background: var(--color-ink);
   display: flex;
   flex-direction: column;

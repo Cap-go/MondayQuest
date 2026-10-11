@@ -198,6 +198,7 @@ const C = 2 * Math.PI * 120
   position: fixed;
   inset: 0;
   z-index: 200;
+  padding-inline: var(--safe-left) var(--safe-right);
   background: var(--color-ink);
   color: var(--color-paper);
   display: flex;
@@ -205,7 +206,7 @@ const C = 2 * Math.PI * 120
   align-items: center;
   justify-content: center;
   gap: 18px;
-  padding: calc(var(--safe-top) + 20px) 24px calc(var(--safe-bottom) + 24px);
+  padding: calc(var(--safe-top) + 20px) calc(var(--safe-right) + 24px) calc(var(--safe-bottom) + 24px) calc(var(--safe-left) + 24px);
 }
 
 .dial {

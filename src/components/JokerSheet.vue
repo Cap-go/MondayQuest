@@ -150,7 +150,7 @@ defineExpose({ present })
 <style scoped>
 .joker-sheet {
   background: var(--color-sheet);
-  padding: 10px 20px calc(var(--safe-bottom) + 24px);
+  padding: 10px calc(var(--safe-right) + 20px) calc(var(--safe-bottom) + 24px) calc(var(--safe-left) + 20px);
   border-top: 2.5px solid var(--color-ink);
 }
 
