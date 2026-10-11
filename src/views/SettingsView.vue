@@ -97,7 +97,8 @@ function reset() {
 
 function link(url: string) {
   haptic.tap()
-  if (url.includes('t.me/'))
+  // Telegram, X and Capgo open in the real browser / their app, not inside Monday Quest.
+  if (/t\.me\/|x\.com\/|capgo\.app/.test(url))
     return openExternal(url)
   if (native)
     void InAppBrowser.open({ url }).catch(() => window.open(url, '_blank'))
