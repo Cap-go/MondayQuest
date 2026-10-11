@@ -105,10 +105,11 @@ function link(url: string) {
     window.open(url, '_blank')
 }
 
+const CAPGO_URL = 'https://capgo.app/?utm_source=mondayquest&utm_medium=app'
+
 const LINKS = [
   ...(COMMUNITY_URL ? [{ label: () => L('Monday Quest group'), hint: 'Telegram', url: COMMUNITY_URL }] : []),
   { label: () => L('Made by Martin Donadieu'), hint: '@martindonadieu', url: 'https://x.com/martindonadieu' },
-  { label: () => L('Live updates by Capgo'), hint: 'capgo.app', url: 'https://capgo.app/?utm_source=mondayquest&utm_medium=app' },
   { label: () => L('Website'), hint: 'mondayquest.com', url: 'https://mondayquest.com' },
   { label: () => L('Privacy'), hint: '', url: 'https://mondayquest.com/privacy' },
 ]
@@ -247,6 +248,13 @@ function custom() {
       <p class="t-body text-xs text-pencil mt-2 px-4">
         {{ $t('settings.aboutText') }}
       </p>
+      <button class="capgo-pill mt-5" @click="link(CAPGO_URL)">
+        <svg viewBox="0 0 1024 1024" class="capgo-logo" aria-hidden="true">
+          <circle cx="512" cy="512" r="512" fill="#001827" />
+          <path fill="#fff" fill-rule="evenodd" transform="translate(512 512) rotate(-45) scale(0.62)" d="M-190-340H190A150 150 0 0 1 340-190V190A150 150 0 0 1 190 340H-190A150 150 0 0 1-340 190V-190A150 150 0 0 1-190-340ZM-160-145A45 45 0 0 1-70-145V145A45 45 0 0 1-160 145V50H-195A45 45 0 0 1-240 5V-5A45 45 0 0 1-195-50H-160ZM160-145A45 45 0 0 0 70-145V145A45 45 0 0 0 160 145V50H195A45 45 0 0 0 240 5V-5A45 45 0 0 0 195-50H160Z" />
+        </svg>
+        <span>{{ L('Made with Capgo') }}</span>
+      </button>
       <div class="flex justify-center gap-3 mt-5">
         <button v-if="native" class="btn" @click="CapgoInAppReview.requestReview()">
           {{ $t('settings.review') }}
@@ -274,6 +282,30 @@ function custom() {
   background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%;
   background-size: 6px 6px;
   background-repeat: no-repeat;
+}
+
+.capgo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 22px 7px 7px;
+  border: 2.5px solid var(--color-ink);
+  border-radius: 999px;
+  background: var(--color-sheet);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  transition: transform 160ms var(--ease-spring);
+}
+
+.capgo-pill:active {
+  transform: scale(0.97);
+}
+
+.capgo-logo {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
 }
 
 .version-line {
