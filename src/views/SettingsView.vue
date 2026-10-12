@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Settings } from '~/stores/quest'
 import { Capacitor } from '@capacitor/core'
-import { DatePicker } from '@capgo/capacitor-date-picker'
 import { CapgoInAppReview } from '@capgo/capacitor-in-app-review'
 import { InAppBrowser } from '@capgo/capacitor-inappbrowser'
 import { toast } from '@capgo/capacitor-pretty-toast'
@@ -18,6 +17,7 @@ import { buildEnv, isTestBuild } from '~/services/env'
 import { haptic } from '~/services/haptics'
 import { notificationsAllowed, requestNotifications, rescheduleAll } from '~/services/notifications'
 import { locate, wakeHM } from '~/services/sun'
+import { pickTime as pickTimeNative } from '~/services/timePicker'
 import { bundleVersion, nativeVersion } from '~/services/updater'
 import { useQuest } from '~/stores/quest'
 
@@ -41,9 +41,9 @@ async function enableNotif() {
 
 async function pickTime(key: 'reminder' | 'evening' | 'wakeAlarm', title: string) {
   haptic.tap()
-  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, date: quest.settings[key], title, locale: L.tag(), doneText: 'OK', cancelText: L('Cancel') }).catch(() => null)
-  if (res?.value)
-    quest.settings[key] = res.value
+  const value = await pickTimeNative(title, quest.settings[key])
+  if (value)
+    quest.settings[key] = value
 }
 
 const autoWake = ref(wakeHM(new Date(Date.now() + 86_400_000)))
@@ -55,9 +55,9 @@ onMounted(async () => {
 /** Picking a time switches the Rising sun alarm from automatic (sunrise) to fixed. */
 async function pickWake() {
   haptic.tap()
-  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, date: quest.settings.wakeAuto ? autoWake.value : quest.settings.wakeAlarm, title: L('Fixed alarm'), locale: L.tag(), doneText: 'OK', cancelText: L('Cancel') }).catch(() => null)
-  if (res?.value) {
-    quest.settings.wakeAlarm = res.value
+  const value = await pickTimeNative(L('Fixed alarm'), quest.settings.wakeAuto ? autoWake.value : quest.settings.wakeAlarm)
+  if (value) {
+    quest.settings.wakeAlarm = value
     quest.settings.wakeAuto = false
   }
 }

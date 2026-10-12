@@ -2,7 +2,6 @@
 import type { TrackerProps } from './useDay'
 import { Capacitor } from '@capacitor/core'
 import { CapgoBrightness } from '@capgo/capacitor-brightness'
-import { DatePicker } from '@capgo/capacitor-date-picker'
 import { computed, onMounted, ref } from 'vue'
 import { useL } from '~/composables/useL'
 import { addDays, formatHM, fromISO } from '~/lib/date'
@@ -11,6 +10,7 @@ import { setSystemAlarm } from '~/services/alarm'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 import { locate, sunriseHM, wakeHM } from '~/services/sun'
+import { pickTime } from '~/services/timePicker'
 import { useQuest } from '~/stores/quest'
 import { useDay } from './useDay'
 
@@ -75,9 +75,9 @@ function awake() {
 }
 
 async function pick() {
-  const res = await DatePicker.present({ mode: 'time', format: 'HH:mm', is24h: true, locale: L.tag(), title: L('Wake-up time'), doneText: 'OK', cancelText: L('Cancel'), date: data.value.wake || alarmHM.value }).catch(() => null)
-  if (res?.value)
-    record(res.value)
+  const value = await pickTime(L('Wake-up time'), data.value.wake || alarmHM.value)
+  if (value)
+    record(value)
 }
 
 function alarm() {
