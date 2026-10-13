@@ -1,7 +1,7 @@
 {
   "name": "monday-quest",
   "type": "module",
-  "version": "1.1.18",
+  "version": "1.1.19",
   "private": true,
   "description": "Monday Quest — 30 weekly challenges to become a more resilient version of yourself.",
   "author": "Martin Donadieu <martin@capgo.app>",
@@ -54,7 +54,7 @@
     "@capgo/capacitor-navigation-bar": "^8.2.12",
     "@capgo/capacitor-pedometer": "^8.0.46",
     "@capgo/capacitor-photo-library": "^8.0.28",
-    "@capgo/capacitor-pretty-toast": "^8.1.23",
+    "@capgo/capacitor-pretty-toast": "^8.1.25",
     "@capgo/capacitor-rich-notifications": "^8.2.5",
     "@capgo/capacitor-shake": "^8.0.47",
     "@capgo/capacitor-sheets": "^8.1.0",
