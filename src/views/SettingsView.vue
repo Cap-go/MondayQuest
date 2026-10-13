@@ -254,7 +254,7 @@ function custom() {
           <circle cx="512" cy="512" r="512" fill="#001827" />
           <path fill="#fff" fill-rule="evenodd" transform="translate(512 512) rotate(-45) scale(0.62)" d="M-190-340H190A150 150 0 0 1 340-190V190A150 150 0 0 1 190 340H-190A150 150 0 0 1-340 190V-190A150 150 0 0 1-190-340ZM-160-145A45 45 0 0 1-70-145V145A45 45 0 0 1-160 145V50H-195A45 45 0 0 1-240 5V-5A45 45 0 0 1-195-50H-160ZM160-145A45 45 0 0 0 70-145V145A45 45 0 0 0 160 145V50H195A45 45 0 0 0 240 5V-5A45 45 0 0 0 195-50H160Z" />
         </svg>
-        <span>{{ L('Made with Capgo') }}</span>
+        <span>{{ L('Made by Capgo') }}</span>
       </button>
       <div class="flex justify-center gap-3 mt-5">
         <button v-if="native" class="btn" @click="CapgoInAppReview.requestReview()">
