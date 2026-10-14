@@ -20,7 +20,13 @@ const holes = DIGITS.map((d, i) => {
   return { d, i, x: C + Math.cos(a) * R, y: C + Math.sin(a) * R, max: 32 + i * STEP }
 })
 
-const angle = ref(0)
+// Dial angle: written straight to the SVG on every pointer move / frame, never re-rendering the tracker.
+let angle = 0
+const dial = ref<SVGGElement>()
+function setAngle(a: number) {
+  angle = a
+  dial.value?.setAttribute('transform', `rotate(${a} ${C} ${C})`)
+}
 const who = ref(data.value.who)
 const svg = ref<SVGSVGElement>()
 const spun = computed(() => data.value.digits.length > 0)
@@ -63,11 +69,11 @@ function move(e: PointerEvent) {
   if (d < -180)
     d += 360
   last = a
-  const prev = angle.value
-  angle.value = Math.max(0, Math.min(active.max, prev + d))
-  if (Math.floor(angle.value / STEP) !== Math.floor(prev / STEP))
+  const prev = angle
+  setAngle(Math.max(0, Math.min(active.max, prev + d)))
+  if (Math.floor(angle / STEP) !== Math.floor(prev / STEP))
     haptic.select()
-  if (angle.value >= active.max && !stopped) {
+  if (angle >= active.max && !stopped) {
     stopped = true
     haptic.thud()
   }
@@ -78,7 +84,7 @@ function up() {
     return
   const hole = active
   active = null
-  if (angle.value >= hole.max - 4) {
+  if (angle >= hole.max - 4) {
     const digits = (data.value.digits + hole.d).slice(-10)
     patch({ digits })
   }
@@ -87,14 +93,14 @@ function up() {
 
 // the dial whirrs back to rest, clicking once per hole
 function release() {
-  const from = angle.value
+  const from = angle
   const t0 = performance.now()
   const dur = Math.max(160, from * 4)
   let ticks = Math.floor(from / STEP)
   const frame = (t: number) => {
     const k = Math.min(1, (t - t0) / dur)
-    angle.value = from * (1 - k)
-    const left = Math.floor(angle.value / STEP)
+    setAngle(from * (1 - k))
+    const left = Math.floor(angle / STEP)
     if (left < ticks) {
       ticks = left
       sfx.play('tick', 0.5)
@@ -124,7 +130,7 @@ onBeforeUnmount(() => cancelAnimationFrame(raf))
     <svg ref="svg" viewBox="0 0 260 260" width="260" height="260" class="touch-none" @pointerdown="down" @pointermove="move" @pointerup="up" @pointercancel="up">
       <circle :cx="C" :cy="C" r="122" fill="var(--color-sheet)" stroke="var(--color-ink)" stroke-width="3" />
       <text v-for="h in holes" :key="h.d" :x="h.x" :y="h.y + 6" text-anchor="middle" font-size="17" font-weight="800" fill="var(--color-ink)">{{ h.d }}</text>
-      <g :transform="`rotate(${angle} ${C} ${C})`">
+      <g ref="dial" :transform="`rotate(0 ${C} ${C})`">
         <circle :cx="C" :cy="C" r="108" fill="none" stroke="var(--color-ink)" stroke-width="2.5" />
         <circle v-for="h in holes" :key="h.d" :cx="h.x" :cy="h.y" r="17" fill="none" stroke="var(--color-ink)" stroke-width="2.5" />
         <circle :cx="C" :cy="C" r="56" fill="var(--color-paper)" stroke="var(--color-ink)" stroke-width="2.5" />

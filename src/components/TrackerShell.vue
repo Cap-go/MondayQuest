@@ -3,19 +3,21 @@ import type { Challenge } from '~/data/challenges'
 import type { Run } from '~/lib/progress'
 import { Capacitor } from '@capacitor/core'
 import { toast } from '@capgo/capacitor-pretty-toast'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import DoneStamp from '~/components/DoneStamp.vue'
 import InkCheck from '~/components/InkCheck.vue'
 import QuestIcon from '~/components/QuestIcon.vue'
 import { useL } from '~/composables/useL'
+import { t } from '~/i18n'
 import { formatDate } from '~/lib/date'
-import { allChecked, canEditDay, dateOfDay, runStatus, WEEK } from '~/lib/progress'
+import { allChecked, canEditDay, checkedCount, dateOfDay, runStatus, WEEK } from '~/lib/progress'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 import { useQuest } from '~/stores/quest'
 import { TRACKERS } from '~/trackers'
 
-const props = defineProps<{ run: Run, challenge: Challenge }>()
+/** readonly: a past week opened from the notebook. stamp: open straight on the DONE stamp. */
+const props = defineProps<{ run: Run, challenge: Challenge, readonly?: boolean, stamp?: boolean }>()
 
 const quest = useQuest()
 const L = useL()
@@ -26,9 +28,13 @@ watch(todayIdx, v => (selected.value = Math.min(WEEK - 1, Math.max(0, v))))
 
 const status = computed(() => runStatus(props.run, quest.today))
 const tracker = computed(() => TRACKERS[props.challenge.tracker])
-const editable = computed(() => canEditDay(props.run, selected.value, quest.today))
+const editable = computed(() => !props.readonly && canEditDay(props.run, selected.value, quest.today))
+const canTick = (i: number) => !props.readonly && canEditDay(props.run, i, quest.today)
 const complete = computed(() => allChecked(props.run))
 const celebrating = ref(false)
+/** The day panel: hidden for finished or past weeks; before Monday only the sunrise alarm shows (to arm it the night before). */
+const showPanel = computed(() => !props.readonly && !props.run.completedAt && (status.value !== 'upcoming' || props.challenge.tracker === 'sunrise'))
+const live = computed(() => !props.readonly && ['upcoming', 'active', 'finishing'].includes(status.value))
 
 const startLabel = computed(() => formatDate(props.run.start, L.tag(), { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }))
 
@@ -80,8 +86,22 @@ function onCelebrated() {
   quest.complete(props.run)
 }
 
+onMounted(() => {
+  if (props.stamp)
+    stampDone()
+})
+
+function giveUp() {
+  haptic.warning()
+  // eslint-disable-next-line no-alert
+  if (!window.confirm(t('detail.giveUpConfirm')))
+    return
+  quest.abandon(props.run)
+  haptic.tap()
+}
+
 function dayLabel(i: number) {
-  return L(`DAY ${i + 1}`)
+  return t('common.day', { n: i + 1 }).toLocaleUpperCase(L.tag())
 }
 
 function dayDate(i: number) {
@@ -105,11 +125,28 @@ function dayDate(i: number) {
       {{ $t('home.startsIn') }} — {{ L('your notebook awaits.') }}
     </p>
     <p v-else-if="status === 'missed'" class="t-body text-center text-graphite mb-6">
-      {{ $t('home.missed') }}
+      {{ $t('home.missed') }} {{ $t('home.weekOver', { n: checkedCount(run) }) }}
+    </p>
+    <p v-else-if="status === 'abandoned'" class="t-body text-center text-graphite mb-6">
+      {{ $t('detail.gaveUp') }} {{ checkedCount(run) }}/7
+    </p>
+    <p v-else-if="status === 'finishing' && !complete" class="t-display text-center text-lg mb-6">
+      {{ $t('home.catchUp', { n: checkedCount(run) }) }}
+    </p>
+    <div v-else-if="status === 'finishing' && complete && !run.completedAt" class="text-center mb-7">
+      <p class="t-display text-lg">
+        {{ $t('home.finishing') }}
+      </p>
+      <button class="btn btn-ink w-full mt-4" @click="stampDone">
+        {{ $t('home.stampDone') }}
+      </button>
+    </div>
+    <p v-if="readonly && !run.completedAt" class="t-label text-center text-pencil mb-6">
+      {{ $t('detail.pastWeek') }}
     </p>
 
     <!-- interactive panel for the selected day -->
-    <section v-if="status !== 'upcoming' && !run.completedAt" ref="panel" class="panel frame mb-7" :class="{ nudge }">
+    <section v-if="showPanel" ref="panel" class="panel frame mb-7" :class="{ nudge }">
       <div class="frame-inner px-4 pt-4 pb-5">
         <div class="flex items-baseline justify-between mb-3">
           <span class="t-display text-lg">{{ dayLabel(selected) }}</span>
@@ -144,7 +181,7 @@ function dayDate(i: number) {
           <InkCheck
             :model-value="run.days[i - 1]!.done"
             :size="58"
-            :disabled="!canEditDay(run, i - 1, quest.today)"
+            :disabled="!canTick(i - 1)"
             :manual="challenge.tracker === 'custom'"
             @update:model-value="v => toggle(i - 1, v)"
             @needs-action="needsAction(i - 1)"
@@ -160,11 +197,15 @@ function dayDate(i: number) {
           label="DONE"
           variant="done"
           :size="70"
-          :disabled="!complete || !!run.completedAt"
+          :disabled="readonly || !complete || !!run.completedAt"
           @update:model-value="stampDone"
         />
       </div>
     </section>
+
+    <button v-if="live && !run.completedAt" class="give-up t-label text-graphite underline" @click="giveUp">
+      {{ $t('detail.giveUp') }}
+    </button>
 
     <DoneStamp v-if="celebrating" :challenge="challenge" @stamped="onCelebrated" @close="celebrating = false" />
   </div>
@@ -173,6 +214,11 @@ function dayDate(i: number) {
 <style scoped>
 .archived :deep(.is-disabled) {
   opacity: 1;
+}
+
+.give-up {
+  display: block;
+  margin: 36px auto 0;
 }
 
 .day-cell {

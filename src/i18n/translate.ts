@@ -38,6 +38,14 @@ export function deviceTag(): string {
   return (typeof navigator !== 'undefined' && navigator.language) || 'en-GB'
 }
 
+/**
+ * Hand-written dictionaries shipped with the app (English source → copy): they work offline
+ * from the very first launch and win over the worker's machine translation.
+ */
+const BUNDLED: Record<string, () => Promise<{ default: Record<string, string> }>> = {
+  fr: () => import('./fr.json'),
+}
+
 const translatable = (t: string) => !!t && /[a-z]/i.test(t)
 
 /** Translate an English string. Returns English until the translation arrives (reactive). */
@@ -143,7 +151,7 @@ function persistSoon() {
   }, 800)
 }
 
-/** Switch language: load the device cache, then fill the gaps from the worker. */
+/** Switch language: load the device cache and the bundled dictionary, then fill the gaps from the worker. */
 export async function setLanguage(code: string, tag = code) {
   lang.value = code
   langTag.value = tag
@@ -159,6 +167,11 @@ export async function setLanguage(code: string, tag = code) {
         dict.set(k, v)
     }
     catch {}
+  }
+  const bundled = await BUNDLED[code]?.().catch(() => undefined)
+  if (bundled && lang.value === code) {
+    for (const [k, v] of Object.entries(bundled.default))
+      dict.set(k, v)
   }
   if (typeof document !== 'undefined')
     document.documentElement.lang = code

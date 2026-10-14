@@ -2,6 +2,7 @@
 import type { TrackerProps } from './useDay'
 import { computed, ref } from 'vue'
 import CameraCapture from '~/components/CameraCapture.vue'
+import { useInView } from '~/composables/useInView'
 import { useL } from '~/composables/useL'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
@@ -19,6 +20,11 @@ let fid = 0
 
 const ready = computed(() => !!data.value.dish.trim() && data.value.ingredients.length >= MIN)
 const heat = computed(() => Math.min(1, data.value.ingredients.length / MIN))
+/** At most 6 bubbles animate, however full the pot gets. */
+const BUBBLES = 6
+const bubbles = computed(() => Math.min(BUBBLES, data.value.ingredients.length))
+const root = ref<HTMLElement>()
+const visible = useInView(root)
 
 function setDish(v: string) {
   patch({ dish: v })
@@ -68,7 +74,7 @@ function serve() {
 </script>
 
 <template>
-  <div class="card border-[2.5px] border-ink p-4 bg-sheet">
+  <div ref="root" class="card border-[2.5px] border-ink p-4 bg-sheet" :class="{ 'anim-off': !visible }">
     <p class="t-label text-graphite">
       {{ L('On the menu') }}
     </p>
@@ -92,10 +98,12 @@ function serve() {
       <svg viewBox="0 0 200 130" class="w-48">
         <!-- steam -->
         <g v-if="heat > 0" fill="none" stroke="var(--color-pencil)" stroke-width="2.5" stroke-linecap="round">
-          <path v-for="i in 3" :key="i" :d="`M${60 + i * 20} 34 q-8 -10 0 -18 q8 -8 0 -18`" class="steam" :style="{ animationDelay: `${i * 0.4}s`, opacity: heat }" />
+          <g v-for="i in 3" :key="i" class="steam" :style="{ animationDelay: `${i * 0.4}s` }">
+            <path :d="`M${60 + i * 20} 34 q-8 -10 0 -18 q8 -8 0 -18`" :style="{ opacity: heat }" />
+          </g>
         </g>
         <!-- bubbles -->
-        <circle v-for="(_, i) in data.ingredients" :key="i" :cx="58 + ((i * 37) % 84)" cy="52" :r="3 + (i % 3)" fill="none" stroke="var(--color-ink)" stroke-width="2" class="bubble" :style="{ animationDelay: `${(i * 0.31) % 1.4}s` }" />
+        <circle v-for="(_, i) in bubbles" :key="i" :cx="58 + ((i * 37) % 84)" cy="52" :r="3 + (i % 3)" fill="none" stroke="var(--color-ink)" stroke-width="2" class="bubble" :style="{ animationDelay: `${(i * 0.31) % 1.4}s` }" />
         <!-- pot -->
         <path d="M40 48 h120 v52 q0 22 -22 22 h-76 q-22 0 -22 -22 z" fill="var(--color-paper)" stroke="var(--color-ink)" stroke-width="3" />
         <line x1="40" y1="48" x2="160" y2="48" stroke="var(--color-ink)" stroke-width="3" />
@@ -215,17 +223,18 @@ function serve() {
   animation: steam 2.2s ease-in-out infinite;
 }
 
+/* group opacity: same look as stroke-opacity on a single stroke, cheaper to animate */
 @keyframes steam {
   0% {
     transform: translateY(6px);
-    stroke-opacity: 0;
+    opacity: 0;
   }
   50% {
-    stroke-opacity: 1;
+    opacity: 1;
   }
   100% {
     transform: translateY(-8px);
-    stroke-opacity: 0;
+    opacity: 0;
   }
 }
 

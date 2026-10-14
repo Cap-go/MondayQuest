@@ -3,6 +3,7 @@ import type { TrackerProps } from './useDay'
 import { Capacitor } from '@capacitor/core'
 import { Health } from '@capgo/capacitor-health'
 import { HomeIndicator } from '@capgo/capacitor-home-indicator'
+import { toast } from '@capgo/capacitor-pretty-toast'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useL } from '~/composables/useL'
 import { formatClock } from '~/lib/date'
@@ -56,8 +57,10 @@ async function logMindful() {
   if (!Capacitor.isNativePlatform())
     return
   const ok = await Health.requestAuthorization({ write: ['mindfulness'] }).catch(() => null)
-  if (!ok?.writeAuthorized.includes('mindfulness'))
+  if (!ok?.writeAuthorized.includes('mindfulness')) {
+    toast.info(Capacitor.getPlatform() === 'ios' ? L('Allow Mindful Minutes in Settings > Health') : L('Allow Mindfulness in Health Connect'), { message: L('To save your sessions in Health.') })
     return
+  }
   await Health.saveSample({ dataType: 'mindfulness', value: MIN, unit: 'minute', startDate: new Date(Date.now() - GOAL).toISOString(), endDate: new Date().toISOString(), mindfulnessSessionType: 'meditation' }).catch(() => {})
 }
 

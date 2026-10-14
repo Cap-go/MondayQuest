@@ -3,6 +3,7 @@ import type { PluginListenerHandle } from '@capacitor/core'
 import type { TrackerProps } from './useDay'
 import { Capacitor } from '@capacitor/core'
 import { CapacitorPedometer } from '@capgo/capacitor-pedometer'
+import { toast } from '@capgo/capacitor-pretty-toast'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import TimerRing from '~/components/TimerRing.vue'
 import { useL } from '~/composables/useL'
@@ -32,8 +33,11 @@ async function startPedometer() {
   if (!Capacitor.isNativePlatform())
     return
   const perm = await CapacitorPedometer.requestPermissions().catch(() => null)
-  if (perm?.activityRecognition !== 'granted')
+  if (perm?.activityRecognition !== 'granted') {
+    // The walk still counts; only the step count is missing.
+    toast.info(Capacitor.getPlatform() === 'ios' ? L('Allow Motion & Fitness in Settings > Monday Quest') : L('Allow Physical activity in Settings > Monday Quest'), { message: L('To count your steps.') })
     return
+  }
   base = steps.value
   handle = await CapacitorPedometer.addListener('measurement', (m) => {
     if (m.numberOfSteps != null)

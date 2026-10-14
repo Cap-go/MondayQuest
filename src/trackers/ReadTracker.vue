@@ -131,15 +131,30 @@ function up(e: PointerEvent) {
   backface-visibility: hidden;
 }
 
+/* The page's shadow lives on its own layer and fades in: box-shadow itself is never animated. */
+.leaf::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 -2px;
+  box-shadow: -20px 0 30px -20px rgb(0 0 0 / 0.4);
+  opacity: 0;
+  pointer-events: none;
+  animation: leaf-shadow 600ms var(--ease-ink) forwards;
+}
+
 @keyframes leaf {
   0% {
     transform: rotateY(0);
-    box-shadow: none;
   }
   100% {
     transform: rotateY(-180deg);
-    box-shadow: -20px 0 30px -20px rgb(0 0 0 / 0.4);
     opacity: 0;
+  }
+}
+
+@keyframes leaf-shadow {
+  to {
+    opacity: 1;
   }
 }
 </style>

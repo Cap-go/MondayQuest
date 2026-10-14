@@ -23,40 +23,52 @@ const holding = ref(false)
 const ready = ref(0)
 let readyTimer: ReturnType<typeof setInterval> | undefined
 let spoken = new Set<string>()
-const ms = ref(0)
-const jitter = ref(0)
-const wobble = ref(0)
+/** Whole seconds: the only part of the clock the template shows, so the tracker re-renders once a second. */
+const sec = ref(0)
+let ms = 0
+let jitter = 0
+let wobble = 0
 let raf = 0
 let t0 = 0
 let lastBeat = 0
 let last = { x: 0, y: 0, z: 0 }
 let handle: PluginListenerHandle | undefined
+let alive = true
+const body = ref<SVGPathElement>()
+const ring = ref<SVGCircleElement>()
 
-const secs = computed(() => ms.value / 1000)
-const progress = computed(() => Math.min(1, secs.value / target.value))
-// Fatigue grows with time; real phone shake adds on top.
-const amp = computed(() => (holding.value ? 0.4 + progress.value * 2.6 + jitter.value * 6 : 0))
-const bodyPath = computed(() => {
-  const a = amp.value
-  const w = wobble.value
-  const y = (i: number) => (Math.sin(w * 1.7 + i * 2.1) * a).toFixed(1)
+const progress = computed(() => Math.min(1, sec.value / target.value))
+const C = 2 * Math.PI * 120
+const REST_PATH = 'M44 92 L110 80 L176 70 L230 64'
+// Fatigue grows with time; real phone shake adds on top. Written straight to the DOM every frame.
+function bodyPath(p: number) {
+  const a = 0.4 + p * 2.6 + jitter * 6
+  const y = (i: number) => (Math.sin(wobble * 1.7 + i * 2.1) * a).toFixed(1)
   return `M44 ${92 + +y(0)} L110 ${80 + +y(1)} L176 ${70 + +y(2)} L230 ${64 + +y(3)}`
-})
+}
 
 async function listen() {
-  handle = await CapacitorAccelerometer.addListener('measurement', ({ x, y, z }) => {
+  const h = await CapacitorAccelerometer.addListener('measurement', ({ x, y, z }) => {
     const d = Math.abs(x - last.x) + Math.abs(y - last.y) + Math.abs(z - last.z)
     last = { x, y, z }
-    jitter.value += (Math.min(1, d) - jitter.value) * 0.15
+    jitter += (Math.min(1, d) - jitter) * 0.15
   }).catch(() => undefined)
+  // Dropped or left the page while the plugin was answering: do not leave a sensor running.
+  if (!alive || !holding.value) {
+    void h?.remove()
+    return
+  }
+  handle = h
   await CapacitorAccelerometer.startMeasurementUpdates().catch(() => {})
+  if (!alive || !holding.value)
+    stopListening()
 }
 
 function stopListening() {
   void CapacitorAccelerometer.stopMeasurementUpdates().catch(() => {})
   void handle?.remove()
   handle = undefined
-  jitter.value = 0
+  jitter = 0
 }
 
 function say(text: string) {
@@ -65,7 +77,7 @@ function say(text: string) {
 
 /** Voice + haptic coaching so you never have to look at the phone. */
 function coach() {
-  const left = Math.ceil(target.value - secs.value)
+  const left = Math.ceil(target.value - ms / 1000)
   const cue = (key: string, text: string) => {
     if (spoken.has(key))
       return
@@ -112,7 +124,9 @@ function start() {
   if (!props.editable || holding.value)
     return
   holding.value = true
-  ms.value = 0
+  ms = 0
+  sec.value = 0
+  wobble = 0
   t0 = performance.now()
   lastBeat = 0
   sfx.play('whoosh', 0.6)
@@ -120,18 +134,24 @@ function start() {
   void KeepAwake.keepAwake().catch(() => {})
   void listen()
   const loop = (t: number) => {
-    ms.value = t - t0
-    wobble.value += 0.6 + progress.value * 0.9
-    const tens = Math.floor(ms.value / 10_000)
+    ms = t - t0
+    const s = Math.floor(ms / 1000)
+    if (s !== sec.value)
+      sec.value = s
+    const p = Math.min(1, ms / 1000 / target.value)
+    wobble += 0.6 + p * 0.9
+    body.value?.setAttribute('d', bodyPath(p))
+    ring.value?.setAttribute('stroke-dashoffset', String(C * (1 - p)))
+    const tens = Math.floor(ms / 10_000)
     if (tens > lastBeat) {
       lastBeat = tens
       haptic.heartbeat()
       sfx.play('tick', 0.5)
     }
     coach()
-    if (secs.value >= target.value && !done.value) {
+    if (ms / 1000 >= target.value && !done.value) {
       sfx.play('bell')
-      markDone({ best: Math.max(data.value.best, Math.floor(secs.value)) })
+      markDone({ best: Math.max(data.value.best, s) })
     }
     raf = requestAnimationFrame(loop)
   }
@@ -150,8 +170,9 @@ function drop() {
   cancelAnimationFrame(raf)
   holding.value = false
   stopListening()
+  body.value?.setAttribute('d', REST_PATH)
   void KeepAwake.allowSleep().catch(() => {})
-  const s = Math.floor(secs.value)
+  const s = Math.floor(ms / 1000)
   haptic.thud()
   sfx.play(s >= target.value ? 'stamp' : 'erase')
   if (s > data.value.best)
@@ -159,6 +180,7 @@ function drop() {
 }
 
 onBeforeUnmount(() => {
+  alive = false
   clearInterval(readyTimer)
   cancelAnimationFrame(raf)
   if (holding.value)
@@ -166,8 +188,6 @@ onBeforeUnmount(() => {
   stopListening()
 })
 
-const left = computed(() => target.value - secs.value)
-const C = 2 * Math.PI * 120
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 </script>
 
@@ -177,7 +197,7 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
       {{ L('Today\'s target') }} · {{ fmt(target) }}
     </p>
     <p class="t-display text-6xl tabular-nums mt-1" :class="{ 'text-ice': holding && progress >= 1 }">
-      {{ fmt(holding ? secs : data.best) }}
+      {{ fmt(holding ? sec : data.best) }}
     </p>
     <svg viewBox="0 0 280 130" class="w-full max-w-[320px] mt-2" :class="{ shake: holding }">
       <line x1="10" y1="112" x2="270" y2="112" stroke="var(--color-rule)" stroke-width="2" />
@@ -185,7 +205,7 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
       <path d="M232 112 L232 84 M232 112 L262 112" stroke="var(--color-ink)" stroke-width="3" fill="none" stroke-linecap="square" />
       <circle cx="244" cy="50" r="11" fill="var(--color-paper)" stroke="var(--color-ink)" stroke-width="3" />
       <!-- body line -->
-      <path :d="bodyPath" stroke="var(--color-ink)" stroke-width="3.5" fill="none" stroke-linejoin="round" />
+      <path ref="body" :d="REST_PATH" stroke="var(--color-ink)" stroke-width="3.5" fill="none" stroke-linejoin="round" />
       <path d="M44 92 L30 112" stroke="var(--color-ink)" stroke-width="3" fill="none" />
       <!-- progress rule -->
       <line x1="10" y1="124" :x2="10 + 260 * (holding ? progress : Math.min(1, data.best / target))" y2="124" stroke="var(--color-ink)" stroke-width="3" class="bar" />
@@ -222,16 +242,17 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
           <svg viewBox="0 0 260 260" class="ring">
             <circle cx="130" cy="130" r="120" fill="none" stroke="rgb(255 255 255 / 0.15)" stroke-width="10" />
             <circle
+              ref="ring"
               cx="130" cy="130" r="120" fill="none" stroke="var(--color-paper)" stroke-width="10"
-              :stroke-dasharray="C" :stroke-dashoffset="C * (1 - progress)" transform="rotate(-90 130 130)"
+              :stroke-dasharray="C" :stroke-dashoffset="C" transform="rotate(-90 130 130)"
             />
           </svg>
           <div class="center">
             <p class="t-display tabular-nums text-paper big">
-              {{ left > 0 ? fmt(Math.ceil(left)) : `+${fmt(-left)}` }}
+              {{ sec < target ? fmt(target - sec) : `+${fmt(sec - target)}` }}
             </p>
             <p class="t-label text-paper/70 mt-2">
-              {{ left > 0 ? L('to hold') : L('bonus') }} · {{ fmt(target) }}
+              {{ sec < target ? L('to hold') : L('bonus') }} · {{ fmt(target) }}
             </p>
           </div>
           <p class="t-label text-paper/60 hint">

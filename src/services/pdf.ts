@@ -5,7 +5,7 @@ import { FileSharer } from '@capgo/capacitor-file-sharer'
 import { jsPDF as JsPDF } from 'jspdf'
 import { CATEGORY_LABEL, CHALLENGES, LEVELS } from '~/data/challenges'
 import { langTag, tr } from '~/i18n/translate'
-import { addDays, formatDate } from '~/lib/date'
+import { addDays, formatDate, toISO } from '~/lib/date'
 import { checkedCount } from '~/lib/progress'
 import { TRACKERS } from '~/trackers'
 
@@ -256,7 +256,7 @@ export async function exportNotebook(input: ExportInput) {
     doc.addPage()
     runPage(doc, input, r, c, page++)
   }
-  const filename = `monday-quest-${new Date().toISOString().slice(0, 10)}.pdf`
+  const filename = `monday-quest-${toISO(new Date())}.pdf`
   if (!Capacitor.isNativePlatform()) {
     doc.save(filename)
     return

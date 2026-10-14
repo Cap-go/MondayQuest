@@ -8,7 +8,7 @@ import { lang } from '~/i18n/translate'
 import { today as todayISO } from '~/lib/date'
 import { allChecked, completeRun, dayIndex, isLive, newRun, patchDayData, runStatus, setDay, streak } from '~/lib/progress'
 import { loadJSON, saveJSON } from '~/lib/storage'
-import { onCloudChange, readCloud, reattachLocal, writeCloud } from '~/services/cloud'
+import { CLOUD_TIMEOUT, onCloudChange, readCloud, reattachLocal, writeCloud } from '~/services/cloud'
 
 /** Bonus level for user-made challenges, never locked. */
 export const CUSTOM_LEVEL = 99
@@ -45,7 +45,11 @@ export interface Jokers {
 /** Jokers are earned, never given: one per month for sharing Monday Quest with someone. */
 export const STARTING_JOKERS = 0
 
-const monthOf = (t: number) => new Date(t).toISOString().slice(0, 7)
+/** Local calendar month (YYYY-MM): the share joker resets at local midnight on the 1st, not UTC. */
+function monthOf(t: number) {
+  const d = new Date(t)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
 
 interface Persisted {
   version: 1
@@ -153,12 +157,24 @@ export const useQuest = defineStore('quest', () => {
       runs.value.splice(i, 1, run)
   }
 
+  /**
+   * Callers often hold a snapshot (a tracker's props.run is only refreshed on the next render),
+   * so every mutation starts from the stored copy: two writes in one handler both land.
+   */
+  function latest(run: Run): Run | undefined {
+    return runs.value.find(r => r.id === run.id)
+  }
+
   function toggleDay(run: Run, idx: number, done: boolean, data?: Record<string, any>) {
-    replace(setDay(run, idx, done, data))
+    const cur = latest(run)
+    if (cur)
+      replace(setDay(cur, idx, done, data))
   }
 
   function patchDay(run: Run, idx: number, data: Record<string, any>) {
-    replace(patchDayData(run, idx, data))
+    const cur = latest(run)
+    if (cur)
+      replace(patchDayData(cur, idx, data))
   }
 
   function todayIndex(run: Run): number {
@@ -166,9 +182,10 @@ export const useQuest = defineStore('quest', () => {
   }
 
   function complete(run: Run) {
-    if (!allChecked(run))
+    const cur = latest(run)
+    if (!cur || !allChecked(cur))
       return
-    replace(completeRun(run))
+    replace(completeRun(cur))
   }
 
   function canUseJoker(c: Challenge): boolean {
@@ -191,7 +208,9 @@ export const useQuest = defineStore('quest', () => {
   }
 
   function abandon(run: Run) {
-    replace({ ...run, abandonedAt: Date.now() })
+    const cur = latest(run)
+    if (cur)
+      replace({ ...cur, abandonedAt: Date.now() })
   }
 
   function addCustom(c: Omit<Challenge, 'id' | 'n' | 'source' | 'level'>) {
@@ -239,9 +258,13 @@ export const useQuest = defineStore('quest', () => {
   }
 
   /** Take the iCloud copy when another device saved after this one (new phone, reinstall, iPad). */
+  /** Set when iCloud was too slow to answer: its copy may be newer, so don't back this phone up over it. */
+  let cloudUnknown = false
+
   async function pullCloud(local: Persisted): Promise<Persisted> {
     const cloud = await readCloud<Persisted>()
-    if (!cloud?.runs || (cloud.savedAt ?? 0) <= (local.savedAt ?? 0))
+    cloudUnknown = cloud === CLOUD_TIMEOUT
+    if (cloud === CLOUD_TIMEOUT || !cloud?.runs || (cloud.savedAt ?? 0) <= (local.savedAt ?? 0))
       return local
     return reattachLocal(cloud, local)
   }
@@ -253,7 +276,7 @@ export const useQuest = defineStore('quest', () => {
     if (data !== local) {
       void saveJSON(KEY, snapshot())
     }
-    else if (runs.value.length || settings.value.onboarded) {
+    else if (!cloudUnknown && (runs.value.length || settings.value.onboarded)) {
       // This phone is the newest copy (or progress from before iCloud sync): back it up now.
       savedAt ||= 1
       void writeCloud(snapshot())
@@ -261,7 +284,12 @@ export const useQuest = defineStore('quest', () => {
     ready.value = true
     setInterval(tick, 60_000)
     onCloudChange(async () => {
+      // An edit still inside the save debounce is the newest copy: stamp and write it before comparing.
+      flushSave()
       const next = await pullCloud(snapshot())
+      // A local edit made while iCloud was being read wins too (it saves with a later stamp).
+      if (content() !== lastContent)
+        return
       if (next.savedAt !== savedAt) {
         apply(next)
         void saveJSON(KEY, snapshot())
@@ -270,20 +298,31 @@ export const useQuest = defineStore('quest', () => {
   }
 
   let saveTimer: ReturnType<typeof setTimeout> | undefined
+  function persist() {
+    saveTimer = undefined
+    const c = content()
+    if (c === lastContent)
+      return
+    lastContent = c
+    savedAt = Date.now()
+    const state = snapshot()
+    void saveJSON(KEY, state satisfies Persisted)
+    void writeCloud(state)
+  }
+
+  /** Write a pending debounced save right now. */
+  function flushSave() {
+    if (saveTimer === undefined)
+      return
+    clearTimeout(saveTimer)
+    persist()
+  }
+
   watch([runs, custom, settings, jokers], () => {
     if (!ready.value)
       return
     clearTimeout(saveTimer)
-    saveTimer = setTimeout(() => {
-      const c = content()
-      if (c === lastContent)
-        return
-      lastContent = c
-      savedAt = Date.now()
-      const state = snapshot()
-      void saveJSON(KEY, state satisfies Persisted)
-      void writeCloud(state)
-    }, 250)
+    saveTimer = setTimeout(persist, 250)
   }, { deep: true })
 
   function tick() {

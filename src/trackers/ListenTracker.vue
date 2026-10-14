@@ -78,8 +78,14 @@ async function arm() {
   samples = 0
   haptic.press()
   sfx.play('chime', 0.5)
-  handle = await CapacitorAccelerometer.addListener('measurement', onSample).catch(() => undefined)
+  const h = await CapacitorAccelerometer.addListener('measurement', onSample).catch(() => undefined)
+  // Disarmed (stop, unmount) while the listener was being added: drop it instead of leaking it.
+  if (!armed.value)
+    return void h?.remove()
+  handle = h
   await CapacitorAccelerometer.startMeasurementUpdates().catch(() => {})
+  if (!armed.value)
+    return void CapacitorAccelerometer.stopMeasurementUpdates().catch(() => {})
   setTimeout(() => {
     sensorless = samples === 0
     evaluate()
@@ -124,9 +130,12 @@ onBeforeUnmount(disarm)
 <template>
   <div class="flex flex-col items-center">
     <TimerRing :progress="progress" :size="200" :ticks="MIN">
-      <svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto mb-1" :class="{ breathe: running }">
-        <path d="M15 19a9 9 0 0 1 18 0c0 6-5 8-6 13a5 5 0 0 1-9 1M20 20a4 4 0 0 1 8 0c0 3-3 3.5-3 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
-      </svg>
+      <!-- The wrapper breathes, not the SVG: a composited transform instead of re-rasterising the icon each frame. -->
+      <div class="w-10 h-10 mx-auto mb-1" :class="{ breathe: running }">
+        <svg viewBox="0 0 48 48" class="w-full h-full">
+          <path d="M15 19a9 9 0 0 1 18 0c0 6-5 8-6 13a5 5 0 0 1-9 1M20 20a4 4 0 0 1 8 0c0 3-3 3.5-3 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+        </svg>
+      </div>
       <p class="t-display text-4xl tabular-nums">
         {{ formatClock(running || elapsed ? remaining : GOAL) }}
       </p>
@@ -169,6 +178,7 @@ onBeforeUnmount(disarm)
 <style scoped>
 .breathe {
   animation: breathe 3.2s ease-in-out infinite;
+  will-change: transform;
 }
 
 @keyframes breathe {

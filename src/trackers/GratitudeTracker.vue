@@ -69,6 +69,9 @@ async function dictate(i: number) {
     toast.error(L('Dictation stopped'), { message: e.message })
     void stopDictation()
   }))
+  // Stopped (or unmounted) while the listeners were being added: drop them, don't start.
+  if (listening.value !== i)
+    return void Promise.all(handles.splice(0).map(h => h.remove()))
   try {
     const res = await SpeechRecognition.start({ language: L.tag(), partialResults: true, addPunctuation: true, popup: false, maxResults: 1 })
     const final = res?.matches?.[0]

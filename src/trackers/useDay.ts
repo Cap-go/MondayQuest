@@ -15,7 +15,10 @@ export interface TrackerProps {
 
 export function useDay<T extends Record<string, any>>(props: TrackerProps, defaults: T) {
   const quest = useQuest()
-  const entry = computed(() => props.run.days[props.idx]!)
+  // Read the stored run, not props.run: the prop only catches up on the next render, so a
+  // handler that patches then reads (or patches twice) would otherwise see the old day.
+  const run = computed(() => quest.runs.find(r => r.id === props.run.id) ?? props.run)
+  const entry = computed(() => run.value.days[props.idx]!)
   const data = computed<T>(() => ({ ...defaults, ...entry.value.data }) as T)
   const done = computed(() => entry.value.done)
 

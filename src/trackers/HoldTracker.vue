@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TrackerProps } from './useDay'
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 import { useL } from '~/composables/useL'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
@@ -12,8 +12,13 @@ const L = useL()
 const { done, markDone } = useDay(props, {})
 
 const HOLD = 2400
-const progress = ref(0)
+const C = 2 * Math.PI * 70
+/** Rest size of the core, scaled up to 22 while holding (transform, not `r`, so it stays on the compositor). */
+const CORE_REST = `scale(${12 / 22})`
+let progress = 0
 const holding = ref(false)
+const arc = ref<SVGCircleElement>()
+const core = ref<SVGCircleElement>()
 let raf = 0
 let t0 = 0
 let lastBeat = 0
@@ -25,12 +30,13 @@ function start() {
   t0 = performance.now()
   lastBeat = 0
   const loop = (t: number) => {
-    progress.value = Math.min(1, (t - t0) / HOLD)
+    progress = Math.min(1, (t - t0) / HOLD)
+    paint(progress)
     if (t - lastBeat > 600) {
       haptic.heartbeat()
       lastBeat = t
     }
-    if (progress.value >= 1) {
+    if (progress >= 1) {
       holding.value = false
       markDone()
       return
@@ -45,13 +51,21 @@ function stop() {
     return
   holding.value = false
   cancelAnimationFrame(raf)
-  if (progress.value < 1) {
+  if (progress < 1) {
     sfx.play('tick')
-    progress.value = 0
+    progress = 0
+    paint(0)
   }
 }
 
-const C = 2 * Math.PI * 70
+// Written from the frame loop: the tracker does not re-render while the ring closes.
+function paint(p: number) {
+  arc.value?.setAttribute('stroke-dashoffset', String(C * (1 - p)))
+  if (core.value)
+    core.value.style.transform = p ? `scale(${(12 + p * 10) / 22})` : CORE_REST
+}
+
+onBeforeUnmount(() => cancelAnimationFrame(raf))
 </script>
 
 <template>
@@ -59,8 +73,8 @@ const C = 2 * Math.PI * 70
     <button class="hold" :class="{ holding, done }" :disabled="!editable" @pointerdown.prevent="start" @pointerup="stop" @pointerleave="stop" @pointercancel="stop">
       <svg viewBox="0 0 160 160" class="w-44 h-44">
         <circle cx="80" cy="80" r="70" fill="none" stroke="var(--color-rule)" stroke-width="5" />
-        <circle cx="80" cy="80" r="70" fill="none" stroke="var(--color-ink)" stroke-width="5" :stroke-dasharray="C" :stroke-dashoffset="C * (1 - (done ? 1 : progress))" transform="rotate(-90 80 80)" />
-        <circle cx="80" cy="80" :r="done ? 22 : 12 + progress * 10" fill="var(--color-ink)" class="core" />
+        <circle ref="arc" cx="80" cy="80" r="70" fill="none" stroke="var(--color-ink)" stroke-width="5" :stroke-dasharray="C" :stroke-dashoffset="done ? 0 : C" transform="rotate(-90 80 80)" />
+        <circle ref="core" cx="80" cy="80" r="22" fill="var(--color-ink)" class="core" :style="{ transform: done ? 'none' : CORE_REST }" />
       </svg>
     </button>
     <p class="t-display text-lg mt-3">
@@ -82,7 +96,8 @@ const C = 2 * Math.PI * 70
 }
 
 .core {
-  transition: r 200ms;
+  transform-origin: 80px 80px;
+  transition: transform 200ms;
 }
 
 .hold.done .core {
@@ -91,7 +106,7 @@ const C = 2 * Math.PI * 70
 
 @keyframes settle {
   from {
-    r: 34;
+    transform: scale(1.5455); /* r 34 over the 22 rest radius */
   }
 }
 </style>

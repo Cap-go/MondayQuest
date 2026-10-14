@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { PluginListenerHandle } from '@capacitor/core'
 import type { TrackerProps } from './useDay'
+import { Capacitor } from '@capacitor/core'
 import { CapgoCompass } from '@capgo/capacitor-compass'
+import { toast } from '@capgo/capacitor-pretty-toast'
 import { CapacitorShake } from '@capgo/capacitor-shake'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useL } from '~/composables/useL'
@@ -26,8 +28,10 @@ const delta = computed(() => {
 })
 const aligned = computed(() => target.value >= 0 && Math.abs(delta.value) < 12)
 
-onMounted(async () => {
-  await CapgoCompass.requestPermissions().catch(() => {})
+/** Compass not allowed yet: asked from a tap (with a word of why), never on page load. */
+const needsCompass = ref(false)
+
+async function listenCompass() {
   const h = await CapgoCompass.addListener('headingChange', ({ value }) => {
     heading.value = value
     if (aligned.value && !lastAligned)
@@ -37,6 +41,25 @@ onMounted(async () => {
   if (h)
     handles.push(h)
   await CapgoCompass.startListening({ minInterval: 60, minHeadingChange: 1 }).catch(() => {})
+}
+
+async function allowCompass() {
+  haptic.tap()
+  const perm = await CapgoCompass.requestPermissions().catch(() => null)
+  if (perm?.compass !== 'granted') {
+    toast.error(L('Allow Location in Settings > Monday Quest'), { message: L('The compass needs it to know where you face.') })
+    return
+  }
+  needsCompass.value = false
+  await listenCompass()
+}
+
+onMounted(async () => {
+  const perm = Capacitor.isNativePlatform() ? await CapgoCompass.checkPermissions().catch(() => null) : null
+  if (!Capacitor.isNativePlatform() || perm?.compass === 'granted')
+    await listenCompass()
+  else
+    needsCompass.value = true
   const sh = await CapacitorShake.addListener('shake', draw).catch(() => null)
   if (sh)
     handles.push(sh)
@@ -78,7 +101,15 @@ function save() {
         </svg>
       </div>
     </div>
-    <p class="t-label text-center mt-2">
+    <div v-if="needsCompass" class="text-center mt-2">
+      <p class="t-body text-xs text-pencil">
+        {{ L('The compass reads where your phone points, using Location. Nothing leaves your phone.') }}
+      </p>
+      <button class="btn w-full mt-2" @click="allowCompass">
+        {{ L('Turn on the compass') }}
+      </button>
+    </div>
+    <p v-else class="t-label text-center mt-2">
       {{ Math.round(heading) }}° {{ target >= 0 ? (aligned ? L('· Go straight ahead') : L(`· turn ${delta > 0 ? 'right' : 'left'}`)) : '' }}
     </p>
     <button class="btn w-full mt-4" :disabled="!editable" @click="draw">

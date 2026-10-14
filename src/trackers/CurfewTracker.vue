@@ -2,15 +2,20 @@
 import type { PluginListenerHandle } from '@capacitor/core'
 import type { TrackerProps } from './useDay'
 import { LightSensor } from '@capgo/capacitor-light-sensor'
+import { toast } from '@capgo/capacitor-pretty-toast'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useL } from '~/composables/useL'
 import { formatHM } from '~/lib/date'
 import { setSystemAlarm } from '~/services/alarm'
 import { haptic } from '~/services/haptics'
+import { sfx } from '~/services/sound'
+import { pickTime } from '~/services/timePicker'
+import { useQuest } from '~/stores/quest'
 import { useDay } from './useDay'
 
 const props = defineProps<TrackerProps>()
 const L = useL()
+const quest = useQuest()
 const { data, done, patch, markDone } = useDay(props, { bed: '' })
 const LIMIT = 22 * 60 + 30
 
@@ -37,20 +42,50 @@ const minutes = computed(() => {
 const onTime = computed(() => minutes.value != null && minutes.value <= LIMIT)
 const dark = computed(() => lux.value != null && lux.value < 10)
 
-function toBed() {
-  const bed = formatHM(new Date())
+/** Minutes since the evening's midnight: 00:30 is 24:30, the same night. */
+function nightMin(hm: string) {
+  const [h, m] = hm.split(':').map(Number)
+  return (h! < 12 ? h! + 24 : h!) * 60 + m!
+}
+
+/** Log a bedtime for this tracker's evening (today, or a forgotten past night). */
+function record(bed: string) {
   patch({ bed })
-  const [h, m] = bed.split(':').map(Number)
-  const mins = (h! < 12 ? h! + 24 : h!) * 60 + m!
-  if (mins <= LIMIT)
+  if (nightMin(bed) <= LIMIT) {
     markDone({ bed })
-  else
+  }
+  else {
     haptic.warning()
+    sfx.play('tick')
+  }
+}
+
+function toBed() {
+  const now = new Date()
+  const bed = formatHM(now)
+  // After midnight, it's still last night: log it on the previous evening's day.
+  // (Past midnight is always past 10:30 p.m., so that night stays unticked.)
+  if (now.getHours() < 12 && props.idx > 0) {
+    const prev = props.idx - 1
+    if (!props.editable || props.run.days[prev]?.done)
+      return
+    quest.patchDay(props.run, prev, { bed })
+    haptic.warning()
+    toast.info(L('Logged for last night'), { message: bed })
+    return
+  }
+  record(bed)
+}
+
+async function pick() {
+  const value = await pickTime(L('Bedtime'), data.value.bed || '22:30')
+  if (value)
+    record(value)
 }
 
 function reminder() {
   haptic.press()
-  void setSystemAlarm('22:15', L('Curfew in 15 minutes. Screens off.'))
+  void setSystemAlarm('22:15', L('Curfew in 15 minutes. Screens off.'), 'curfew')
 }
 
 // moon phase grows through the week
@@ -66,9 +101,9 @@ const moonX = computed(() => 30 - (props.idx / 6) * 26)
     <p class="t-label text-graphite mt-2">
       {{ L('Bedtime') }}
     </p>
-    <p class="t-display text-5xl tabular-nums">
+    <button class="t-display text-5xl tabular-nums underline decoration-dashed decoration-2 underline-offset-8" :disabled="!editable" @click="pick">
       {{ data.bed || '--:--' }}
-    </p>
+    </button>
     <p v-if="data.bed" class="t-body text-sm mt-1">
       {{ onTime ? L('Before 10:30 p.m. Good night.') : L('Too late tonight.') }}
     </p>

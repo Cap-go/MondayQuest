@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import type { IconName } from '~/data/challenges'
 
-withDefaults(defineProps<{ name: IconName, size?: number, stroke?: number, draw?: boolean }>(), {
+withDefaults(defineProps<{
+  name: IconName
+  size?: number
+  stroke?: number
+  draw?: boolean
+  /** ms before the first stroke starts drawing (default 80, 420 as a direct child of a `.stagger` entrance). */
+  drawDelay?: number
+}>(), {
   size: 64,
   stroke: 2.6,
   draw: false,
@@ -70,7 +77,7 @@ const PATHS: Record<IconName, string[]> = {
 </script>
 
 <template>
-  <svg :width="size" :height="size" viewBox="0 0 48 48" fill="none" stroke="currentColor" :stroke-width="stroke" stroke-linecap="round" stroke-linejoin="round" :class="{ 'icon-draw': draw }" aria-hidden="true">
+  <svg :width="size" :height="size" viewBox="0 0 48 48" fill="none" stroke="currentColor" :stroke-width="stroke" stroke-linecap="round" stroke-linejoin="round" :class="{ 'icon-draw': draw }" :style="drawDelay != null ? { '--draw-delay': `${drawDelay}ms` } : undefined" aria-hidden="true">
     <path v-for="(d, i) in PATHS[name]" :key="i" :d="d" pathLength="1" :style="{ '--i': i }" />
   </svg>
 </template>
@@ -80,7 +87,12 @@ const PATHS: Record<IconName, string[]> = {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   animation: draw 900ms var(--ease-ink) forwards;
-  animation-delay: calc(var(--i) * 120ms + 80ms);
+  animation-delay: calc(var(--i) * 120ms + var(--draw-delay, 80ms));
+}
+
+/* On a challenge page the icon rises with the entrance stagger: draw once it has settled, not during. */
+.stagger > .icon-draw {
+  --draw-delay: 420ms;
 }
 
 @keyframes draw {

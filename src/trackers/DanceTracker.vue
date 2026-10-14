@@ -20,12 +20,16 @@ const s = useSession(props, {
   lockHint: false,
   targetMs: GOAL,
   autoCheck: false,
+  // The song can run over while the groove catches up: the tracker stops the clock itself.
+  stopAtTarget: false,
   keepAwake: true,
   title: () => L('DANCE FLOOR'),
   subtitle: () => L('One full song'),
   short: '♫',
   doneBody: () => L('Song over! Come back to tick it.'),
 })
+// The dancer moves at 2 beats per second: needs the per-frame clock.
+s.smooth.value = true
 const { running, elapsed, done, start, pause } = s
 const extra = useDay(props, { groove: 0 })
 const groove = ref<number>(extra.data.value.groove)
@@ -34,13 +38,19 @@ const groove = ref<number>(extra.data.value.groove)
 const energy = ref(0)
 let sensed = false
 let handle: PluginListenerHandle | undefined
+let unmounted = false
 onMounted(async () => {
   handle = await CapacitorAccelerometer.addListener('measurement', ({ x, y, z }) => {
     sensed = true
     const e = Math.abs(Math.hypot(x, y, z) - 1)
     energy.value += (Math.min(1, e / 0.6) - energy.value) * 0.15
   }).catch(() => undefined)
+  // Left before the listener was ready: don't start a sensor nobody will stop.
+  if (unmounted)
+    return void handle?.remove()
   await CapacitorAccelerometer.startMeasurementUpdates().catch(() => {})
+  if (unmounted)
+    void CapacitorAccelerometer.stopMeasurementUpdates().catch(() => {})
 })
 
 const moving = computed(() => !sensed || energy.value > 0.18)
@@ -82,6 +92,7 @@ watch(elapsed, (t) => {
 })
 
 onBeforeUnmount(() => {
+  unmounted = true
   if (running.value)
     extra.patch({ groove: groove.value })
   void CapacitorAccelerometer.stopMeasurementUpdates().catch(() => {})

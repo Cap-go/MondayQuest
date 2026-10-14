@@ -2,10 +2,13 @@
 import type { Challenge } from '~/data/challenges'
 import { FileSharer } from '@capgo/capacitor-file-sharer'
 import { CapgoInAppReview } from '@capgo/capacitor-in-app-review'
-import { computed, onMounted, ref } from 'vue'
+import { setDirection } from '@capgo/capacitor-transitions/vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import QuestIcon from '~/components/QuestIcon.vue'
 import { useL } from '~/composables/useL'
 import { COMMUNITY_URL, openExternal } from '~/config'
+import { CHALLENGES } from '~/data/challenges'
 import { ct } from '~/i18n/content'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
@@ -15,11 +18,24 @@ const props = defineProps<{ challenge: Challenge }>()
 const emit = defineEmits<{ stamped: [], close: [] }>()
 
 const quest = useQuest()
+const router = useRouter()
 const L = useL()
 const text = computed(() => ct(props.challenge))
 const landed = ref(false)
+/** The stamp has hit the paper: only then does it blend into it like real ink. */
+const inked = ref(false)
+const nextBtn = ref<HTMLButtonElement>()
+const closeBtn = ref<HTMLButtonElement>()
+const timers: ReturnType<typeof setTimeout>[] = []
+const later = (fn: () => void, ms: number) => timers.push(setTimeout(fn, ms))
+// Read before the stamp saves this run: true only for the very first completed challenge.
+const firstEver = quest.completedIds.size === 0
 
-const confetti = Array.from({ length: 46 }, (_, i) => ({
+// Same pick as the Today screen's "next up": the first booklet challenge not cleared and not running.
+const next = computed(() => CHALLENGES.find(c => !quest.clearedIds.has(c.id) && !quest.runFor(c.id)))
+const nextTitle = computed(() => (next.value ? ct(next.value).title : ''))
+
+const confetti = Array.from({ length: 20 }, (_, i) => ({
   x: (Math.random() - 0.5) * 520,
   y: -Math.random() * 520 - 80,
   r: Math.random() * 720 - 360,
@@ -29,17 +45,30 @@ const confetti = Array.from({ length: 46 }, (_, i) => ({
 }))
 
 onMounted(() => {
-  setTimeout(() => {
+  // Focus the primary action: "Next" when there is one, otherwise "Continue".
+  void nextTick(() => (nextBtn.value ?? closeBtn.value)?.focus({ preventScroll: true }))
+  later(() => {
     landed.value = true
     sfx.play('done')
     haptic.thud()
-    setTimeout(() => haptic.success(), 160)
+    later(() => haptic.success(), 160)
     emit('stamped')
   }, 420)
   // First completed challenge is the moment people love the app the most.
-  if (quest.completedIds.size <= 1)
-    setTimeout(() => CapgoInAppReview.requestReview().catch(() => {}), 2600)
+  if (firstEver)
+    later(() => CapgoInAppReview.requestReview().catch(() => {}), 2600)
 })
+onBeforeUnmount(() => timers.forEach(clearTimeout))
+
+function goNext() {
+  const c = next.value
+  if (!c)
+    return
+  haptic.tap()
+  emit('close')
+  setDirection('forward')
+  void router.push(`/challenge/${c.id}/read`)
+}
 
 async function share() {
   haptic.tap()
@@ -90,29 +119,35 @@ function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, ma
 
 <template>
   <Teleport to="body">
-    <div class="done-overlay" @click.self="emit('close')">
-      <div class="confetti" :class="{ go: landed }">
+    <div class="done-overlay" role="dialog" aria-modal="true" aria-labelledby="done-title" @click.self="emit('close')">
+      <!-- static blur: the tint above it fades in, the backdrop filter itself is never animated -->
+      <div class="done-blur" aria-hidden="true" />
+      <div class="confetti" :class="{ go: landed }" aria-hidden="true">
         <i v-for="(c, i) in confetti" :key="i" :class="`s${c.shape}`" :style="{ '--x': `${c.x}px`, '--y': `${c.y}px`, '--r': `${c.r}deg`, '--s': `${c.s}px`, '--d': `${c.d}ms` }" />
       </div>
       <div class="card sheet">
-        <QuestIcon :name="challenge.icon" :size="72" draw class="mx-auto mb-3" />
+        <!-- drawn once the stamp has landed, not while the card rises -->
+        <QuestIcon :name="challenge.icon" :size="72" draw :draw-delay="700" class="mx-auto mb-3" />
         <p class="t-label text-center">
           {{ $t('done.title') }}
         </p>
-        <h2 class="t-display text-3xl text-center mt-1">
+        <h2 id="done-title" class="t-display text-3xl text-center mt-1">
           {{ text.title }}
         </h2>
-        <div class="stamp" :class="{ landed }">
+        <div class="stamp" :class="{ landed, inked }" @animationend="inked = true">
           DONE
         </div>
         <p class="t-body text-center text-graphite px-4">
           {{ $t('done.subtitle') }}
         </p>
-        <div class="grid grid-cols-2 gap-3 mt-6">
+        <button v-if="next" ref="nextBtn" class="btn btn-ink w-full mt-6" @click="goNext">
+          {{ $t('done.next', { title: nextTitle }) }}
+        </button>
+        <div class="grid grid-cols-2 gap-3" :class="next ? 'mt-3' : 'mt-6'">
           <button class="btn" @click="share">
             {{ $t('done.share') }}
           </button>
-          <button class="btn btn-ink" @click="emit('close')">
+          <button ref="closeBtn" class="btn" :class="{ 'btn-ink': !next }" @click="emit('close')">
             {{ L('Continue') }}
           </button>
         </div>
@@ -133,9 +168,16 @@ function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, ma
   place-items: center;
   padding: 24px calc(var(--safe-right) + 24px) 24px calc(var(--safe-left) + 24px);
   background: color-mix(in oklab, var(--color-paper) 70%, transparent);
+  animation: tint 260ms ease both;
+}
+
+.done-blur {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  animation: fade 260ms ease both;
+  pointer-events: none;
 }
 
 .card {
@@ -156,6 +198,10 @@ function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, ma
   border: 7px solid var(--color-ink);
   transform: rotate(-8deg) scale(3);
   opacity: 0;
+}
+
+/* blend only once it sits still: a blended layer scaling down from 3x is costly to composite */
+.stamp.inked {
   mix-blend-mode: multiply;
 }
 
@@ -191,6 +237,7 @@ function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, ma
   height: var(--s);
   background: var(--color-ink);
   opacity: 0;
+  will-change: transform, opacity;
 }
 
 .confetti i.s1 {
@@ -222,9 +269,9 @@ function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, ma
   }
 }
 
-@keyframes fade {
+@keyframes tint {
   from {
-    opacity: 0;
+    background-color: transparent;
   }
 }
 

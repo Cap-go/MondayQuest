@@ -49,10 +49,11 @@ async function exportPdf() {
   }
 }
 
-function open(id: string) {
+/** A notebook entry opens its own week (?run=), not whichever run of that challenge is latest. */
+function open(id: string, runId?: string) {
   haptic.tap()
   setDirection('forward')
-  void router.push(`/challenge/${id}/track`)
+  void router.push({ path: `/challenge/${id}/track`, query: runId ? { run: runId } : undefined })
 }
 </script>
 
@@ -83,7 +84,16 @@ function open(id: string) {
       {{ $t('journal.empty') }}
     </p>
 
-    <article v-for="e in entries" :key="e.run.id" class="sheet entry mt-6 p-5" @click="open(e.c.id)">
+    <article
+      v-for="e in entries"
+      :key="e.run.id"
+      class="sheet entry mt-6 p-5"
+      role="button"
+      tabindex="0"
+      @click="open(e.c.id, e.run.id)"
+      @keydown.enter.self="open(e.c.id, e.run.id)"
+      @keydown.space.self.prevent="open(e.c.id, e.run.id)"
+    >
       <header class="flex items-center gap-3">
         <QuestIcon :name="e.c.icon" :size="34" :stroke="3" />
         <div class="flex-1">

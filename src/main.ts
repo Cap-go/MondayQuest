@@ -11,11 +11,12 @@ import App from './App.vue'
 import { i18n } from './i18n'
 import { applyLanguage } from './i18n/content'
 import { router } from './router'
+import { armSunrise } from './services/alarm'
 import { flushCloud } from './services/cloud'
 import { detectBuildEnv } from './services/env'
 import { setHapticsEnabled } from './services/haptics'
 import { renderTabbar, setupNativeNavigation } from './services/navigation'
-import { clearBadge, initNotifications, onNotificationOpen, rescheduleAll } from './services/notifications'
+import { clearBadge, initNotifications, localizeNotifications, onNotificationOpen, rescheduleAll } from './services/notifications'
 import { setSoundEnabled, sfx } from './services/sound'
 import { notifyReady } from './services/updater'
 import { consumeWidgetEvents, syncTodayWidget } from './services/widgets'
@@ -32,17 +33,22 @@ initTransitions({ platform: 'auto', duration: 420 })
 async function boot() {
   const app = createApp(App)
   const pinia = createPinia()
-  app.use(pinia).use(i18n).use(router)
+  app.use(pinia).use(i18n)
 
   const quest = useQuest()
-  await quest.load()
+  const loaded = quest.load()
+  // Onboarding comes first, whatever opened the app (deep link, widget, notification tap).
+  router.beforeEach(async (to) => {
+    await loaded
+    if (!quest.settings.onboarded && to.path !== '/onboarding')
+      return '/onboarding'
+  })
+  app.use(router)
+  await loaded
   // Phone language by default; cached translations load before the first paint.
   await applyLanguage(quest.settings.locale)
   setSoundEnabled(quest.settings.sound)
   setHapticsEnabled(quest.settings.haptics)
-
-  if (!quest.settings.onboarded)
-    await router.replace('/onboarding')
 
   // Fonts are bundled but load lazily (font-display: swap): wait for them under the
   // splash so the first screen never reflows from the system font.
@@ -79,6 +85,7 @@ async function boot() {
     await consumeWidgetEvents()
     await syncTodayWidget()
     await rescheduleAll()
+    await armSunrise()
     await clearBadge()
   }
   void refresh()
@@ -108,17 +115,21 @@ async function boot() {
   })
 
   let syncTimer: ReturnType<typeof setTimeout> | undefined
-  watch(() => [quest.runs, quest.settings.reminder, quest.settings.evening, quest.locale], () => {
+  watch(() => [quest.runs, quest.settings.reminder, quest.settings.evening, quest.settings.wakeAuto, quest.settings.wakeAlarm, quest.locale], () => {
     clearTimeout(syncTimer)
     syncTimer = setTimeout(() => {
       void syncTodayWidget()
       void rescheduleAll()
+      void armSunrise()
     }, 800)
   }, { deep: true })
 
   watch(() => quest.settings.sound, setSoundEnabled)
   watch(() => quest.settings.haptics, setHapticsEnabled)
   watch(() => quest.settings.locale, l => void applyLanguage(l))
+  // Android channel names and notification action titles follow the language too.
+  if (native)
+    watch(() => ['channelQuest', 'channelWake', 'actionDone', 'actionLater', 'actionWrite'].map(k => i18n.global.t(`notif.${k}`)).join('|'), () => void localizeNotifications())
   // Native tab titles are pushed once: redraw when the language or its translations change.
   watch(() => ['today', 'levels', 'journal', 'settings'].map(id => i18n.global.t(`tabs.${id}`)).join('|'), () => {
     void renderTabbar(!!router.currentRoute.value.meta.hideTabs)

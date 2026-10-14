@@ -270,11 +270,19 @@ cap-sheet-handle:focus-visible {
   animation-delay: 380ms;
 }
 
+/* A tracker scrolled off screen (read page, other tab): its decorative loops stop costing frames. */
+.anim-off,
+.anim-off * {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 1ms !important;
+    /* a 1ms infinite loop would flicker every frame: play each animation once and stop on its end state */
+    animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
 }

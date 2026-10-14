@@ -28,13 +28,18 @@ export function reattachLocal<T>(cloud: T, local: unknown): T {
   return fill(cloud, local)
 }
 
-export async function readCloud<T extends Stamped>(): Promise<T | null> {
+/** iCloud did not answer in time: unknown, not empty. Callers must not overwrite the cloud copy. */
+export const CLOUD_TIMEOUT = Symbol('cloud-timeout')
+
+export async function readCloud<T extends Stamped>(): Promise<T | null | typeof CLOUD_TIMEOUT> {
   try {
-    const { value } = await Promise.race([
+    const res = await Promise.race([
       ICloudKV.get({ key: KEY }),
-      new Promise<{ value: null }>(r => setTimeout(r, 1500, { value: null })),
+      new Promise<typeof CLOUD_TIMEOUT>(r => setTimeout(r, 1500, CLOUD_TIMEOUT)),
     ])
-    return value ? JSON.parse(value) as T : null
+    if (res === CLOUD_TIMEOUT)
+      return res
+    return res.value ? JSON.parse(res.value) as T : null
   }
   catch {
     return null

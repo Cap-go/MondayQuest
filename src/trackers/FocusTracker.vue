@@ -4,6 +4,7 @@ import type { TrackerProps } from './useDay'
 import { App } from '@capacitor/app'
 import { VolumeButtons } from '@capgo/capacitor-volume-buttons'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useInView } from '~/composables/useInView'
 import { useL } from '~/composables/useL'
 import { formatClock } from '~/lib/date'
 import { haptic } from '~/services/haptics'
@@ -40,6 +41,7 @@ function addSwitch() {
 }
 
 const handles: PluginListenerHandle[] = []
+let unmounted = false
 onMounted(async () => {
   const a = await App.addListener('appStateChange', ({ isActive }) => {
     if (!isActive)
@@ -47,11 +49,17 @@ onMounted(async () => {
   }).catch(() => undefined)
   const v = await VolumeButtons.addListener('volumeButtonPressed', () => addSwitch()).catch(() => undefined)
   for (const h of [a, v]) {
-    if (h)
+    // Left before the plugins answered: drop the listeners instead of keeping them forever.
+    if (h && unmounted)
+      void h.remove().catch(() => {})
+    else if (h)
       handles.push(h)
   }
 })
-onBeforeUnmount(() => handles.forEach(h => void h.remove().catch(() => {})))
+onBeforeUnmount(() => {
+  unmounted = true
+  handles.forEach(h => void h.remove().catch(() => {}))
+})
 
 function go() {
   if (!props.editable || done.value)
@@ -70,17 +78,22 @@ const tallies = computed(() => {
   const n = extra.data.value.switches
   return Array.from({ length: Math.ceil(n / 5) }, (_, g) => Math.min(5, n - g * 5))
 })
+// Whole percent steps: the fill changes about every 18 s and glides there with its 1s transition.
 const ripe = computed(() => `color-mix(in oklab, var(--color-sun) ${Math.round(progress.value * 85)}%, var(--color-paper))`)
+const root = ref<HTMLElement>()
+const visible = useInView(root)
 </script>
 
 <template>
-  <div class="flex flex-col items-center">
+  <div ref="root" class="flex flex-col items-center" :class="{ 'anim-off': !visible }">
     <div class="relative" :class="{ wobble: flash }">
       <svg viewBox="0 0 200 200" class="w-48 h-48">
         <circle cx="100" cy="112" r="78" fill="none" stroke="var(--color-rule)" stroke-width="3" stroke-dasharray="2 6" />
         <circle cx="100" cy="112" r="78" fill="none" stroke="var(--color-ink)" stroke-width="3" :stroke-dasharray="490" :stroke-dashoffset="490 * (1 - progress)" transform="rotate(-90 100 112)" />
         <path d="M100 48 C56 48 34 76 34 112 C34 150 64 176 100 176 C136 176 166 150 166 112 C166 76 144 48 100 48 Z" :style="{ fill: ripe }" stroke="var(--color-ink)" stroke-width="3" class="body" />
-        <path d="M100 52 L84 34 M100 52 L116 34 M100 52 L72 50 M100 52 L128 50 M100 52 V22" fill="none" stroke="var(--color-ink)" stroke-width="3" stroke-linecap="square" class="stem" :class="{ sway: running }" />
+        <g class="stem" :class="{ sway: running }">
+          <path d="M100 52 L84 34 M100 52 L116 34 M100 52 L72 50 M100 52 L128 50 M100 52 V22" fill="none" stroke="var(--color-ink)" stroke-width="3" stroke-linecap="square" />
+        </g>
         <path d="M56 96 q-6 18 4 34" fill="none" stroke="var(--color-paper)" stroke-width="4" stroke-linecap="round" :style="{ opacity: progress }" />
       </svg>
       <div class="absolute inset-0 grid place-items-center pt-8">

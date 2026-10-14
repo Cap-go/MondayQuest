@@ -27,9 +27,10 @@ const { running, elapsed, progress, remaining, done, start, pause } = s
 
 const peeked = ref(false)
 let handle: PluginListenerHandle | undefined
+let unmounted = false
 
 onMounted(async () => {
-  handle = await App.addListener('appStateChange', ({ isActive }) => {
+  const h = await App.addListener('appStateChange', ({ isActive }) => {
     if (!isActive || !running.value || done.value || !props.editable)
       return
     extra.patch({ peeks: extra.data.value.peeks + 1 })
@@ -38,8 +39,15 @@ onMounted(async () => {
     sfx.play('erase', 0.6)
     setTimeout(() => (peeked.value = false), 2400)
   }).catch(() => undefined)
+  // Left before the listener was ready: drop it instead of leaking it.
+  if (unmounted)
+    return void h?.remove()
+  handle = h
 })
-onBeforeUnmount(() => void handle?.remove())
+onBeforeUnmount(() => {
+  unmounted = true
+  void handle?.remove()
+})
 
 function wake() {
   if (!props.editable || running.value || done.value)

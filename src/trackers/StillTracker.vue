@@ -3,6 +3,7 @@ import type { PluginListenerHandle } from '@capacitor/core'
 import type { TrackerProps } from './useDay'
 import { CapacitorAccelerometer } from '@capgo/capacitor-accelerometer'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useInView } from '~/composables/useInView'
 import { useL } from '~/composables/useL'
 import { formatClock } from '~/lib/date'
 import { haptic } from '~/services/haptics'
@@ -69,17 +70,34 @@ function evaluate() {
   }
 }
 
+/** No accelerometer: there is nothing to wait for, the clock just runs. */
+function goSensorless() {
+  sensorless = true
+  if (armed.value && !done.value && !running.value)
+    void s.start()
+}
+
 async function arm() {
   if (!props.editable || done.value || armed.value)
     return
   armed.value = true
   samples = 0
   haptic.press()
-  handle = await CapacitorAccelerometer.addListener('measurement', onSample).catch(() => undefined)
-  await CapacitorAccelerometer.startMeasurementUpdates().catch(() => {})
+  const h = await CapacitorAccelerometer.addListener('measurement', onSample).catch(() => undefined)
+  // Stopped or left while the plugin was answering.
+  if (!armed.value) {
+    void h?.remove()
+    return
+  }
+  handle = h
+  const started = await CapacitorAccelerometer.startMeasurementUpdates().then(() => true, () => false)
+  if (!armed.value)
+    return
+  if (!handle || !started)
+    return goSensorless()
   probe = setTimeout(() => {
-    sensorless = samples === 0
-    evaluate()
+    if (samples === 0)
+      goSensorless()
   }, 1500)
 }
 
@@ -103,7 +121,13 @@ onMounted(() => {
 onBeforeUnmount(disarm)
 
 // Ripples: loud while you move, settling to a mirror when you are still.
-const agitation = computed(() => (done.value ? 0 : armed.value ? motion.value : 0.35))
+// Stepped: the sensor fires ~60 times a second, the ripples only need a few levels
+// (opacity glides between them with its 900ms transition).
+const agitation = computed(() => (done.value ? 0 : armed.value ? Math.round(motion.value * 20) / 20 : 0.35))
+// 4 fixed speeds: a live animation-duration would make the rings jump on every sample.
+const ringSpeed = computed(() => `${(2.4 - (Math.round(agitation.value * 3) / 3) * 1.6).toFixed(2)}s`)
+const root = ref<HTMLElement>()
+const visible = useInView(root)
 const hint = computed(() => {
   if (done.value)
     return L('Dead calm. Nothing at all.')
@@ -116,18 +140,20 @@ const hint = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center">
+  <div ref="root" class="flex flex-col items-center" :class="{ 'anim-off': !visible }">
     <svg viewBox="0 0 300 150" class="w-full max-w-[320px]">
       <defs>
         <clipPath id="still-pond"><ellipse cx="150" cy="80" rx="128" ry="52" /></clipPath>
       </defs>
       <ellipse cx="150" cy="80" rx="128" ry="52" fill="var(--color-ice)" :fill-opacity="0.25 + progress * 0.45" />
       <g clip-path="url(#still-pond)">
-        <ellipse
-          v-for="i in 4" :key="i" class="ring" cx="150" cy="80" :rx="28 * i" :ry="11 * i"
-          fill="none" stroke="var(--color-ink)" stroke-width="1.5"
-          :style="{ opacity: agitation * (1 - i * 0.18), animationDuration: `${2.4 - agitation * 1.6}s`, animationDelay: `${i * -0.5}s` }"
-        />
+        <g v-for="i in 4" :key="i" class="ring" :style="{ animationDuration: ringSpeed, animationDelay: `${i * -0.5}s` }">
+          <ellipse
+            cx="150" cy="80" :rx="28 * i" :ry="11 * i"
+            fill="none" stroke="var(--color-ink)" stroke-width="1.5" class="ripple"
+            :style="{ opacity: agitation * (1 - i * 0.18) }"
+          />
+        </g>
         <line x1="40" x2="260" y1="80" y2="80" stroke="var(--color-ink)" stroke-width="1.5" :style="{ opacity: 1 - agitation }" class="mirror" />
         <circle cx="210" cy="56" r="7" fill="var(--color-sun)" :style="{ opacity: done ? 1 : 0.15 + progress * 0.6 }" />
       </g>
@@ -162,6 +188,9 @@ const hint = computed(() => {
 .ring {
   transform-origin: 150px 80px;
   animation: spread linear infinite;
+}
+
+.ripple {
   transition: opacity 900ms ease;
 }
 

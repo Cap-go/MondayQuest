@@ -19,6 +19,20 @@ const jokerSheet = ref<InstanceType<typeof JokerSheet> | null>(null)
 
 const levels = computed(() => LEVELS.map(l => ({ ...l, items: challengesOfLevel(l.n), done: quest.levelDone(l.n), locked: l.n > quest.currentLevel && !quest.settings.unlockAll })))
 
+// Ink only the checks that flipped since the last visit, not every finished row on each mount.
+const SEEN_KEY = 'mq.levelsSeenDone'
+const seenDone = (() => {
+  try {
+    const raw = localStorage.getItem(SEEN_KEY)
+    return raw ? new Set(JSON.parse(raw) as string[]) : undefined
+  }
+  catch {
+    return undefined
+  }
+})()
+const fresh = new Set(seenDone ? [...quest.completedIds].filter(id => !seenDone.has(id)) : [])
+localStorage.setItem(SEEN_KEY, JSON.stringify([...quest.completedIds]))
+
 function open(c: Challenge) {
   haptic.tap()
   setDirection('forward')
@@ -101,7 +115,7 @@ function newCustom() {
           </div>
           <QuestIcon v-if="state(c) === 'joker'" name="joker" :size="26" :stroke="3" class="shrink-0 mr-0.5" />
           <QuestIcon v-else-if="state(c) === 'locked'" name="lock" :size="22" :stroke="3" class="shrink-0 text-pencil mr-1" />
-          <span v-else class="box" :class="state(c)">
+          <span v-else class="box" :class="[state(c), { fresh: fresh.has(c.id) }]">
             <svg v-if="state(c) === 'done'" viewBox="0 0 100 100" class="overflow-visible"><path d="M20 50 C27 55 33 63 40 77 C53 52 72 25 104 2" fill="none" stroke="var(--color-ink)" stroke-width="11" stroke-linecap="round" /></svg>
             <span v-else-if="state(c) === 'live'" class="live-dot" />
           </span>
@@ -245,7 +259,7 @@ function newCustom() {
   height: 100%;
 }
 
-.box.done svg path {
+.box.done.fresh svg path {
   stroke-dasharray: 160;
   animation: draw 700ms var(--ease-ink) both;
 }

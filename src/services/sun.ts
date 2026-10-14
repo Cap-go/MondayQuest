@@ -1,6 +1,8 @@
 import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
+import { toast } from '@capgo/capacitor-pretty-toast'
 import * as SunCalc from 'suncalc'
+import { tr } from '~/i18n/translate'
 import { formatHM } from '~/lib/date'
 
 // Sunrise for the Rising sun challenge, computed on the device from a coarse position and the date.
@@ -23,13 +25,24 @@ function cached(): Coords | null {
 
 /** Rough position from the time zone offset, when location is unavailable (lat defaults to 45°N/S). */
 function fromTimezone(): Coords {
-  const offsetMin = -new Date().getTimezoneOffset()
+  // Standard time, not summer time: DST would shift the guessed longitude by 15° (an hour of sunrise).
+  const y = new Date().getFullYear()
+  const offsetMin = -Math.max(new Date(y, 0, 1).getTimezoneOffset(), new Date(y, 6, 1).getTimezoneOffset())
   const tz = new Intl.DateTimeFormat().resolvedOptions().timeZone ?? ''
   const south = /Australia|Pacific\/Auckland|America\/(?:Sao_Paulo|Buenos_Aires|Santiago|Montevideo)|Africa\/Johannesburg/.test(tz)
   return { lat: south ? -33 : 45, lon: offsetMin / 4, at: Date.now(), approx: true }
 }
 
 let current: Coords | null = cached()
+
+let toasted = false
+/** Once per session: the sunrise falls back to a time zone estimate. */
+function deniedToast() {
+  if (toasted)
+    return
+  toasted = true
+  toast.info(tr('Allow Location in Settings > Monday Quest'), { message: tr('Sunrise is estimated from your time zone until then.') })
+}
 
 /** Best known position; asks for location once (coarse), refreshes at most daily. */
 export async function locate(ask = false): Promise<Coords> {
@@ -43,7 +56,11 @@ export async function locate(ask = false): Promise<Coords> {
         if (perm.coarseLocation !== 'granted' && perm.location !== 'granted') {
           if (!ask)
             throw new Error('not asked')
-          await Geolocation.requestPermissions({ permissions: ['coarseLocation'] })
+          const asked = await Geolocation.requestPermissions({ permissions: ['coarseLocation'] })
+          if (asked.coarseLocation !== 'granted' && asked.location !== 'granted') {
+            deniedToast()
+            throw new Error('denied')
+          }
         }
       }
       const p = await Geolocation.getCurrentPosition({ enableHighAccuracy: false, timeout: 8000, maximumAge: 86_400_000 })

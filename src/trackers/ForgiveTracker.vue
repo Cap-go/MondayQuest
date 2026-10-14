@@ -47,7 +47,13 @@ function pick(how: typeof HOW[number]['id']) {
 }
 
 // Hold the sponge to wipe the grudge off the page.
-const wipe = ref(0)
+// Written as a CSS variable from the frame loop: the tracker does not re-render while you wipe.
+let wipe = 0
+const slate = ref<HTMLElement>()
+function setWipe(v: number) {
+  wipe = v
+  slate.value?.style.setProperty('--w', String(v))
+}
 let raf = 0
 let t0 = 0
 let lastTick = 0
@@ -60,13 +66,13 @@ function press() {
   t0 = performance.now()
   lastTick = 0
   const loop = (t: number) => {
-    wipe.value = Math.min(1, (t - t0) / HOLD)
+    setWipe(Math.min(1, (t - t0) / HOLD))
     if (t - lastTick > 160) {
       lastTick = t
       haptic.tap()
       sfx.play('erase', 0.35)
     }
-    if (wipe.value >= 1) {
+    if (wipe >= 1) {
       sfx.play('chime')
       haptic.success()
       markDone({ who: who.value.trim(), what: what.value.trim(), how: data.value.how })
@@ -80,7 +86,7 @@ function press() {
 function release() {
   cancelAnimationFrame(raf)
   if (!done.value)
-    wipe.value = 0
+    setWipe(0)
 }
 
 onBeforeUnmount(() => cancelAnimationFrame(raf))
@@ -95,7 +101,7 @@ const howLabel = computed(() => HOW.find(h => h.id === data.value.how))
     </p>
 
     <!-- the grudge, written on the page, wiped by the sponge -->
-    <div class="slate mt-3" :style="{ '--w': done ? 1 : wipe }">
+    <div ref="slate" class="slate mt-3" :style="{ '--w': done ? 1 : 0 }">
       <p class="t-display text-lg leading-tight">
         {{ L('I forgive') }}
         <input v-if="!done && editable" v-model="who" class="ink-input inline-input t-display" :placeholder="L('who?')" @change="save">

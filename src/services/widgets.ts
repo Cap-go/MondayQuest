@@ -3,7 +3,8 @@ import { Capacitor } from '@capacitor/core'
 import { CapgoWidgetKit } from '@capgo/capacitor-widget-kit'
 import { CATEGORY_LABEL } from '~/data/challenges'
 import { tr } from '~/i18n/translate'
-import { checkedCount, runStatus } from '~/lib/progress'
+import { today as todayISO } from '~/lib/date'
+import { checkedCount, dayIndex, runStatus } from '~/lib/progress'
 import { useQuest } from '~/stores/quest'
 
 const native = Capacitor.isNativePlatform()
@@ -23,6 +24,8 @@ const TODAY_DEFINITION: SvgTemplateDefinition = {
       patches: [
         { op: 'set', path: 'state.done', value: true },
         { op: 'increment', path: 'state.checked', amount: 1 },
+        // Fill today's square in the week row too. checkPath is a safe key when today is outside the run.
+        { op: 'set', path: 'state.{{state.checkPath}}', value: true },
       ],
     },
   ],
@@ -87,6 +90,7 @@ export async function syncTodayWidget() {
         streak: quest.currentStreak,
         runId: run.id,
         dayIndex: idx,
+        checkPath: idx >= 0 && idx < 7 ? `days.${idx}` : 'outside',
         locale: quest.locale,
       }
     : {
@@ -104,6 +108,7 @@ export async function syncTodayWidget() {
         streak: quest.currentStreak,
         runId: '',
         dayIndex: -1,
+        checkPath: 'outside',
         locale: quest.locale,
       }
 
@@ -123,10 +128,18 @@ export async function consumeWidgetEvents() {
   if (!events.length)
     return
   const quest = useQuest()
-  const run = quest.activeRuns[0]
-  if (run) {
-    const idx = quest.todayIndex(run)
-    if (idx >= 0 && idx < 7 && events.some(e => e.actionId === 'check'))
+  for (const e of events) {
+    if (e.actionId !== 'check')
+      continue
+    // Ticks can sit in the queue past midnight: they belong to the day (and run) they were tapped on.
+    const runId = (e.state as { runId?: unknown } | undefined)?.runId
+    const run = typeof runId === 'string' && runId
+      ? quest.runs.find(r => r.id === runId)
+      : quest.activeRuns[0]
+    if (!run || run.abandonedAt || run.completedAt)
+      continue
+    const idx = dayIndex(run, todayISO(new Date(e.createdAt)))
+    if (idx >= 0 && idx < 7 && !run.days[idx]!.done)
       quest.toggleDay(run, idx, true, { via: 'widget' })
   }
   await CapgoWidgetKit.acknowledgeTemplateEvents({ activityId: TODAY_ID }).catch(() => {})

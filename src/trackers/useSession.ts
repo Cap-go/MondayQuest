@@ -23,6 +23,8 @@ interface SessionOpts {
   onComplete?: () => void
   /** Suggest locking the phone once the Live Activity is up (off when the screen is needed). */
   lockHint?: boolean
+  /** Stop the clock at the target (default true). Off when the tracker needs overtime (dance groove). */
+  stopAtTarget?: boolean
 }
 
 /**
@@ -78,17 +80,27 @@ export function useSession(props: TrackerProps, opts: SessionOpts) {
     timer.running.value ? void pause() : void start()
   }
 
+  // Immediate: a session that ran out while the tracker was closed (app killed, other tab)
+  // is settled as soon as it mounts, not on a tick that never comes.
   watch(timer.progress, (p) => {
-    if (p >= 1 && !completed) {
-      completed = true
-      sfx.play('bell')
-      void endSessionActivity()
-      void cancelTimerEnd(key)
-      if (opts.autoCheck !== false)
-        day.markDone()
-      opts.onComplete?.()
+    if (p < 1)
+      return
+    // Target reached: stop the clock so the screen can sleep and pedometers stop with `running`.
+    if (opts.stopAtTarget !== false && timer.running.value) {
+      day.patch({ elapsed: opts.targetMs, startedAt: undefined } as any)
+      if (opts.keepAwake)
+        void KeepAwake.allowSleep().catch(() => {})
     }
-  })
+    if (completed)
+      return
+    completed = true
+    sfx.play('bell')
+    void endSessionActivity()
+    void cancelTimerEnd(key)
+    if (opts.autoCheck !== false)
+      day.markDone()
+    opts.onComplete?.()
+  }, { immediate: true })
 
   onBeforeUnmount(() => {
     if (opts.keepAwake)

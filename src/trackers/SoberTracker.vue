@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { TrackerProps } from './useDay'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useInView } from '~/composables/useInView'
 import { useL } from '~/composables/useL'
 import { fromISO } from '~/lib/date'
 import { haptic } from '~/services/haptics'
@@ -14,7 +15,6 @@ const { data, done, patch, markDone } = useDay(props, { cravings: 0 })
 const now = ref(Date.now())
 let timer: ReturnType<typeof setInterval>
 onMounted(() => (timer = setInterval(() => (now.value = Date.now()), 1000)))
-onBeforeUnmount(() => clearInterval(timer))
 
 const clean = computed(() => {
   const ms = Math.max(0, now.value - fromISO(props.run.start).getTime())
@@ -26,26 +26,39 @@ const clean = computed(() => {
 })
 
 // Hold the glass to drink it: 3 seconds of water instead of the craving.
-const fill = ref(0)
+// The water level is written straight to the SVG from the frame loop: no re-render per frame.
+let fill = 0
+/** Some water in the glass: the wave only animates then. */
+const wet = ref(false)
+const water = ref<SVGGElement>()
 const holding = ref(false)
 let raf = 0
 let t0 = 0
+let emptyTimer: ReturnType<typeof setTimeout> | undefined
+function setFill(v: number) {
+  fill = v
+  water.value?.setAttribute('transform', `translate(0 ${84 - v * 80})`)
+  if (wet.value !== (v > 0))
+    wet.value = v > 0
+}
 function holdStart() {
   if (!props.editable)
     return
   holding.value = true
+  clearTimeout(emptyTimer)
   t0 = performance.now()
   sfx.play('water', 0.6)
   const loop = () => {
-    fill.value = Math.min(1, (performance.now() - t0) / 3000)
-    if (Math.floor(fill.value * 10) !== Math.floor((fill.value - 0.016) * 10))
+    const prev = fill
+    setFill(Math.min(1, (performance.now() - t0) / 3000))
+    if (Math.floor(fill * 10) !== Math.floor(prev * 10))
       haptic.tap()
-    if (fill.value >= 1) {
+    if (fill >= 1) {
       holding.value = false
       haptic.success()
       sfx.play('chime')
       patch({ cravings: (data.value.cravings ?? 0) + 1 })
-      setTimeout(() => (fill.value = 0), 900)
+      emptyTimer = setTimeout(setFill, 900, 0)
       return
     }
     raf = requestAnimationFrame(loop)
@@ -57,19 +70,28 @@ function holdEnd() {
     return
   holding.value = false
   cancelAnimationFrame(raf)
-  const from = fill.value
+  const from = fill
   const start = performance.now()
   const drain = () => {
-    fill.value = Math.max(0, from - (performance.now() - start) / 400)
-    if (fill.value > 0)
+    setFill(Math.max(0, from - (performance.now() - start) / 400))
+    if (fill > 0)
       raf = requestAnimationFrame(drain)
   }
   drain()
 }
+
+const root = ref<HTMLElement>()
+const visible = useInView(root)
+
+onBeforeUnmount(() => {
+  clearInterval(timer)
+  cancelAnimationFrame(raf)
+  clearTimeout(emptyTimer)
+})
 </script>
 
 <template>
-  <div>
+  <div ref="root" :class="{ 'anim-off': !visible }">
     <p class="t-label text-center text-graphite">
       {{ L('Free for') }}
     </p>
@@ -89,8 +111,10 @@ function holdEnd() {
         <svg viewBox="0 0 60 84" class="w-20">
           <clipPath id="glass-clip"><path d="M6 4 L54 4 L48 80 L12 80 Z" /></clipPath>
           <g clip-path="url(#glass-clip)">
-            <rect x="0" :y="84 - fill * 80" width="60" height="84" fill="var(--color-ice)" />
-            <path :d="`M0 ${84 - fill * 80} q7.5 -4 15 0 t15 0 t15 0 t15 0 v6 h-60z`" fill="var(--color-ice)" class="wave" />
+            <g ref="water" transform="translate(0 84)">
+              <rect x="0" y="0" width="60" height="84" fill="var(--color-ice)" />
+              <path d="M0 0 q7.5 -4 15 0 t15 0 t15 0 t15 0 v6 h-60z" fill="var(--color-ice)" class="wave" :class="{ wet }" />
+            </g>
           </g>
           <path d="M6 4 L54 4 L48 80 L12 80 Z" fill="none" stroke="var(--color-ink)" stroke-width="3" stroke-linejoin="round" />
         </svg>
@@ -123,7 +147,7 @@ function holdEnd() {
   transform: scale(1.06) rotate(-6deg);
 }
 
-.wave {
+.wave.wet {
   animation: wave 1.2s linear infinite;
 }
 

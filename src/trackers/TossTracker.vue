@@ -68,13 +68,21 @@ function toss() {
   }, 620)
 }
 
+let unmounted = false
 onMounted(async () => {
-  shake = await CapacitorShake.addListener('shake', () => {
+  const h = await CapacitorShake.addListener('shake', () => {
     if (name.value.trim())
       toss()
   }).catch(() => undefined)
+  // Left before the plugin answered: don't keep a shake listener nobody removes.
+  if (unmounted)
+    return void h?.remove()
+  shake = h
 })
-onBeforeUnmount(() => void shake?.remove())
+onBeforeUnmount(() => {
+  unmounted = true
+  void shake?.remove()
+})
 </script>
 
 <template>

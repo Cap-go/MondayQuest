@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { Run } from '~/lib/progress'
 import { setDirection } from '@capgo/capacitor-transitions/vue'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import JokerSheet from '~/components/JokerSheet.vue'
 import QuestIcon from '~/components/QuestIcon.vue'
@@ -10,7 +11,8 @@ import { useL } from '~/composables/useL'
 import { CATEGORY_LABEL, challengesOfLevel } from '~/data/challenges'
 import { ct } from '~/i18n/content'
 import { tr } from '~/i18n/translate'
-import { formatDate, isMonday, nextMonday } from '~/lib/date'
+import { formatDate, isMonday, nextMonday, toISO } from '~/lib/date'
+import { isLive, runStatus } from '~/lib/progress'
 import { haptic } from '~/services/haptics'
 import { nativeTabs, navTitle } from '~/services/navigation'
 import { ensureReminders } from '~/services/notifications'
@@ -27,16 +29,32 @@ const c = computed(() => quest.challenge(id.value))
 const text = computed(() => (c.value ? ct(c.value) : undefined))
 const run = computed(() => quest.runFor(id.value))
 const last = computed(() => quest.lastRun(id.value))
-const completed = computed(() => last.value?.completedAt)
-// Keep showing a run right after DONE so the celebration isn't unmounted.
-const shown = computed(() => run.value ?? (last.value?.completedAt ? last.value : undefined))
+const lastStatus = computed(() => last.value && runStatus(last.value, quest.today))
+const completed = computed(() => [...quest.runs].reverse().find(r => r.challengeId === id.value && r.completedAt)?.completedAt)
+/** ?run=<id> opens one specific week (from the notebook), live or not. */
+const pinned = computed<Run | undefined>(() => {
+  const rid = route.query.run
+  return typeof rid === 'string' ? quest.runs.find(r => r.id === rid && r.challengeId === id.value) : undefined
+})
+// Keep showing a run right after DONE so the celebration isn't unmounted, and a missed week so it says so.
+const shown = computed(() => pinned.value ?? run.value ?? (last.value?.completedAt || lastStatus.value === 'missed' ? last.value : undefined))
+/** Past weeks are kept as they were: nothing to tick. */
+const readonly = computed(() => !!shown.value && !shown.value.completedAt && !isLive(shown.value, quest.today))
+/** The last try ran out: starting again is a retry, said as such. */
+const retry = computed(() => !run.value && lastStatus.value === 'missed')
 
 const pager = ref<HTMLElement | null>(null)
+const leafRead = ref<HTMLElement | null>(null)
+const leafTrack = ref<HTMLElement | null>(null)
+const tabInk = ref<HTMLElement | null>(null)
 const page = ref(route.params.page === 'track' ? 1 : 0)
-const scrollP = ref(page.value)
 const sheet = ref<any>(null)
 const jokerSheet = ref<InstanceType<typeof JokerSheet> | null>(null)
 const skipped = computed(() => quest.skippedIds.has(id.value))
+
+// "Turn the page" hint, shown on the read leaf until the user has turned it once.
+const SWIPE_KEY = 'mq.swipeHint'
+const swipeHint = ref(localStorage.getItem(SWIPE_KEY) !== '1')
 
 // Native navbar title (the back button is native on device).
 watch([() => route.path, () => text.value?.title], () => {
@@ -44,21 +62,70 @@ watch([() => route.path, () => text.value?.title], () => {
     navTitle.value = text.value.title
 }, { immediate: true })
 
+/**
+ * The page turn is written straight to the elements (one rAF per frame): a reactive
+ * scroll position would re-render the whole view on every scroll event.
+ */
+function paint() {
+  const el = pager.value
+  if (!el)
+    return
+  const p = el.clientWidth ? el.scrollLeft / el.clientWidth : page.value
+  if (tabInk.value)
+    tabInk.value.style.transform = `translateX(${p * 100}%)`
+  if (leafRead.value) {
+    const s = leafRead.value.style
+    s.transform = `perspective(1200px) rotateY(${-p * 18}deg)`
+    s.opacity = String(1 - p * 0.5)
+    s.visibility = p > 0.99 ? 'hidden' : 'visible'
+  }
+  if (leafTrack.value) {
+    const s = leafTrack.value.style
+    s.transform = `perspective(1200px) rotateY(${(1 - p) * 18}deg)`
+    s.opacity = String(0.5 + p * 0.5)
+    s.visibility = p < 0.01 ? 'hidden' : 'visible'
+  }
+}
+
+let frame = 0
+onBeforeUnmount(() => cancelAnimationFrame(frame))
+
 onMounted(async () => {
   await nextTick()
   if (pager.value && page.value === 1)
     pager.value.scrollLeft = pager.value.clientWidth
+  paint()
+  if (route.query.start === '1' && !run.value)
+    setTimeout(askStart, 250)
 })
 
+// The pager only exists once the challenge is known: paint its first frame as soon as it mounts.
+watch(pager, el => el && nextTick(paint))
+
+/** Path for a page, keeping the pinned run (one-shot intents like ?start are dropped). */
+function pagePath(p: number) {
+  const query = typeof route.query.run === 'string' ? { run: route.query.run } : undefined
+  return { path: `/challenge/${id.value}/${p ? 'track' : 'read'}`, query }
+}
+
 function onScroll() {
+  if (!frame) {
+    frame = requestAnimationFrame(() => {
+      frame = 0
+      paint()
+    })
+  }
   const el = pager.value!
-  scrollP.value = el.scrollLeft / el.clientWidth
-  const p = Math.round(scrollP.value)
+  const p = Math.round(el.scrollLeft / el.clientWidth)
   if (p !== page.value) {
     page.value = p
     sfx.play('page', 0.5)
     haptic.select()
-    void router.replace(`/challenge/${id.value}/${p ? 'track' : 'read'}`)
+    if (p === 1 && swipeHint.value) {
+      swipeHint.value = false
+      localStorage.setItem(SWIPE_KEY, '1')
+    }
+    void router.replace(pagePath(p))
   }
 }
 
@@ -86,11 +153,14 @@ function askStart() {
   sheet.value?.present?.()
 }
 
+const monday = computed(() => isMonday(quest.today))
+
 function start(when: 'monday' | 'now' | 'hardcore') {
-  const date = when === 'now' || isMonday(quest.today) ? quest.today : nextMonday(quest.today)
+  const date = when === 'now' || monday.value ? quest.today : nextMonday(quest.today)
   if (when === 'hardcore' && c.value) {
+    // Jokers clear a challenge too: Hardcore only starts what is still to do.
     for (const ch of challengesOfLevel(c.value.level)) {
-      if (!quest.completedIds.has(ch.id))
+      if (!quest.clearedIds.has(ch.id))
         quest.start(ch.id, date)
     }
   }
@@ -101,10 +171,13 @@ function start(when: 'monday' | 'now' | 'hardcore') {
   void ensureReminders()
   sfx.play('chime')
   haptic.success()
+  // A pinned old week would hide the new one: drop the pin and land on the live run.
+  if (pinned.value)
+    void router.replace({ path: `/challenge/${id.value}/${page.value ? 'track' : 'read'}` })
   setTimeout(goPage, 350, 1)
 }
 
-const mondayLabel = computed(() => capitalize(formatDate(isMonday(quest.today) ? quest.today : nextMonday(quest.today), L.tag(), { weekday: 'long', day: 'numeric', month: 'long' })))
+const mondayLabel = computed(() => capitalize(formatDate(monday.value ? quest.today : nextMonday(quest.today), L.tag(), { weekday: 'long', day: 'numeric', month: 'long' })))
 
 function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1)
@@ -126,14 +199,14 @@ function capitalize(s: string) {
           <button :class="{ on: page === 1 }" @click="goPage(1)">
             {{ $t('detail.track') }}
           </button>
-          <span class="ink" :style="{ transform: `translateX(${scrollP * 100}%)` }" />
+          <span ref="tabInk" class="ink" />
         </div>
         <span v-if="!nativeTabs" class="w-10" />
       </div>
 
       <div ref="pager" class="pager no-scrollbar" @scroll.passive="onScroll">
         <!-- PAGE 1 — the booklet's challenge page -->
-        <section class="leaf" :style="{ transform: `perspective(1200px) rotateY(${-scrollP * 18}deg)`, opacity: 1 - scrollP * 0.5, visibility: scrollP > 0.99 ? 'hidden' : 'visible' }">
+        <section ref="leafRead" class="leaf">
           <div class="sheet page">
             <div class="text-center stagger">
               <QuestIcon :name="c.icon" :size="104" :stroke="2.4" draw class="mx-auto" />
@@ -163,10 +236,10 @@ function capitalize(s: string) {
                 <QuestIcon name="lock" :size="18" :stroke="3" class="inline -mt-1 mr-1" /> {{ L('Locked') }}
               </button>
               <button v-else class="btn btn-ink w-full" @click="askStart">
-                {{ completed ? $t('common.restart') : $t('common.start') }}
+                {{ retry ? $t('home.retry') : completed ? $t('common.restart') : $t('common.start') }}
               </button>
               <p v-if="completed" class="t-label text-center mt-3">
-                ✓ {{ $t('detail.completedOn', { date: formatDate(new Date(completed).toISOString().slice(0, 10), L.tag(), { day: 'numeric', month: 'long' }) }) }}
+                ✓ {{ $t('detail.completedOn', { date: formatDate(toISO(new Date(completed)), L.tag(), { day: 'numeric', month: 'long' }) }) }}
               </p>
               <p v-if="skipped && !run && !completed" class="t-label text-center mt-3 flex items-center justify-center gap-1">
                 <QuestIcon name="joker" :size="16" :stroke="3" /> {{ L('Skipped with a joker') }}
@@ -178,13 +251,16 @@ function capitalize(s: string) {
                 {{ $t('detail.locked') }}
               </p>
             </div>
+            <button v-if="swipeHint" class="swipe t-label text-graphite" @click="goPage(1)">
+              {{ $t('detail.swipe') }} →
+            </button>
           </div>
         </section>
 
         <!-- PAGE 2 — the tracking page -->
-        <section class="leaf" :style="{ transform: `perspective(1200px) rotateY(${(1 - scrollP) * 18}deg)`, opacity: 0.5 + scrollP * 0.5, visibility: scrollP < 0.01 ? 'hidden' : 'visible' }">
+        <section ref="leafTrack" class="leaf">
           <div class="sheet page">
-            <TrackerShell v-if="shown" :key="shown.id" :run="shown" :challenge="c" />
+            <TrackerShell v-if="shown" :key="shown.id" :run="shown" :challenge="c" :readonly="readonly" :stamp="route.query.stamp === '1'" />
             <div v-else class="text-center py-10">
               <p class="t-label">
                 {{ $t('common.startDate') }} :
@@ -202,7 +278,7 @@ function capitalize(s: string) {
                 {{ $t('detail.locked') }}
               </p>
               <button v-else class="btn btn-ink w-full mt-10" @click="askStart">
-                {{ $t('common.start') }}
+                {{ retry ? $t('home.retry') : $t('common.start') }}
               </button>
             </div>
           </div>
@@ -221,13 +297,14 @@ function capitalize(s: string) {
               <h3 class="t-display text-2xl mt-2">
                 {{ $t('start.title') }}
               </h3>
-              <button class="choice" @click="start('monday')">
-                <span class="t-display text-lg">{{ $t('start.nextMonday') }}</span>
-                <span class="t-body text-sm text-graphite">{{ mondayLabel }} · {{ $t('start.mondayHint') }}</span>
-              </button>
-              <button class="choice" @click="start('now')">
+              <!-- Monday: today is the Monday. Any other day: starting now comes first. -->
+              <button v-if="!monday" class="choice primary" @click="start('now')">
                 <span class="t-display text-lg">{{ $t('start.now') }}</span>
                 <span class="t-body text-sm text-graphite">{{ $t('start.nowHint') }}</span>
+              </button>
+              <button class="choice" :class="{ primary: monday }" @click="start('monday')">
+                <span class="t-display text-lg">{{ monday ? $t('start.thisMonday') : $t('start.nextMonday') }}</span>
+                <span class="t-body text-sm text-graphite">{{ mondayLabel }} · {{ $t('start.mondayHint') }}</span>
               </button>
               <button v-if="quest.settings.hardcore && c.source !== 'custom'" class="choice inverted" @click="start('hardcore')">
                 <span class="t-display text-lg">Hardcore</span>
@@ -363,6 +440,22 @@ function capitalize(s: string) {
 
 .choice:active {
   transform: scale(0.97);
+}
+
+.choice.primary {
+  box-shadow: 5px 5px 0 var(--color-ink);
+}
+
+.swipe {
+  display: block;
+  margin: 26px auto 0;
+  animation: swipe-hint 1.8s var(--ease-spring) infinite;
+}
+
+@keyframes swipe-hint {
+  50% {
+    transform: translateX(6px);
+  }
 }
 
 .choice.inverted {

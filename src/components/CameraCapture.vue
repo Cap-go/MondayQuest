@@ -2,6 +2,7 @@
 import { Capacitor } from '@capacitor/core'
 import { CameraPreview } from '@capgo/camera-preview'
 import { PhotoLibrary } from '@capgo/capacitor-photo-library'
+import { toast } from '@capgo/capacitor-pretty-toast'
 import { onBeforeUnmount, ref } from 'vue'
 import { useL } from '~/composables/useL'
 import { fileToDataUrl, shrinkImage } from '~/lib/image'
@@ -27,8 +28,10 @@ async function open() {
     return fileInput.value?.click()
   haptic.tap()
   const perm = await CameraPreview.requestPermissions({ disableAudio: true }).catch(() => null)
-  if (perm?.camera !== 'granted')
+  if (perm?.camera !== 'granted') {
+    toast.error(L('Allow Camera in Settings > Monday Quest'))
     return
+  }
   document.documentElement.classList.add('camera-on')
   camera.value = true
   // Full-screen preview: the default 4:3 frame leaves the native background showing below it.

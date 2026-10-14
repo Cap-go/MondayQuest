@@ -50,10 +50,10 @@ function drop() {
     haptic.thud()
     sfx.play('stamp', 0.4)
   }, 340)
+  patch({ items })
+  // Tick once the item has landed, unless it was undone meanwhile.
   if (items.length >= GOAL)
-    setTimeout(markDone, 700, { items })
-  else
-    patch({ items })
+    setTimeout(() => data.value.items.length >= GOAL && markDone(), 700)
 }
 
 function undo() {

@@ -16,7 +16,11 @@ const cam = ref<InstanceType<typeof CameraCapture> | null>(null)
   <div>
     <div class="polaroid mx-auto" :class="{ has: data.photo }">
       <div class="shot">
-        <img v-if="data.photo" :src="data.photo" alt="">
+        <template v-if="data.photo">
+          <img :src="data.photo" alt="">
+          <!-- the undeveloped print: a pre-filtered copy that fades out (opacity only, no animated filter) -->
+          <img :src="data.photo" alt="" aria-hidden="true" class="raw">
+        </template>
         <span v-else class="t-label text-pencil">{{ L('No selfies!') }}</span>
       </div>
       <p class="t-body text-center text-sm mt-2">
@@ -59,15 +63,22 @@ const cam = ref<InstanceType<typeof CameraCapture> | null>(null)
 }
 
 .shot img {
+  grid-area: 1 / 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.shot .raw {
+  filter: brightness(2.4) contrast(0.3) grayscale(1);
   animation: reveal 1.8s ease both;
+  will-change: opacity;
+  pointer-events: none;
 }
 
 @keyframes reveal {
-  from {
-    filter: brightness(2.4) contrast(0.3) grayscale(1);
+  to {
+    opacity: 0;
   }
 }
 

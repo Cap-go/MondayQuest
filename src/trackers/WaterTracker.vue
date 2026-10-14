@@ -17,13 +17,20 @@ const GOAL = Math.min(8, 6 + Math.floor(props.idx / 2))
 // The water surface follows the phone's tilt.
 const tilt = ref(0)
 let handle: PluginListenerHandle | undefined
+let unmounted = false
 onMounted(async () => {
   handle = await CapacitorAccelerometer.addListener('measurement', ({ x }) => {
     tilt.value += (Math.max(-1, Math.min(1, x)) * 28 - tilt.value) * 0.2
   }).catch(() => undefined)
+  // Left before the listener was ready: don't start a sensor nobody will stop.
+  if (unmounted)
+    return void handle?.remove()
   await CapacitorAccelerometer.startMeasurementUpdates().catch(() => {})
+  if (unmounted)
+    void CapacitorAccelerometer.stopMeasurementUpdates().catch(() => {})
 })
 onBeforeUnmount(() => {
+  unmounted = true
   void CapacitorAccelerometer.stopMeasurementUpdates().catch(() => {})
   void handle?.remove()
 })

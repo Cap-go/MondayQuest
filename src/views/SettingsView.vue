@@ -15,7 +15,7 @@ import { COMMUNITY_URL, openExternal } from '~/config'
 import { deviceTag, languageOf } from '~/i18n/translate'
 import { buildEnv, isTestBuild } from '~/services/env'
 import { haptic } from '~/services/haptics'
-import { notificationsAllowed, requestNotifications, rescheduleAll } from '~/services/notifications'
+import { notificationsAllowed, notificationStatus, requestNotifications, rescheduleAll } from '~/services/notifications'
 import { locate, wakeHM } from '~/services/sun'
 import { pickTime as pickTimeNative } from '~/services/timePicker'
 import { bundleVersion, nativeVersion } from '~/services/updater'
@@ -32,10 +32,20 @@ onMounted(async () => {
 })
 
 async function enableNotif() {
+  // iOS never shows the prompt again after a refusal: only the system Settings can turn them back on.
+  // (No plugin here opens the app's settings page, so explain the way instead.)
+  const status = await notificationStatus()
+  if (status === 'denied' || status === 'blocked') {
+    toast.info(L('Allow Notifications in Settings > Monday Quest'), { duration: 5000 })
+    return
+  }
   notif.value = await requestNotifications()
   if (notif.value) {
     toast.success(L('Reminders on'))
     void rescheduleAll()
+  }
+  else {
+    toast.info(L('Allow Notifications in Settings > Monday Quest'), { duration: 5000 })
   }
 }
 

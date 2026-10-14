@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { haptic } from '~/services/haptics'
 import { sfx } from '~/services/sound'
 
@@ -22,10 +22,11 @@ const emit = defineEmits<{
 }>()
 
 const pressing = ref(false)
-const erasing = ref(0)
+/** A long press is erasing the tick: the fade itself is a CSS transition over eraseHold. */
+const erasing = ref(false)
 const bump = ref(false)
 let holdTimer: ReturnType<typeof setTimeout> | undefined
-let raf = 0
+let bumpTimer: ReturnType<typeof setTimeout> | undefined
 let holdStart = 0
 
 const checked = computed(() => props.modelValue)
@@ -39,12 +40,7 @@ function down() {
   pressing.value = true
   if (checked.value) {
     holdStart = performance.now()
-    const loop = () => {
-      erasing.value = Math.min(1, (performance.now() - holdStart) / props.eraseHold)
-      if (erasing.value < 1)
-        raf = requestAnimationFrame(loop)
-    }
-    raf = requestAnimationFrame(loop)
+    erasing.value = true
     holdTimer = setTimeout(() => {
       sfx.play('erase')
       haptic.thud()
@@ -58,17 +54,15 @@ function up() {
   if (!pressing.value)
     return
   const wasChecked = checked.value
-  const held = erasing.value
+  const held = holdStart ? Math.min(1, (performance.now() - holdStart) / props.eraseHold) : 0
   reset()
   if (!wasChecked && !props.disabled && !props.manual) {
     haptic.warning()
-    bump.value = true
-    setTimeout(() => (bump.value = false), 420)
+    pop()
     emit('needsAction')
   }
   else if (!wasChecked && !props.disabled) {
-    bump.value = true
-    setTimeout(() => (bump.value = false), 420)
+    pop()
     sfx.play('check')
     void haptic.check()
     emit('update:modelValue', true)
@@ -78,19 +72,31 @@ function up() {
   }
 }
 
+function pop() {
+  bump.value = true
+  clearTimeout(bumpTimer)
+  bumpTimer = setTimeout(() => (bump.value = false), 420)
+}
+
 function reset() {
   pressing.value = false
-  erasing.value = 0
+  erasing.value = false
+  holdStart = 0
   clearTimeout(holdTimer)
-  cancelAnimationFrame(raf)
 }
+
+onBeforeUnmount(() => {
+  clearTimeout(holdTimer)
+  clearTimeout(bumpTimer)
+})
 </script>
 
 <template>
   <button
     type="button"
     class="ink-check relative inline-flex flex-col items-center gap-1.5 outline-none"
-    :class="{ 'is-checked': checked, 'is-pressing': pressing, 'is-bump': bump, 'is-disabled': disabled }"
+    :class="{ 'is-checked': checked, 'is-pressing': pressing, 'is-bump': bump, 'is-disabled': disabled, 'is-erasing': erasing }"
+    :style="{ '--erase': `${eraseHold}ms` }"
     :aria-pressed="checked"
     :aria-label="label"
     @pointerdown.prevent="down"
@@ -101,7 +107,7 @@ function reset() {
     <span v-if="label" class="t-label text-[0.72rem]" :class="variant === 'done' ? 'font-extrabold' : ''">{{ label }}</span>
     <svg :width="size" :height="size" viewBox="0 0 100 100" class="overflow-visible">
       <rect x="8" y="8" width="84" height="84" fill="var(--color-sheet)" stroke="var(--color-ink)" :stroke-width="variant === 'done' ? 6 : 5" />
-      <rect v-if="erasing > 0" x="8" y="8" width="84" height="84" fill="var(--color-ink)" :opacity="erasing * 0.12" />
+      <rect x="8" y="8" width="84" height="84" fill="var(--color-ink)" class="smudge" />
       <!-- the ink check: overshoots the frame like a pen check would -->
       <path
         class="tick"
@@ -112,7 +118,6 @@ function reset() {
         stroke-width="10"
         stroke-linecap="round"
         stroke-linejoin="round"
-        :style="{ opacity: 1 - erasing * 0.85 }"
       />
       <circle class="blot" cx="20" cy="50" r="6" fill="var(--color-ink)" />
     </svg>
@@ -134,6 +139,23 @@ function reset() {
 
 .is-disabled {
   opacity: 0.32;
+}
+
+/* Long press to erase: the smudge darkens and the tick fades over the hold, on the compositor. */
+.smudge {
+  opacity: 0;
+}
+
+.is-erasing .smudge {
+  opacity: 0.12;
+  transition: opacity var(--erase) linear;
+}
+
+.is-erasing .tick {
+  opacity: 0.15;
+  transition:
+    stroke-dashoffset 380ms var(--ease-ink) 40ms,
+    opacity var(--erase) linear;
 }
 
 .tick {

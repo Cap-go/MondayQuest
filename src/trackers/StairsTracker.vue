@@ -25,6 +25,7 @@ const altitude = ref(0)
 let lastAlt: number | null = null
 let ascent = 0
 let handle: PluginListenerHandle | undefined
+let unmounted = false
 
 function addFloors(n: number) {
   const floors = Math.max(0, data.value.floors + n)
@@ -46,10 +47,12 @@ async function toggle() {
   if (!isAvailable)
     return
   await CapacitorBarometer.requestPermissions().catch(() => {})
+  if (unmounted)
+    return
   tracking.value = true
   lastAlt = null
   ascent = 0
-  handle = await CapacitorBarometer.addListener('measurement', (m) => {
+  const h = await CapacitorBarometer.addListener('measurement', (m) => {
     altitude.value = m.relativeAltitude
     if (lastAlt != null && m.relativeAltitude > lastAlt)
       ascent += m.relativeAltitude - lastAlt
@@ -58,14 +61,21 @@ async function toggle() {
       ascent -= FLOOR_M
       addFloors(1)
     }
-  })
+  }).catch(() => undefined)
+  // Stopped or left while the listener was being added: drop it instead of leaking it.
+  if (unmounted || !tracking.value)
+    return void h?.remove()
+  handle = h
   await CapacitorBarometer.startMeasurementUpdates().catch(() => {})
+  if (unmounted || !tracking.value)
+    void CapacitorBarometer.stopMeasurementUpdates().catch(() => {})
 }
 
 async function stop() {
   tracking.value = false
   await CapacitorBarometer.stopMeasurementUpdates().catch(() => {})
   await handle?.remove()
+  handle = undefined
 }
 
 onMounted(async () => {
@@ -74,10 +84,11 @@ onMounted(async () => {
     return
   const start = new Date().setHours(0, 0, 0, 0)
   const m = await CapacitorPedometer.getMeasurement({ start, end: Date.now() }).catch(() => null)
-  if (m?.floorsAscended && m.floorsAscended > data.value.floors)
+  if (!unmounted && m?.floorsAscended && m.floorsAscended > data.value.floors)
     addFloors(m.floorsAscended - data.value.floors)
 })
 onBeforeUnmount(() => {
+  unmounted = true
   if (tracking.value)
     void stop()
 })

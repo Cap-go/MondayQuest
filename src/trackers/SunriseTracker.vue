@@ -2,7 +2,7 @@
 import type { TrackerProps } from './useDay'
 import { Capacitor } from '@capacitor/core'
 import { CapgoBrightness } from '@capgo/capacitor-brightness'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useL } from '~/composables/useL'
 import { addDays, formatHM, fromISO } from '~/lib/date'
 import { dateOfDay } from '~/lib/progress'
@@ -82,20 +82,34 @@ async function pick() {
 
 function alarm() {
   haptic.press()
-  void setSystemAlarm(alarmHM.value, L(`Sunrise at ${sunrise.value} — up you get!`))
+  void setSystemAlarm(alarmHM.value, L(`Sunrise at ${sunrise.value} — up you get!`), 'sunrise')
 }
+
+// The rays only spin while the drawing is on screen.
+const sky = ref<SVGSVGElement | null>(null)
+const visible = ref(true)
+let observer: IntersectionObserver | undefined
+onMounted(() => {
+  if (!sky.value || typeof IntersectionObserver === 'undefined')
+    return
+  observer = new IntersectionObserver(([e]) => (visible.value = !!e?.isIntersecting))
+  observer.observe(sky.value)
+})
+onBeforeUnmount(() => observer?.disconnect())
 </script>
 
 <template>
   <div>
-    <svg viewBox="0 0 240 130" class="w-full max-w-72 mx-auto block">
+    <svg ref="sky" viewBox="0 0 240 130" class="w-full max-w-72 mx-auto block">
       <defs>
         <clipPath id="sky"><rect x="0" y="0" width="240" height="92" /></clipPath>
       </defs>
       <g clip-path="url(#sky)">
-        <circle cx="120" :cy="sunY" r="22" fill="none" stroke="var(--color-ink)" stroke-width="3" class="sun" />
-        <g v-if="beforeSix" class="rays" stroke="var(--color-ink)" stroke-width="2.5" stroke-linecap="round">
-          <line v-for="i in 8" :key="i" :x1="120 + Math.cos(i * Math.PI / 4) * 30" :y1="sunY + Math.sin(i * Math.PI / 4) * 30" :x2="120 + Math.cos(i * Math.PI / 4) * 38" :y2="sunY + Math.sin(i * Math.PI / 4) * 38" />
+        <g class="sun" :style="{ transform: `translateY(${sunY}px)` }">
+          <circle cx="120" cy="0" r="22" fill="none" stroke="var(--color-ink)" stroke-width="3" />
+          <g v-if="beforeSix" class="rays" :class="{ paused: !visible }" stroke="var(--color-ink)" stroke-width="2.5" stroke-linecap="round">
+            <line v-for="i in 8" :key="i" :x1="120 + Math.cos(i * Math.PI / 4) * 30" :y1="Math.sin(i * Math.PI / 4) * 30" :x2="120 + Math.cos(i * Math.PI / 4) * 38" :y2="Math.sin(i * Math.PI / 4) * 38" />
+          </g>
         </g>
       </g>
       <line x1="10" y1="92" x2="230" y2="92" stroke="var(--color-ink)" stroke-width="3" />
@@ -133,13 +147,17 @@ function alarm() {
 
 <style scoped>
 .sun {
-  transition: cy 900ms var(--ease-out-quint);
+  transition: transform 900ms var(--ease-out-quint);
 }
 
 .rays {
   animation: spin 18s linear infinite;
-  transform-origin: 120px 60px;
+  transform-origin: 120px 0;
   transform-box: view-box;
+}
+
+.rays.paused {
+  animation-play-state: paused;
 }
 
 @keyframes spin {
