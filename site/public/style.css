@@ -17,7 +17,7 @@ nav a{text-decoration:none}
 .btn{display:inline-block;padding:14px 22px;border:3px solid var(--ink);font-family:Archivo,system-ui;font-weight:800;text-transform:uppercase;text-decoration:none;font-size:14px}
 .btn.ink{background:var(--ink);color:var(--paper)}
 .phones{display:flex;gap:14px;justify-content:center}
-.phones img{width:46%;max-width:220px;height:auto;aspect-ratio:430/932;object-fit:cover;border:3px solid var(--ink);border-radius:22px;box-shadow:0 30px 50px -30px rgba(0,0,0,.5)}
+.phones img{width:46%;max-width:220px;height:auto;aspect-ratio:390/760;object-fit:contain;border:3px solid var(--ink);border-radius:22px;box-shadow:0 30px 50px -30px rgba(0,0,0,.5)}
 .phones img:nth-child(2){transform:translateY(40px)}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:96px;border:3px solid var(--ink)}
 .grid>div{padding:22px}
@@ -32,3 +32,9 @@ footer{margin-top:80px;padding-top:20px;border-top:2px solid var(--ink);display:
 .doc h1{font-size:48px;margin:48px 0 24px}
 .doc h2{font-size:20px;margin:32px 0 8px}
 @media (max-width:760px){.hero{grid-template-columns:1fr;margin-top:32px}.phones{margin-bottom:40px}.btn{padding:12px 18px}.btns .btn{flex:1;text-align:center}.grid{grid-template-columns:1fr}.grid>div+div{border-left:0;border-top:3px solid var(--ink)}.levels ol{grid-template-columns:1fr 1fr}}
+
+.nav-links{display:flex;align-items:center;gap:18px}
+.source-link{display:inline-block;margin-bottom:18px;font-size:16px;text-underline-offset:4px}
+@media(max-width:400px){nav{gap:12px}.mark{font-size:13px}.mark img{width:28px;height:28px}.nav-links{gap:10px;font-size:14px}.nav-links .btn{padding:10px;font-size:12px}}
+
+.nav-links{flex-shrink:0;white-space:nowrap}

@@ -12,3 +12,7 @@ Rendered from the real web build at the exact device sizes (run `bunx vite previ
 Add `fr-FR` (or any locale) as the 5th argument for translated screenshots. `store/seed.ts` builds the demo notebook (`bun store/seed.ts > /tmp/mq-seed.json`).
 
 Creative assets (product page header 3840×1646, search result 3840×2560): `store/creative/*.html`, rendered by `store/creative/render.ts` (expects the iPhone screenshots copied next to them as s1–s4.png and the Archivo/Didact fonts).
+
+## Website screenshots
+
+Run `bun add --no-save playwright sharp`, start `bun run dev --port 5288`, then run `bun store/site-screenshots.mjs`. This refreshes the three WebP images in `site/public/img` from the current app with demo progress at 3× resolution. Set `CHROMIUM_PATH` if your Chromium executable is elsewhere. Bump the image query version in `site/public/index.html` after refreshing to invalidate cached images.
