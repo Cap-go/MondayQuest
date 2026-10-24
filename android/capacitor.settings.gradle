@@ -56,6 +56,9 @@ project(':capgo-capacitor-health').projectDir = new File('../node_modules/@capgo
 include ':capgo-capacitor-home-indicator'
 project(':capgo-capacitor-home-indicator').projectDir = new File('../node_modules/@capgo/capacitor-home-indicator/android')
 
+include ':capgo-capacitor-icloud-kv'
+project(':capgo-capacitor-icloud-kv').projectDir = new File('../node_modules/@capgo/capacitor-icloud-kv/android')
+
 include ':capgo-capacitor-in-app-review'
 project(':capgo-capacitor-in-app-review').projectDir = new File('../node_modules/@capgo/capacitor-in-app-review/android')
 

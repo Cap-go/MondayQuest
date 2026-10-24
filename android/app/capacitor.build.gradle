@@ -27,6 +27,7 @@ dependencies {
     implementation project(':capgo-capacitor-file-sharer')
     implementation project(':capgo-capacitor-health')
     implementation project(':capgo-capacitor-home-indicator')
+    implementation project(':capgo-capacitor-icloud-kv')
     implementation project(':capgo-capacitor-in-app-review')
     implementation project(':capgo-capacitor-inappbrowser')
     implementation project(':capgo-capacitor-keep-awake')

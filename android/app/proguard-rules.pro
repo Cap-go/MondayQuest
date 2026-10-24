@@ -12,10 +12,11 @@
 #   public *;
 #}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# R8 release build. Capacitor's consumer rules already keep @CapacitorPlugin
+# classes, Plugin subclasses, and @PluginMethod methods, so the JS bridge
+# still finds them after obfuscation.
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
+
+-keep class ee.forgr.mondayquest.MainActivity { *; }

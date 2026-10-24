@@ -190,6 +190,7 @@ jobs:
             --keystore-store-password "$KEYSTORE_STORE_PASSWORD"
             --android-track production
             --android-release-status completed
+            --submit-to-store-review
             --output-upload
             --output-retention 7d
             -a "$CAPGO_TOKEN"
@@ -209,7 +210,8 @@ jobs:
       github.event_name != 'pull_request' &&
       ((github.event.inputs.release_target || 'auto') == 'native' ||
         ((github.event.inputs.release_target || 'auto') == 'auto' && needs.detect-release.outputs.release_type == 'native')) &&
-      ((github.event.inputs.native_platform || 'both') != 'android')
+      ((github.event.inputs.native_platform || 'both') != 'android') &&
+      (github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[android only]'))
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
