@@ -188,6 +188,8 @@ jobs:
             --keystore-key-alias "$KEYSTORE_KEY_ALIAS"
             --keystore-key-password "$KEYSTORE_KEY_PASSWORD"
             --keystore-store-password "$KEYSTORE_STORE_PASSWORD"
+            --android-track production
+            --android-release-status completed
             --output-upload
             --output-retention 7d
             -a "$CAPGO_TOKEN"
