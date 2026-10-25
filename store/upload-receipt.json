@@ -1,0 +1,132 @@
+{
+  "appId": "6820978787",
+  "version": "1.0.21",
+  "versionId": "8113e494-a073-48eb-a8f1-656815b31b85",
+  "cli": "asc 5.16.1",
+  "displayType": "APP_IPHONE_DUO",
+  "verifiedAt": "2026-10-25T10:49:26.951Z",
+  "localizations": [
+    {
+      "locale": "en-US",
+      "localizationId": "37dd65d2-15c1-4d4f-bb43-d7edb53a60a9",
+      "screenshotSetId": "22dc30d2-e0af-4f39-a465-b18bf6b3c733",
+      "screenshots": [
+        {
+          "id": "1d400019-68fe-8063-8016-1492fb84c155",
+          "name": "1-1-outer-today.png",
+          "md5": "f0bc622f28a6f36586cd8bbbdd6a4a89",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "22000019-68fe-8063-8020-a28163a4afbb",
+          "name": "1-2-outer-levels.png",
+          "md5": "6c643a781e4c07118e0941c946a62baf",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "cc000019-68fe-8063-8007-a7e11d6c3625",
+          "name": "1-3-outer-water.png",
+          "md5": "c2ee0ff93394feb0fba7c17043e86b8c",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "9a400019-68fe-8063-800e-ab2b05ee0b1a",
+          "name": "2-1-inner-portrait-today.png",
+          "md5": "f87ba95ebea5e2609a637c07ffeb0241",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "70400019-68fe-8063-8025-da795c70f8ba",
+          "name": "2-2-inner-portrait-levels.png",
+          "md5": "26bec63e8ef2252ce704ff477754eabd",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "0c800019-68fe-8063-800d-3bc759fab3d7",
+          "name": "2-3-inner-portrait-water.png",
+          "md5": "1afc8eefbc0c2caaabda95a75dd5f671",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "cfc00019-68fe-8063-8017-18597b058af2",
+          "name": "3-1-inner-landscape-today.png",
+          "md5": "cb9ea3a6289259154166e09c4ed273ea",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "b0400019-68fe-8063-8032-b052c41d9ce4",
+          "name": "3-2-inner-landscape-levels.png",
+          "md5": "71d617cc5eb36b95abdb589724e54d14",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "c1400019-68fe-8063-801d-22efdf88df67",
+          "name": "3-3-inner-landscape-water.png",
+          "md5": "d3f7c4ab6bb1cef38ce73ec3e8310ea5",
+          "state": "COMPLETE"
+        }
+      ]
+    },
+    {
+      "locale": "fr-FR",
+      "localizationId": "19972df5-4036-4ceb-b679-8ae9a17f41cb",
+      "screenshotSetId": "d7bbf685-ae2a-4f23-9e77-938c46b67cc4",
+      "screenshots": [
+        {
+          "id": "c1000019-68fe-8063-802d-0a0510e7e279",
+          "name": "1-1-outer-today.png",
+          "md5": "ddcc6cfa4e462780d5e7001170df3dd0",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "eec00019-68fe-8063-8038-b503047cdba8",
+          "name": "1-2-outer-levels.png",
+          "md5": "efad2478cbb62cf00c274bf7a9c086e3",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "72000019-68fe-8063-8022-ad3b96af5760",
+          "name": "1-3-outer-water.png",
+          "md5": "a93326fd26220654fce75ee17608d5d1",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "8cc00019-68fe-8063-802b-23a35de2c640",
+          "name": "2-1-inner-portrait-today.png",
+          "md5": "074133561fea8e75482054263b89a1c8",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "51000019-68fe-8063-801a-f381baa1e41a",
+          "name": "2-2-inner-portrait-levels.png",
+          "md5": "d6edcb5d9b98f3f7c89de62569be7ce4",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "48000019-68fe-8063-8032-c5b3fd17142c",
+          "name": "2-3-inner-portrait-water.png",
+          "md5": "65e9d344137f30b54103d103b1fe5708",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "0ec00019-68fe-8063-8024-044ad4b0b6dd",
+          "name": "3-1-inner-landscape-today.png",
+          "md5": "02cc376d74196c3de7cf2a3a0ea281b4",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "b4800019-68fe-8063-8025-76fa3fd85433",
+          "name": "3-2-inner-landscape-levels.png",
+          "md5": "02a17227a0f41f9f9284800181647b5d",
+          "state": "COMPLETE"
+        },
+        {
+          "id": "34000019-68fe-8063-8021-eda6a7ede800",
+          "name": "3-3-inner-landscape-water.png",
+          "md5": "b750940df1045ce8f6a20cb8d94c2e88",
+          "state": "COMPLETE"
+        }
+      ]
+    }
+  ]
+}

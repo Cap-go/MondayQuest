@@ -59,7 +59,7 @@ function newCustom() {
 </script>
 
 <template>
-  <QuestPage :title="$t('tabs.levels')">
+  <QuestPage :title="$t('tabs.levels')" class="levels-page">
     <h1 class="t-display text-[2.6rem]">
       {{ $t('tabs.levels') }}
     </h1>
@@ -153,6 +153,20 @@ function newCustom() {
 </template>
 
 <style scoped>
+@container (min-width: 800px) {
+  .levels-page :deep(.page-body) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;
+    align-items: start;
+  }
+
+  .levels-page :deep(.page-body) > :not(section) {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
 .joker-chip {
   display: inline-flex;
   align-items: center;

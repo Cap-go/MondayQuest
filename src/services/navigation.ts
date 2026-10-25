@@ -101,6 +101,7 @@ export async function renderTabbar(hidden = false, animated = false) {
     animated,
     selectedId: activeTab.value,
     labels: true,
+    style: { placement: Capacitor.getPlatform() === 'ios' ? 'sidebar' : 'auto' },
     tabs: TABS.map(id => ({
       id,
       title: tabTitle(id),

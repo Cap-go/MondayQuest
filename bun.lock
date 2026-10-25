@@ -32,7 +32,7 @@
         "@capgo/capacitor-keep-awake": "^8.1.20",
         "@capgo/capacitor-light-sensor": "^8.1.23",
         "@capgo/capacitor-native-audio": "^8.4.38",
-        "@capgo/capacitor-native-navigation": "^8.13.2",
+        "@capgo/capacitor-native-navigation": "^8.14.0",
         "@capgo/capacitor-navigation-bar": "^8.2.17",
         "@capgo/capacitor-pedometer": "^8.0.51",
         "@capgo/capacitor-photo-library": "^8.0.32",
@@ -66,6 +66,7 @@
         "@vue/test-utils": "^2.5.1",
         "eslint": "^10.12.0",
         "happy-dom": "^20.14.6",
+        "playwright": "^1.64.1",
         "tailwindcss": "^4.3.3",
         "typescript": "~5.9",
         "vite": "^8.3.4",
@@ -151,7 +152,7 @@
 
     "@capgo/capacitor-native-audio": ["@capgo/capacitor-native-audio@8.4.38", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-BYWrYmFGSAewjZq9X5dLuofawCeQM8bqJ+RlXuN9Eup7W/S64LhT6iGtqcXBssKOwAFV2eo9p9CgDh03HqNx3w=="],
 
-    "@capgo/capacitor-native-navigation": ["@capgo/capacitor-native-navigation@8.13.2", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-IjUdmSEdM/aNkIak4HUq5nNg8AFK8f060d3+y0F5DbuZ2/zAAfaKMGr806jznJ2OC5y+yfJlq6yi5JXAjJlH3w=="],
+    "@capgo/capacitor-native-navigation": ["@capgo/capacitor-native-navigation@8.14.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-U/U4LsvnHJwa4kMFnQP/5LuvZ6xCUbFwE1KZqQz30bf/rSqJFUG0Gth3Kajh4an/W66oy3knxVTSkIqxpLcwxA=="],
 
     "@capgo/capacitor-navigation-bar": ["@capgo/capacitor-navigation-bar@8.2.17", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-g0DhZVOxIDf4huFB0oOEoalJoXYmbWuZnHe+f3LRkXVmVRAIYOPAsGii35KFsOoE457KW6DhjwixAcTGtWxS3w=="],
 
@@ -1004,6 +1005,10 @@
     "pinia": ["pinia@4.0.3", "", { "dependencies": { "nostics": "^1.1.4" }, "peerDependencies": { "@vue/devtools-api": "^8.1.5", "typescript": ">=5.6.0", "vue": "^3.5.11" }, "optionalPeers": ["typescript"] }, "sha512-XMQqpvjgG7LMqVhhFUzKLT4KEbsYbfZZ0CZU9PgdFm1O2VKBmIkykL8+SfNhOaT7sR0wT6BEgKT0YNDYWgmVRA=="],
 
     "pkg-types": ["pkg-types@2.3.3", "", { "dependencies": { "confbox": "^0.3.1", "exsolve": "^1.1.1", "pathe": "^2.0.3" } }, "sha512-j/lCFdcppV0JxWpCEITdbDltBxPP6cHT+yNJ6Go2OgoSA9518X847X9z0p6LtA4Nc16+eQzCZjRrWanTGvHJ5w=="],
+
+    "playwright": ["playwright@1.64.1", "", { "dependencies": { "playwright-core": "1.64.1" }, "bin": { "playwright": "cli.js" } }, "sha512-HCrVhHr5QQuwYoswEUGTb7gGp522yflbv/ST8nF4sFWGuLjQCt17Q/EubpGGSNKYn1tsTCPZxqHhHCfVURu7UA=="],
+
+    "playwright-core": ["playwright-core@1.64.1", "", { "bin": { "playwright-core": "cli.js" } }, "sha512-BC4s8y6SEVA6Q1rSxZTto8hI1KUI3xXlHGZgvGqP4IqPdI/a6FX9H29IDNz7vKo9l21b6LfYosScPL6M3xxyDQ=="],
 
     "plist": ["plist@3.1.1", "", { "dependencies": { "@xmldom/xmldom": "^0.9.10", "base64-js": "^1.5.1", "xmlbuilder": "^15.1.1" } }, "sha512-ZIfcLJC+7E7FBFnDxm9MPmt7D+DidyQ26lewieO75AdhA2ayMtsJSES0iWzqJQbcVRSrTufQoy0DR94xHue0oA=="],
 

@@ -36,7 +36,6 @@ onMounted(() => {
 <style>
 .app-root {
   position: fixed;
-  /* iPhone Duo outer display reports an 84px right inset (status pill + tab bar column). */
   inset: 0 var(--safe-right) 0 var(--safe-left);
   background: var(--color-paper);
   --tabbar-h: var(--cap-native-tabbar-height, 0px);
@@ -47,6 +46,7 @@ onMounted(() => {
 }
 
 .outlet {
+  container-type: inline-size;
   position: absolute;
   inset: 0;
   display: block;

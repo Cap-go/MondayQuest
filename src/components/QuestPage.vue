@@ -69,4 +69,11 @@ onUnmounted(() => cleanup?.())
 .page-flush {
   min-height: 100%;
 }
+
+@container (min-width: 800px) {
+  .page-body {
+    max-width: 1040px;
+    padding-inline: 32px;
+  }
+}
 </style>

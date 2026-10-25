@@ -32,8 +32,8 @@ function go(id: TabId) {
 <style scoped>
 .web-tabbar {
   position: fixed;
-  left: 12px;
-  right: 12px;
+  left: calc(var(--safe-left) + 12px);
+  right: calc(var(--safe-right) + 12px);
   bottom: calc(var(--safe-bottom) + 10px);
   height: 62px;
   display: grid;

@@ -1,0 +1,90 @@
+{
+  "provider": "iOS Simulator via duoctl",
+  "bundle": "ee.forgr.mondayquest",
+  "device": "C5ABAB9E-C068-4680-8940-F5B82B502D0E",
+  "locale": "en-US",
+  "capturedAt": "2026-10-25T10:42:59.609Z",
+  "captures": [
+    {
+      "name": "1-1-outer-today.png",
+      "route": "today",
+      "mode": "outer",
+      "width": 1398,
+      "height": 2034,
+      "sha256": "06fcf38c8ebb9a1a9ac4566f6846be35966d4edb3f635c6ec1970a543873a777",
+      "rawSha256": "a7c970b864b4ccb795e48eb6d71c365b386fc1c85f675bd4bfeafe6923ab9995"
+    },
+    {
+      "name": "1-2-outer-levels.png",
+      "route": "levels",
+      "mode": "outer",
+      "width": 1398,
+      "height": 2034,
+      "sha256": "8543d028fee4a807d106b8960e1ec22908d590a678f73e6a0bb6f90ac134695b",
+      "rawSha256": "ed62461cf3f14bd4adc2c43d6ff1c25bd178f081bdc9ba8aa79c19d2f5a63e1d"
+    },
+    {
+      "name": "1-3-outer-water.png",
+      "route": "challenge/mq16/track",
+      "mode": "outer",
+      "width": 1398,
+      "height": 2034,
+      "sha256": "e5bd9e3a491895db717268456abfce1d233f4f4e1ac74d40b80313bbd071abcc",
+      "rawSha256": "2d6d907ad47af53125a44725fcecb9d2bf70c4caa86e60e2ae041d6c4aa3fe37"
+    },
+    {
+      "name": "2-1-inner-portrait-today.png",
+      "route": "today",
+      "mode": "inner-portrait",
+      "width": 2007,
+      "height": 2853,
+      "sha256": "7100f2204630008be47fbe72b16c5c6e313a2ef9348c0e313f538d993957a359",
+      "rawSha256": "21a7aecd2c0a789353583fb707fcb71e6b8070d13aef1b6d0a3d5abd443f7fa0"
+    },
+    {
+      "name": "2-2-inner-portrait-levels.png",
+      "route": "levels",
+      "mode": "inner-portrait",
+      "width": 2007,
+      "height": 2853,
+      "sha256": "f738eea69170fc5f05f7edb9c39af7e96e30b91f513a8e6cd1ed6723c5ad0b7c",
+      "rawSha256": "2cf038825f179985ca788af6c431897d86314797a47eb268cb4e914b5c3a6d08"
+    },
+    {
+      "name": "2-3-inner-portrait-water.png",
+      "route": "challenge/mq16/track",
+      "mode": "inner-portrait",
+      "width": 2007,
+      "height": 2853,
+      "sha256": "5661bb41679b7a1444580ef35607642e3c8bca2f6ddfd0fdd7a7b465ef893493",
+      "rawSha256": "9dcee036cae058aa5d74c1cab4011e5b1938b69c2b58f0b035e94ba788dca36a"
+    },
+    {
+      "name": "3-1-inner-landscape-today.png",
+      "route": "today",
+      "mode": "inner-landscape",
+      "width": 2853,
+      "height": 2007,
+      "sha256": "9079b56a310bf60603438a4113bf79cffce34f9bb7c8039c9bbe6b297554f865",
+      "rawSha256": "092ee83fcb0019d952b9c5533b891c869eb42f71f03874f2857ec5ca48119506"
+    },
+    {
+      "name": "3-2-inner-landscape-levels.png",
+      "route": "levels",
+      "mode": "inner-landscape",
+      "width": 2853,
+      "height": 2007,
+      "sha256": "d76fa35b1496e3fb20c57942734806d27d77eb8caf5ead761c93cf20c6c6533a",
+      "rawSha256": "3bdefd4e4d3de4ef2b3aa0d4bea37520000f85f3318bdf2bfc681f0a9c8201f1"
+    },
+    {
+      "name": "3-3-inner-landscape-water.png",
+      "route": "challenge/mq16/track",
+      "mode": "inner-landscape",
+      "width": 2853,
+      "height": 2007,
+      "sha256": "8e55abfd80cc202387ac9a30187e29d16167a6a1f0a644b57a006d71b1d050fa",
+      "rawSha256": "aace9bed326e114267df19044590ec6f3c22070c966da29ab5044fdd610c0ab4"
+    }
+  ]
+}

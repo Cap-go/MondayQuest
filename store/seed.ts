@@ -6,7 +6,7 @@ const full = (extra: (i: number) => any) => Array.from({ length: 7 }, (_, i) => 
 const doneRun = (id: string, w: number, extra: (i: number) => any = () => ({})) => ({ id: `${id}-r`, challengeId: id, start: at(w), completedAt: Date.now() - w * 86400000, days: full(extra) })
 const todayIdx = (today.getDay() + 6) % 7
 const live = { id: 'mq06-live', challengeId: 'mq06', start: at(0), days: Array.from({ length: 7 }, (_, i) => ({ done: i < todayIdx, data: i < todayIdx ? { lunch: true, dinner: true } : {} })) }
-const state = {
+export const state = {
   version: 1,
   custom: [],
   jokers: { earned: [{ kind: 'share', at: Date.now() - 86400000 * 3 }], used: [] },
@@ -20,4 +20,5 @@ const state = {
     live,
   ],
 }
-console.log(JSON.stringify(state))
+if (import.meta.main)
+  console.log(JSON.stringify(state))
