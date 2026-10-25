@@ -47,6 +47,8 @@
 	<string>Read your steps and floors to tick your challenges automatically.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Save your meditation minutes to Health.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Your approximate location is used on this phone only to work out the next sunrise for the Rising sun alarm.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your approximate location is used on this phone only to work out the next sunrise for the Rising sun alarm.</string>
 	<key>NSMicrophoneUsageDescription</key>

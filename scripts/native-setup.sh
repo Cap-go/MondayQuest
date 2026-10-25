@@ -21,6 +21,9 @@ if [ -d ios/App ]; then
   plist_set "$INFO" NSHealthShareUsageDescription string "Read your steps and floors to tick your challenges automatically."
   plist_set "$INFO" NSHealthUpdateUsageDescription string "Save your meditation minutes to Health."
   plist_set "$INFO" NSLocationWhenInUseUsageDescription string "Your approximate location is used on this phone only to work out the next sunrise for the Rising sun alarm."
+  # @capacitor/geolocation links a background-location API. App Store Connect
+  # (ITMS-90683) requires this key even though the app only reads location while in use.
+  plist_set "$INFO" NSLocationAlwaysAndWhenInUseUsageDescription string "Your approximate location is used on this phone only to work out the next sunrise for the Rising sun alarm."
   plist_set "$INFO" NSAlarmKitUsageDescription string "Set a real wake-up alarm for the Sunrise challenge, even in silent mode."
   plist_set "$INFO" NSSupportsLiveActivities bool true
   plist_set "$INFO" CapgoWidgetKitAppGroup string group.ee.forgr.mondayquest.widgetkit
