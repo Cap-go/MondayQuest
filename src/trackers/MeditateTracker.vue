@@ -92,8 +92,13 @@ onBeforeUnmount(() => void HomeIndicator.show().catch(() => {}))
     <button class="btn btn-ink mt-3 w-48" :disabled="!editable || done" @click="running ? end() : begin()">
       {{ done ? L('Meditated ✓') : running ? L('Pause') : elapsed ? L('Resume') : L('Sit down') }}
     </button>
-    <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('Screen kept awake · session saved to Health') }}
+    <p v-if="Capacitor.isNativePlatform()" class="t-body text-sm text-graphite mt-3 text-center">
+      <template v-if="Capacitor.getPlatform() === 'ios'">
+        {{ L('With your permission, Monday Quest uses HealthKit to save completed meditation sessions as Mindful Minutes in Apple Health.') }}
+      </template>
+      <template v-else>
+        {{ L('With your permission, completed sessions are saved to Health Connect.') }}
+      </template>
     </p>
 
     <!-- full-screen zen mode -->

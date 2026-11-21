@@ -16,7 +16,7 @@
         "@capacitor/preferences": "^8",
         "@capacitor/splash-screen": "^8",
         "@capacitor/status-bar": "^8",
-        "@capgo/camera-preview": "^8.14.2",
+        "@capgo/camera-preview": "^8.15.4",
         "@capgo/capacitor-accelerometer": "^8.0.52",
         "@capgo/capacitor-alarm": "^8.1.14",
         "@capgo/capacitor-barometer": "^8.0.23",
@@ -120,7 +120,7 @@
 
     "@capacitor/synapse": ["@capacitor/synapse@1.0.4", "", {}, "sha512-/C1FUo8/OkKuAT4nCIu/34ny9siNHr9qtFezu4kxm6GY1wNFxrCFWjfYx5C1tUhVGz3fxBABegupkpjXvjCHrw=="],
 
-    "@capgo/camera-preview": ["@capgo/camera-preview@8.14.2", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-2YmkpIVz8h/2SrB3UOoM83tUWJ0Xy7TzFzp1FFuLj85PwxrQwmJ8K8600M8aF8RmetjYbn4X4qGwxzwwYzXrxQ=="],
+    "@capgo/camera-preview": ["@capgo/camera-preview@8.15.4", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-wYKHyU/BnylXXtS2iVZVGn2fs95tOrlGc29rwvhufLMrpHWNvdsvUi2kYfiCph267YokcPmoTUNVzSdVZEz9VQ=="],
 
     "@capgo/capacitor-accelerometer": ["@capgo/capacitor-accelerometer@8.0.52", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-kSjebwmCw5Qxx9WJjvvarkSMeAPizyHvoELicyv3kOeKcA9gK8EMic2vm4fCzNKA4JT3muvbTftIkLkArAUxMQ=="],
 
