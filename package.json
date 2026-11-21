@@ -36,7 +36,7 @@
     "@capacitor/preferences": "^8",
     "@capacitor/splash-screen": "^8",
     "@capacitor/status-bar": "^8",
-    "@capgo/camera-preview": "^8.14.2",
+    "@capgo/camera-preview": "^8.15.4",
     "@capgo/capacitor-accelerometer": "^8.0.52",
     "@capgo/capacitor-alarm": "^8.1.14",
     "@capgo/capacitor-barometer": "^8.0.23",

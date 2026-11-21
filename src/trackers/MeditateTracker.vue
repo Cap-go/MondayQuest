@@ -25,7 +25,7 @@ const s = useSession(props, {
   subtitle: () => L(`Meditation · ${MIN} min`),
   short: '◯',
   doneBody: () => L(`${MIN} minutes of calm. Come back gently.`),
-  onComplete: () => void logMindful(),
+  onComplete: logMindful,
 })
 const { running, elapsed, progress, done, start, pause } = s
 
@@ -51,7 +51,7 @@ async function end() {
   await HomeIndicator.show().catch(() => {})
 }
 
-async function logMindful() {
+async function logMindful(reachedAt: number) {
   zen.value = false
   void HomeIndicator.show().catch(() => {})
   if (!Capacitor.isNativePlatform())
@@ -61,7 +61,7 @@ async function logMindful() {
     toast.info(Capacitor.getPlatform() === 'ios' ? L('Allow Mindful Minutes in Settings > Health') : L('Allow Mindfulness in Health Connect'), { message: L('To save your sessions in Health.') })
     return
   }
-  await Health.saveSample({ dataType: 'mindfulness', value: MIN, unit: 'minute', startDate: new Date(Date.now() - GOAL).toISOString(), endDate: new Date().toISOString(), mindfulnessSessionType: 'meditation' }).catch(() => {})
+  await Health.saveSample({ dataType: 'mindfulness', value: MIN, unit: 'minute', startDate: new Date(reachedAt - GOAL).toISOString(), endDate: new Date(reachedAt).toISOString(), mindfulnessSessionType: 'meditation' }).catch(() => {})
 }
 
 onBeforeUnmount(() => void HomeIndicator.show().catch(() => {}))
@@ -92,8 +92,13 @@ onBeforeUnmount(() => void HomeIndicator.show().catch(() => {}))
     <button class="btn btn-ink mt-3 w-48" :disabled="!editable || done" @click="running ? end() : begin()">
       {{ done ? L('Meditated ✓') : running ? L('Pause') : elapsed ? L('Resume') : L('Sit down') }}
     </button>
-    <p class="t-body text-xs text-pencil mt-3 text-center">
-      {{ L('Screen kept awake · session saved to Health') }}
+    <p v-if="Capacitor.isNativePlatform()" class="t-body text-sm text-graphite mt-3 text-center">
+      <template v-if="Capacitor.getPlatform() === 'ios'">
+        {{ L('With your permission, Monday Quest uses HealthKit to save completed meditation sessions as Mindful Minutes in Apple Health.') }}
+      </template>
+      <template v-else>
+        {{ L('With your permission, completed sessions are saved to Health Connect.') }}
+      </template>
     </p>
 
     <!-- full-screen zen mode -->

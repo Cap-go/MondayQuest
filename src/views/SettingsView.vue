@@ -223,6 +223,15 @@ function custom() {
       </button>
     </section>
 
+    <section v-if="Capacitor.getPlatform() === 'ios'" class="mt-8">
+      <h2 class="t-label">
+        {{ L('Apple Health') }}
+      </h2>
+      <p class="t-body text-sm text-graphite mt-2">
+        {{ L('With your permission, Monday Quest uses HealthKit to save completed meditation sessions as Mindful Minutes in Apple Health.') }}
+      </p>
+    </section>
+
     <section class="mt-8 sheet p-5">
       <p class="t-label">
         {{ $t('settings.health') }}

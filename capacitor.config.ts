@@ -13,6 +13,9 @@ const config: CapacitorConfig = {
     backgroundColor: '#f6f4ef',
   },
   plugins: {
+    CameraPreview: {
+      iosCallKit: false,
+    },
     SplashScreen: {
       launchAutoHide: false,
       backgroundColor: '#f6f4ef',
