@@ -20,7 +20,7 @@ interface SessionOpts {
   keepAwake?: boolean
   /** Auto-tick the day when the target is reached (default true). */
   autoCheck?: boolean
-  onComplete?: () => void
+  onComplete?: (reachedAt: number) => void
   /** Suggest locking the phone once the Live Activity is up (off when the screen is needed). */
   lockHint?: boolean
   /** Stop the clock at the target (default true). Off when the tracker needs overtime (dance groove). */
@@ -32,7 +32,7 @@ interface SessionOpts {
  * a backup notification if the phone is locked when the time is up.
  */
 export function useSession(props: TrackerProps, opts: SessionOpts) {
-  const day = useDay(props, { elapsed: 0, startedAt: undefined as number | undefined })
+  const day = useDay(props, { elapsed: 0, startedAt: undefined as number | undefined, reachedAt: undefined as number | undefined })
   const key = `${props.run.id}-${props.idx}`
 
   const state = computed<TimerState>(() => ({ elapsed: day.data.value.elapsed ?? 0, startedAt: day.data.value.startedAt }))
@@ -68,6 +68,9 @@ export function useSession(props: TrackerProps, opts: SessionOpts) {
   }
 
   async function pause() {
+    const { startedAt, elapsed } = state.value
+    if (startedAt != null && Date.now() >= startedAt + opts.targetMs - elapsed)
+      day.patch({ reachedAt: startedAt + opts.targetMs - elapsed })
     timer.pause()
     sfx.play('tick')
     void cancelTimerEnd(key)
@@ -85,9 +88,13 @@ export function useSession(props: TrackerProps, opts: SessionOpts) {
   watch(timer.progress, (p) => {
     if (p < 1)
       return
+    const { startedAt, elapsed } = state.value
+    const reachedAt = startedAt != null
+      ? startedAt + opts.targetMs - elapsed
+      : day.data.value.reachedAt ?? Date.now()
     // Target reached: stop the clock so the screen can sleep and pedometers stop with `running`.
     if (opts.stopAtTarget !== false && timer.running.value) {
-      day.patch({ elapsed: opts.targetMs, startedAt: undefined } as any)
+      day.patch({ elapsed: opts.targetMs, startedAt: undefined, reachedAt })
       if (opts.keepAwake)
         void KeepAwake.allowSleep().catch(() => {})
     }
@@ -99,7 +106,7 @@ export function useSession(props: TrackerProps, opts: SessionOpts) {
     void cancelTimerEnd(key)
     if (opts.autoCheck !== false)
       day.markDone()
-    opts.onComplete?.()
+    opts.onComplete?.(reachedAt)
   }, { immediate: true })
 
   onBeforeUnmount(() => {

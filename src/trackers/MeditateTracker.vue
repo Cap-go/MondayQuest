@@ -25,7 +25,7 @@ const s = useSession(props, {
   subtitle: () => L(`Meditation · ${MIN} min`),
   short: '◯',
   doneBody: () => L(`${MIN} minutes of calm. Come back gently.`),
-  onComplete: () => void logMindful(),
+  onComplete: logMindful,
 })
 const { running, elapsed, progress, done, start, pause } = s
 
@@ -51,7 +51,7 @@ async function end() {
   await HomeIndicator.show().catch(() => {})
 }
 
-async function logMindful() {
+async function logMindful(reachedAt: number) {
   zen.value = false
   void HomeIndicator.show().catch(() => {})
   if (!Capacitor.isNativePlatform())
@@ -61,7 +61,7 @@ async function logMindful() {
     toast.info(Capacitor.getPlatform() === 'ios' ? L('Allow Mindful Minutes in Settings > Health') : L('Allow Mindfulness in Health Connect'), { message: L('To save your sessions in Health.') })
     return
   }
-  await Health.saveSample({ dataType: 'mindfulness', value: MIN, unit: 'minute', startDate: new Date(Date.now() - GOAL).toISOString(), endDate: new Date().toISOString(), mindfulnessSessionType: 'meditation' }).catch(() => {})
+  await Health.saveSample({ dataType: 'mindfulness', value: MIN, unit: 'minute', startDate: new Date(reachedAt - GOAL).toISOString(), endDate: new Date(reachedAt).toISOString(), mindfulnessSessionType: 'meditation' }).catch(() => {})
 }
 
 onBeforeUnmount(() => void HomeIndicator.show().catch(() => {}))
